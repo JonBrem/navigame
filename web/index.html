@@ -1,8 +1,45 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <title>Heyo</title>
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Bestes Spiel ^_^</title>
+    <link rel="stylesheet" href="lib/foundation/css/foundation.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div class="row">
+      <div class="small-12 columns">
+        <h1>Navigationsspiel</h1>
+      </div>
+    </div>
+
+    <div class="row" id="content_area">
+    </div>
+
+    <!-- Foundation -->
+    <script src="lib/foundation/js/vendor/jquery.js"></script>
+    <script src="lib/foundation/js/vendor/what-input.js"></script>
+    <script src="lib/foundation/js/vendor/foundation.js"></script>
+
+    <!-- Libs -->
+    <script src="lib/lodash.js"></script> <!-- Templating (and other fancy things, but I don't use those often) -->
+    <script src="lib/fabric.js"></script> <!-- Canvas manipulation -->
+    <script src="lib/hammer.js"></script> <!-- Touch gestures -->
+    <script src="src/utility/load_image.js"></script>
+
+    <!-- Application parts -->
+    <script src="src/navilogger.js"></script>
+    <script src="src/navigameapp.js"></script>
+
+    <script src="src/view_templates/templates.js"></script>
+    <script src="src/view_templates/map.js"></script>
+    <script src="src/view_templates/hidden_image.js"></script>
+
+    <script src="src/view/map_visuals.js"></script>
+
+    <script>
+        let gameApp = new GameApp("content_area");
+        gameApp.startGame();
+    </script>
 </body>
 </html>
