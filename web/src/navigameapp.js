@@ -1,8 +1,11 @@
 var GameApp = (function () {
 
     function GameApp(mainAreaName) {
-        this.mapVisuals = null;;
-        this.mainHTMLObject = $("#" + mainAreaName)
+        this.canvasManager = null;
+        this.mapVisuals = null;
+        this.mapControls = null;
+
+        this.mainHTMLObject = $("#" + mainAreaName);
     }
 
     GameApp.prototype.startGame = function () {
@@ -15,8 +18,14 @@ var GameApp = (function () {
 
         this._compileTemplates();
 
+        this.canvasManager = new CanvasManager();
+        this.canvasManager.init(this.mainHTMLObject);
+
         this.mapVisuals = new MapVisuals();
-        this.mapVisuals.init(this.mainHTMLObject);
+        this.mapVisuals.init(this.canvasManager);
+
+        this.mapControls = new MapControls();
+        this.mapControls.init(this.canvasManager);
 
         Log.log("verbose", "setup finished: ", this);
     };

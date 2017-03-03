@@ -2,6 +2,12 @@ h1 {
     color: #333;
 }
 
+.canvas-container {
+    border: 2px solid #777;
+    border-radius: 6px;
+    padding: 2px;
+}
+
 #my_canvas {
     width: 100%;
 }
