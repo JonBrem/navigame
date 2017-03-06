@@ -60,20 +60,22 @@ var CanvasManager = (function () {
     CanvasManager.prototype.centerImage = function () {
         this._visualsGroup.setLeft(0);
         this._visualsGroup.setTop(0);
-        
+
         this._fabricCanvas.renderAll();
     };
 
     CanvasManager.prototype.moveTo = function (pos) {
-        console.log("? ", pos, this._visualsGroup.left);
-
         this._visualsGroup.setLeft(pos.x);
         this._visualsGroup.setTop(pos.y);
-        
+
         this._fabricCanvas.renderAll();
     };
 
     CanvasManager.prototype.moveBy = function (pos) {
+        let zoomMultiplier = this._fabricCanvas.getZoom();
+        pos.x /= zoomMultiplier;
+        pos.y /= zoomMultiplier;
+
         let prevPos = {x: this._visualsGroup.getLeft(), y: this._visualsGroup.getTop()};
 
         this.moveTo({x: prevPos.x + pos.x, y: prevPos.y + pos.y});
@@ -82,25 +84,26 @@ var CanvasManager = (function () {
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
         this._visualsGroup.setLeft(-center.x);
         this._visualsGroup.setTop(-center.y);
-        
+
         this._visualsGroup.setScaleX(zoomLevel);
-        this._visualsGroup.setScaleY(zoomLevel);        
+        this._visualsGroup.setScaleY(zoomLevel);
 
         this._fabricCanvas.renderAll();
     };
 
-    CanvasManager.prototype.zoomBy = function (zoomLevel, center) {
-        this._visualsGroup.setLeft(-center.x);
-        this._visualsGroup.setTop(-center.y);
-        
-        this._visualsGroup.setScaleX(zoomLevel);
-        this._visualsGroup.setScaleY(zoomLevel);        
+    CanvasManager.prototype.zoomBy = function (zoomDelta, center) {
+        //this._visualsGroup.setLeft(-center.x);
+        //this._visualsGroup.setTop(-center.y);
+
+        let zoomBefore = this._fabricCanvas.getZoom();
+
+        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), zoomDelta + zoomBefore);
 
         this._fabricCanvas.renderAll();
     };
 
     // set new absolute rotation
-    CanvasManager.prototype.setRotation = function (rotation, center) {      
+    CanvasManager.prototype.setRotation = function (rotation, center) {
         let prevRotation = this._visualsGroup.getAngle();
         this.rotateBy(-prevRotation, center, false);
         this.rotateBy(rotation, center, true);

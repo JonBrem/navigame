@@ -34,6 +34,7 @@ var MapControls = (function () {
         $("body").append(this._$controlsDiv);
 
         this._$controlsDiv.on("mousedown", function(e) {that._onMouseDown(e);});
+        this._$controlsDiv.on("wheel", function(e) {that._onScroll(e);});
         $("body").on("mousemove", function(e) {that._onMouseMove(e);});
         $("body").on("mouseup", function(e) {that._onMouseUp(e);});
 
@@ -84,6 +85,16 @@ var MapControls = (function () {
 
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
         }
+    };
+
+    MapControls.prototype._onScroll = function (e) {
+        this._canvasManager.zoomBy(e.originalEvent.wheelDelta / Math.abs(e.originalEvent.wheelDelta) * 0.3,
+         {
+            x: e.originalEvent.offsetX,
+            y: e.originalEvent.offsetY
+         });
+
+        e.preventDefault();
     };
 
     MapControls.prototype._canvasCenter = function () {
