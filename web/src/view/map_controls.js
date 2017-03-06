@@ -67,6 +67,8 @@ var MapControls = (function () {
             this._translating = true;
         }
 
+        console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
+
         this._manipulationStart = {x: e.offsetX, y: e.offsetY};
     };
 

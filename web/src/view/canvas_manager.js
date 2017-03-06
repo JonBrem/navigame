@@ -57,6 +57,18 @@ var CanvasManager = (function () {
         return this._fabricCanvas.upperCanvasEl;
     };
 
+    CanvasManager.prototype.calculatePositionOnMap = function (canvasPos) {
+        let originalPositionFractionX = canvasPos.x / this._fabricCanvas.width;
+        let originalPositionFractionY = canvasPos.y / this._fabricCanvas.height;
+
+        let boundaries = gameApp.canvasManager._fabricCanvas.calcViewportBoundaries();
+
+        let newPosX = boundaries.tl.x + originalPositionFractionX * (boundaries.tr.x - boundaries.tl.x);
+        let newPosY = boundaries.tl.y + originalPositionFractionY * (boundaries.bl.y - boundaries.tl.y);
+
+        return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
+    };
+
     CanvasManager.prototype.centerImage = function () {
         this._visualsGroup.setLeft(0);
         this._visualsGroup.setTop(0);
