@@ -84,6 +84,8 @@ var MarkerControls = (function () {
             originY: "center"
         });
 
+        newMarker.tag = "marker";
+
         this._canvasManager.addToVisualLayer(newMarker);
     };
 

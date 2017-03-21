@@ -88,17 +88,46 @@ var CanvasManager = (function () {
         return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
     };
 
-    CanvasManager.prototype.calculatePositionOnCanvas = function (mapPos) {
-        let originalPositionFractionX = canvasPos.x / this._fabricCanvas.width;
-        let originalPositionFractionY = canvasPos.y / this._fabricCanvas.height;
-
-        let boundaries = this._fabricCanvas.calcViewportBoundaries();
-
-        let newPosX = boundaries.tl.x + originalPositionFractionX * (boundaries.tr.x - boundaries.tl.x);
-        let newPosY = boundaries.tl.y + originalPositionFractionY * (boundaries.bl.y - boundaries.tl.y);
-
-        return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
+    CanvasManager.prototype.isClickOnMap = function (mapPosition) {
+        return !(this.isClickOnRoute(mapPosition) || this.isClickOnMarker(mapPosition));
     };
+
+    CanvasManager.prototype.isClickOnRoute = function (mapPosition) {
+        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
+            let obj = this._visualsGroup._objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "route") {
+                let routeLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
+                let routeTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
+
+                if (mapPosition.x >= routeLeft && mapPosition.x <= routeLeft + obj.width &&
+                    mapPosition.y >= routeTop && mapPosition.y <= routeTop + obj.height) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    CanvasManager.prototype.isClickOnMarker = function (mapPosition) {
+        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
+            let obj = this._visualsGroup._objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
+                let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
+                let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
+
+                if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
+                    mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
 
     /**
      * Positions the map at the center of the canvas.

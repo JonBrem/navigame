@@ -60,16 +60,25 @@ var MapControls = (function () {
             isCtrl = !!ev.ctrlKey;
         }
 
-        if (isCtrl) {
-            this._rotating = true;
-            this._rotationAngle = 0;
-        } else {
-            this._translating = true;
-        }
-
+        let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
         console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
 
-        this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+        if (this._canvasManager.isClickOnMap(positionOnMap)) {
+            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+            if (isCtrl) {
+                this._rotating = true;
+                this._rotationAngle = 0;
+            } else {
+                this._translating = true;
+            }
+        } else if (this._canvasManager.isClickOnMarker(positionOnMap)) {
+            console.log("MARKEEEER");
+        } else if (this._canvasManager.isClickOnRoute(positionOnMap)) {
+
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     MapControls.prototype._onMouseMove = function (e) {
