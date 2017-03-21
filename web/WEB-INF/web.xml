@@ -11,6 +11,12 @@
     
     <servlet-mapping>
         <servlet-name>AppServlet</servlet-name>
-        <url-pattern>/abc/*</url-pattern>
+        <url-pattern>/navigame/*</url-pattern>
     </servlet-mapping>
+
+    <listener>
+        <listener-class>
+            de.ur.iw.navigame.server.AppServlet
+        </listener-class>
+    </listener>
 </web-app>
