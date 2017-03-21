@@ -1,5 +1,6 @@
 package de.ur.iw.navigame.server;
 
+import de.ur.iw.navigame.data_download.AreaLevels;
 import de.ur.iw.navigame.data_download.UniversityAreas;
 import de.ur.iw.navigame.utility.FileStorage;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
@@ -63,7 +64,7 @@ public class AppServlet extends UnifiedServlet implements ServletContextListener
 
         requestHandlers = new HashMap<>();
         requestHandlers.put("areas", new UniversityAreas());
-        requestHandlers.put("detail", new UniversityAreas());
+        requestHandlers.put("area_levels", new AreaLevels());
     }
 
     /**

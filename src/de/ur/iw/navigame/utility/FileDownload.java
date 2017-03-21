@@ -1,9 +1,8 @@
 package de.ur.iw.navigame.utility;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -12,7 +11,7 @@ import java.util.function.Consumer;
 
 public class FileDownload {
 
-    public void Download(String webAddress, Consumer<String> onSuccess, Consumer<Void> onFail) {
+    public void download(String webAddress, Consumer<String> onSuccess, Consumer<Void> onFail) {
         try {
             URLConnection connection = getUrlConnection(webAddress);
             BufferedReader br = getReader(connection);
@@ -26,12 +25,36 @@ public class FileDownload {
         }
     }
 
+
+    public void downloadImage(String webAddress, Consumer<byte[]> onSuccess, Consumer<Void> onFail) {
+        try {
+            URL url = new URL(webAddress);
+            InputStream in = new BufferedInputStream(url.openStream());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buf = new byte[1024];
+
+            int n;
+            while (( n = in.read(buf)) != -1)
+            {
+                out.write(buf, 0, n);
+            }
+            out.close();
+            in.close();
+            byte[] response = out.toByteArray();
+            onSuccess.accept(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            onFail.accept(null);
+        }
+    }
+
     private StringBuilder readLines(BufferedReader br) throws IOException {
         StringBuilder toReturn = new StringBuilder();
         String line;
         while((line = br.readLine()) != null) {
             toReturn.append(line).append('\n');
         }
+        br.close();
         return toReturn;
     }
 

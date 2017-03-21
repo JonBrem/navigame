@@ -3,10 +3,10 @@ package de.ur.iw.navigame.data_download;
 import de.ur.iw.navigame.utility.FileDownload;
 import de.ur.iw.navigame.utility.FileStorage;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import javax.json.*;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class UniversityAreas implements ServletRequestHandler{
     }
 
     private void downloadAreasFile(HttpServletResponse response) {
-        new FileDownload().Download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
+        new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
                 s -> onAreasFileLoaded(s, response),
                 v -> onDownloadError(response));
     }
@@ -39,9 +39,8 @@ public class UniversityAreas implements ServletRequestHandler{
     }
 
     private void readAndPrintAreasInfo(String jsonContents, HttpServletResponse response) {
-        JsonObject fromFile = Json.createReader(new ByteArrayInputStream(jsonContents.getBytes())).readObject();
-        JsonArray responseArray = Json.createArrayBuilder().build();
-        responseArray = readAreasFromFile(fromFile, responseArray);
+        JSONObject fromFile = new JSONObject(jsonContents);
+        JSONArray responseArray = readAreasFromFile(fromFile);
 
         try {
             PrintWriter responseWriter = response.getWriter();
@@ -53,16 +52,18 @@ public class UniversityAreas implements ServletRequestHandler{
         }
     }
 
-    private JsonArray readAreasFromFile(JsonObject fromFile, JsonArray responseArray) {
-        if (fromFile.containsKey("territories")) {
-            JsonArray array = fromFile.getJsonArray("territories");
+    private JSONArray readAreasFromFile(JSONObject fromFile) {
+        JSONArray responseArray = new JSONArray();
 
-            for(int i = 0; i < array.size(); i++) {
-                Set<String> keys = array.getJsonObject(i).keySet();
+        if (fromFile.has("territories")) {
+            JSONArray array = fromFile.getJSONArray("territories");
+
+            for(int i = 0; i < array.length(); i++) {
+                Set<String> keys = array.getJSONObject(i).keySet();
 
                 for(String key : keys) {
                     if (key.equals("Uni Regensburg")) {
-                        responseArray = buildAreasArray(array.getJsonObject(i).getJsonArray(key), i, key);
+                        responseArray = buildAreasArray(array.getJSONObject(i).getJSONArray(key), i, key);
                     }
                 }
             }
@@ -70,17 +71,17 @@ public class UniversityAreas implements ServletRequestHandler{
         return responseArray;
     }
 
-    private JsonArray buildAreasArray(JsonArray uniAreasArray, int i, String key) {
-        JsonArrayBuilder values = Json.createArrayBuilder();
+    private JSONArray buildAreasArray(JSONArray uniAreasArray, int i, String key) {
+        JSONArray values = new JSONArray();
 
-        for(int j = 0; j < uniAreasArray.size(); j++) {
-            JsonObjectBuilder partObject = Json.createObjectBuilder();
-            partObject.add("name", uniAreasArray.getJsonObject(j).getString("name"));
-            partObject.add("filename", uniAreasArray.getJsonObject(j).getString("filename"));
-            values.add(partObject);
+        for(int j = 0; j < uniAreasArray.length(); j++) {
+            JSONObject partObject = new JSONObject();
+            partObject.put("name", uniAreasArray.getJSONObject(j).getString("name"));
+            partObject.put("filename", uniAreasArray.getJSONObject(j).getString("filename"));
+            values.put(partObject);
         }
 
-        return values.build();
+        return values;
     }
 
     private void onDownloadError(HttpServletResponse response) {

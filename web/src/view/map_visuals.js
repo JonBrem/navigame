@@ -14,7 +14,7 @@ var MapVisuals = (function () {
         this._canvasManager = canvasManager;
 
         let that = this;
-        let src = "res/mathe_level1.svg";
+        let src = "mathematik-erdgeschoss.jpg.svg";
         ImageLoader.loadImage(src, {success: that._imageLoaded,
                                  error: function() {Log.log("error", "image could not be loaded: " + src);} })
 

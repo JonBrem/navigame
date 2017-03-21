@@ -23,16 +23,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javax.json-api-1.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/javax.json-1.0.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/json-20160810.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

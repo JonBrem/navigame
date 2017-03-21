@@ -22,6 +22,16 @@ public class FileStorage {
             e.printStackTrace();
         }
     }
+    public static void storeImageFile(String name, byte[] contents) {
+        try {
+            FileOutputStream w = new FileOutputStream(sc.getRealPath("/") + name);
+            w.write(contents);
+            w.flush();
+            w.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static boolean fileExists(String name) {
         return new File(sc.getRealPath("/") + name).exists();
@@ -35,11 +45,28 @@ public class FileStorage {
             while((line = reader.readLine()) != null) {
                 b.append(line).append("\n");
             }
+            reader.close();
             onSuccess.accept(b.toString());
         } catch (IOException e) {
             e.printStackTrace();
             onFail.accept(null);
         }
+    }
+
+    public static String loadFileNoCallback(String name) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(sc.getRealPath("/") + name));
+            StringBuilder b = new StringBuilder();
+            String line;
+            while((line = reader.readLine()) != null) {
+                b.append(line).append("\n");
+            }
+            reader.close();
+            return b.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
