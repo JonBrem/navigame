@@ -37,31 +37,50 @@ var CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
+    /**
+     * @return {Number} the canvas's (coordinate system) width.
+     */
     CanvasManager.prototype.canvasWidth = function () {
         return this._fabricCanvas.width;
     };
 
+    /**
+     * @return {Number} the canvas's (coordinate system) height.
+     */
     CanvasManager.prototype.canvasHeight = function () {
         return this._fabricCanvas.height;
     };
 
+    /**
+     * @return {Number} the canvas's (html element) width.
+     */
     CanvasManager.prototype.elementWidth = function () {
         return $(this._fabricCanvas.upperCanvasEl).width();
     };
 
+    /**
+     * @return {Number} the canvas's (html element) height.
+     */
     CanvasManager.prototype.elementHeight = function () {
         return $(this._fabricCanvas.upperCanvasEl).height();
     };
 
+    /**
+     * @return {HTMLElement} the canvas's html element.
+     */
     CanvasManager.prototype.canvasElement = function () {
         return this._fabricCanvas.upperCanvasEl;
     };
 
+    /**
+     * @param  {object with keys x, y} canvasPos 
+     * @return {[canvas.Point]} point in transformed coordinates.
+     */
     CanvasManager.prototype.calculatePositionOnMap = function (canvasPos) {
         let originalPositionFractionX = canvasPos.x / this._fabricCanvas.width;
         let originalPositionFractionY = canvasPos.y / this._fabricCanvas.height;
 
-        let boundaries = gameApp.canvasManager._fabricCanvas.calcViewportBoundaries();
+        let boundaries = this._fabricCanvas.calcViewportBoundaries();
 
         let newPosX = boundaries.tl.x + originalPositionFractionX * (boundaries.tr.x - boundaries.tl.x);
         let newPosY = boundaries.tl.y + originalPositionFractionY * (boundaries.bl.y - boundaries.tl.y);
@@ -69,6 +88,21 @@ var CanvasManager = (function () {
         return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
     };
 
+    CanvasManager.prototype.calculatePositionOnCanvas = function (mapPos) {
+        let originalPositionFractionX = canvasPos.x / this._fabricCanvas.width;
+        let originalPositionFractionY = canvasPos.y / this._fabricCanvas.height;
+
+        let boundaries = this._fabricCanvas.calcViewportBoundaries();
+
+        let newPosX = boundaries.tl.x + originalPositionFractionX * (boundaries.tr.x - boundaries.tl.x);
+        let newPosY = boundaries.tl.y + originalPositionFractionY * (boundaries.bl.y - boundaries.tl.y);
+
+        return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
+    };
+
+    /**
+     * Positions the map at the center of the canvas.
+     */
     CanvasManager.prototype.centerImage = function () {
         this._visualsGroup.setLeft(0);
         this._visualsGroup.setTop(0);
@@ -76,6 +110,10 @@ var CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
+    /**
+     * Moves the map to the specified position (position of top left corner)
+     * @param  {object with keys x, y} pos Coordinates to move to
+     */
     CanvasManager.prototype.moveTo = function (pos) {
         this._visualsGroup.setLeft(pos.x);
         this._visualsGroup.setTop(pos.y);
@@ -83,16 +121,26 @@ var CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
-    CanvasManager.prototype.moveBy = function (pos) {
+    /**
+     * Moves the map by the values.
+     * @param  {object with keys x, y} moveBy x and y values to move by, will be
+     * mutated. 
+     */
+    CanvasManager.prototype.moveBy = function (moveBy) {
         let zoomMultiplier = this._fabricCanvas.getZoom();
-        pos.x /= zoomMultiplier;
-        pos.y /= zoomMultiplier;
+        moveBy.x /= zoomMultiplier;
+        moveBy.y /= zoomMultiplier;
 
         let prevPos = {x: this._visualsGroup.getLeft(), y: this._visualsGroup.getTop()};
 
-        this.moveTo({x: prevPos.x + pos.x, y: prevPos.y + pos.y});
+        this.moveTo({x: prevPos.x + moveBy.x, y: prevPos.y + moveBy.y});
     };
 
+    /**
+     * Sets the zoom level and the center position.
+     * @param  {Number} zoomLevel new zoom level
+     * @param  {object with keys x, y} center center of the zoom.
+     */
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
         this._visualsGroup.setLeft(-center.x);
         this._visualsGroup.setTop(-center.y);
@@ -103,6 +151,12 @@ var CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
+
+    /**
+     * Zooms by zoomDelta with "center" as the zoom center.
+     * @param  {Number} zoomDelta change in zoom level.
+     * @param  {object with keys x, y} center center of the zoom.
+     */
     CanvasManager.prototype.zoomBy = function (zoomDelta, center) {
         //this._visualsGroup.setLeft(-center.x);
         //this._visualsGroup.setTop(-center.y);
@@ -114,14 +168,25 @@ var CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
-    // set new absolute rotation
+    /**
+     * Set absolute rotation of the map.
+     * 
+     * @param {Number}  rotation    new rotation
+     * @param {object with keys x, y}   center  center of the rotation
+     */
     CanvasManager.prototype.setRotation = function (rotation, center) {
         let prevRotation = this._visualsGroup.getAngle();
         this.rotateBy(-prevRotation, center, false);
         this.rotateBy(rotation, center, true);
     };
 
-    // relative rotation
+
+    /**
+     * Set relative rotation of the map.
+     * @param {Number}  rotation    change in rotation
+     * @param {object with keys x, y}   center  center of the rotation
+     * @param {updateRender} updateRender  whether or not to re-render after this function (default is true)
+     */
     CanvasManager.prototype.rotateBy = function (rotation, center, updateRender) {
         if (!updateRender)
             updateRender = true;
@@ -188,8 +253,17 @@ var CanvasManager = (function () {
             originX: 'left',
             originY: 'top',
             lockMovementX: true,
-            lockMovementY: true
+            lockMovementY: true,
         });
+
+        // only to get a background color:
+        this._visualsGroup.add(new fabric.Rect({
+            left: this._visualsGroup.width / (-2),
+            top: this._visualsGroup.height / (-2),
+            width: this._visualsGroup.width, 
+            height: this._visualsGroup.height,
+            fill: "#ffffff"
+        }));
 
         this._visualsGroup.hasBorders = false;
         this._visualsGroup.hasControls = false;

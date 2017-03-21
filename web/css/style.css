@@ -1,10 +1,14 @@
+body {
+    background: url('../res/background.png');
+    background-repeat: repeat;
+}
+
 h1 {
     color: #333;
 }
 
 .canvas-container {
-    border: 2px solid #777;
-    border-radius: 6px;
+    background: #cccccc;
     padding: 2px;
 }
 

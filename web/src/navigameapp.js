@@ -4,6 +4,7 @@ var GameApp = (function () {
         this.canvasManager = null;
         this.mapVisuals = null;
         this.mapControls = null;
+        this.markerControls = null;
 
         this.mainHTMLObject = $("#" + mainAreaName);
     }
@@ -26,6 +27,9 @@ var GameApp = (function () {
 
         this.mapControls = new MapControls();
         this.mapControls.init(this.canvasManager);
+
+        this.markerControls = new MarkerControls();
+        this.markerControls.init(this.mainHTMLObject, this.canvasManager);
 
         Log.log("verbose", "setup finished: ", this);
     };
