@@ -111,8 +111,9 @@ var CanvasManager = (function () {
     };
 
     CanvasManager.prototype.isClickOnMarker = function (mapPosition) {
-        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
-            let obj = this._visualsGroup._objects[i];
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 0; i < objects.length; i++) {
+            let obj = objects[i];
 
             if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
                 let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
@@ -121,6 +122,25 @@ var CanvasManager = (function () {
                 if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
                     mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
                     return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    CanvasManager.prototype.getClickedMarker = function (mapPosition) {
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 0; i < objects.length; i++) {
+            let obj = objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
+                let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
+                let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
+
+                if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
+                    mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
+                    return obj;
                 }
             }
         }
@@ -143,9 +163,17 @@ var CanvasManager = (function () {
      * Moves the map to the specified position (position of top left corner)
      * @param  {object with keys x, y} pos Coordinates to move to
      */
-    CanvasManager.prototype.moveTo = function (pos) {
-        this._visualsGroup.setLeft(pos.x);
-        this._visualsGroup.setTop(pos.y);
+    CanvasManager.prototype.moveTo = function (pos, moveWhat) {
+        if (moveWhat == null)
+            moveWhat = this._visualsGroup;
+
+        moveWhat.setLeft(pos.x);
+        moveWhat.setTop(pos.y);
+
+        if (moveWhat != this._visualsGroup) {
+            this._visualsGroup.remove(moveWhat);
+            this._visualsGroup.add(moveWhat);
+        }
 
         this._fabricCanvas.renderAll();
     };
@@ -155,14 +183,24 @@ var CanvasManager = (function () {
      * @param  {object with keys x, y} moveBy x and y values to move by, will be
      * mutated. 
      */
-    CanvasManager.prototype.moveBy = function (moveBy) {
+    CanvasManager.prototype.moveBy = function (moveBy, moveWhat) {
+        if (moveWhat == null)
+            moveWhat = this._visualsGroup;
+
         let zoomMultiplier = this._fabricCanvas.getZoom();
         moveBy.x /= zoomMultiplier;
         moveBy.y /= zoomMultiplier;
 
-        let prevPos = {x: this._visualsGroup.getLeft(), y: this._visualsGroup.getTop()};
+        if (moveWhat != null) {
+            let newX = Math.cos(-this._visualsGroup.angle * Math.PI / 180) * moveBy.x - Math.sin(-this._visualsGroup.angle * Math.PI / 180) * moveBy.y;
+            let newY = Math.sin(-this._visualsGroup.angle * Math.PI / 180) * moveBy.x + Math.cos(-this._visualsGroup.angle * Math.PI / 180) * moveBy.y;
+            moveBy.x = newX;
+            moveBy.y = newY;
+        }
 
-        this.moveTo({x: prevPos.x + moveBy.x, y: prevPos.y + moveBy.y});
+        let prevPos = {x: moveWhat.getLeft(), y: moveWhat.getTop()};
+
+        this.moveTo({x: prevPos.x + moveBy.x, y: prevPos.y + moveBy.y}, moveWhat);
     };
 
     /**

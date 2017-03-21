@@ -6,8 +6,14 @@ var MarkerControls = (function () {
         this._canvasManager = null;
         this._htmlElement = null;
 
+        this._$mapControlsDiv = null;
         this._$controlsWrapper = null;
         this._$newMarkerDroppable = null;
+
+        this._markerClicked = false;
+        this._markerMoving = false;
+        this._clickedMarker = null;
+        this._manipulationStart = null;
 
         that = this;
     }
@@ -21,10 +27,12 @@ var MarkerControls = (function () {
         $contentArea.append(this._htmlElement);
 
         this._$controlsWrapper = $("#controls-section");
+        this._$mapControlsDiv = $("#map_controls_inv_layer");
 
         let that = this;
 
         this._setupControls();
+        this._setupMapMarkerControls();
 
         Log.log("verbose", "Finished Initializing Marker Controls", this);
     };
@@ -43,6 +51,14 @@ var MarkerControls = (function () {
         let that = this;
         this._$newMarkerDroppable.on("dragstart", function(event, ui) {that._onNewMarkerDragStart(event, ui);});
         this._$newMarkerDroppable.on("dragstop", function(event, ui) {that._onNewMarkerDragStop(event, ui);});
+    };
+
+    MarkerControls.prototype._setupMapMarkerControls = function () {
+        let that = this;
+
+        this._$mapControlsDiv.on("mousedown", function(e) {that._onMapMouseDown(e);});
+        $("body").on("mousemove", function(e) {that._onMapMouseMove(e);});
+        $("body").on("mouseup", function(e) {that._onMapMouseUp(e);});
     };
 
     MarkerControls.prototype._onNewMarkerDragStart = function (event, ui) {
@@ -87,6 +103,49 @@ var MarkerControls = (function () {
         newMarker.tag = "marker";
 
         this._canvasManager.addToVisualLayer(newMarker);
+    };
+
+    MarkerControls.prototype._onMapMouseDown = function (e) {
+        let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
+
+        if (this._canvasManager.isClickOnMarker(positionOnMap)) {
+            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+        
+            this._markerClicked = true;
+            this._clickedMarker = this._canvasManager.getClickedMarker(positionOnMap);
+            this._markerMoving = false;
+        
+        } else {
+            this._markerClicked = false;
+            this._markerMoving = false;
+        }
+    };
+
+    MarkerControls.prototype._onMapMouseMove = function (e) {
+        if (this._markerClicked) {
+            this._markerMoving = true;
+
+            this._canvasManager.moveBy(
+             {
+                x: e.offsetX - this._manipulationStart.x,
+                y: e.offsetY - this._manipulationStart.y
+             }, this._clickedMarker);
+
+            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+        } else {
+            this._markerMoving = false;
+        }
+    };
+
+    MarkerControls.prototype._onMapMouseUp = function (e) {
+        if (this._markerMoving) {
+            // re-positioned
+        } else if (this._markerClicked) {
+            // manipulate marker
+        }
+
+        this._markerClicked = false;
+        this._markerMoving = false;
     };
 
     return MarkerControls;

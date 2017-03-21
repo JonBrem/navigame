@@ -61,7 +61,7 @@ var MapControls = (function () {
         }
 
         let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
-        console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
+        // console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
 
         if (this._canvasManager.isClickOnMap(positionOnMap)) {
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
@@ -71,14 +71,18 @@ var MapControls = (function () {
             } else {
                 this._translating = true;
             }
-        } else if (this._canvasManager.isClickOnMarker(positionOnMap)) {
-            console.log("MARKEEEER");
-        } else if (this._canvasManager.isClickOnRoute(positionOnMap)) {
-
         }
 
         e.preventDefault();
         e.stopPropagation();
+    };
+
+    MapControls.prototype.onMarkerMouseDown = function() {
+
+    };
+
+    MapControls.prototype.onRouteMouseDown = function() {
+
     };
 
     MapControls.prototype._onMouseMove = function (e) {

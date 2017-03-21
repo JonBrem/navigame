@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c7e893c5-d0f6-4414-b9ff-c7f82d86a1c4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/canvas_manager.js" afterPath="$PROJECT_DIR$/web/src/view/canvas_manager.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_controls.js" afterPath="$PROJECT_DIR$/web/src/view/map_controls.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/marker_controls.js" afterPath="$PROJECT_DIR$/web/src/view/marker_controls.js" />
@@ -678,12 +677,12 @@
       <workItem from="1488904024345" duration="605000" />
       <workItem from="1489843665425" duration="109000" />
       <workItem from="1490025114257" duration="615000" />
-      <workItem from="1490048876419" duration="7265000" />
+      <workItem from="1490048876419" duration="9567000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="39015000" />
+    <option name="totallyTimeSpent" value="41317000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1911" y="-9" width="1618" height="868" extended-state="6" />
