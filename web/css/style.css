@@ -1,3 +1,14 @@
+/*
+material colors: 
+    #2196F3;
+    #03A9F4;
+    #00BCD4;
+    #4CAF50;
+    #9C27B0;
+    #F44336;
+    #607D8B; 
+ */
+
 body {
     background: url('../res/background.png');
     background-repeat: repeat;
@@ -14,4 +25,8 @@ h1 {
 
 #my_canvas {
     width: 100%;
+}
+
+.new_marker_container {
+    border-right: 2px solid #607d8b;
 }

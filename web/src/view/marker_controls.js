@@ -10,6 +10,11 @@ var MarkerControls = (function () {
         this._$controlsWrapper = null;
         this._$newMarkerDroppable = null;
 
+        this._$markerManipulationArea = null;
+
+        this._$markerEditButton = null;
+        this._$markerDeleteButton = null;
+
         this._markerClicked = false;
         this._markerMoving = false;
         this._clickedMarker = null;
@@ -28,6 +33,8 @@ var MarkerControls = (function () {
 
         this._$controlsWrapper = $("#controls-section");
         this._$mapControlsDiv = $("#map_controls_inv_layer");
+
+        this._$markerManipulationArea = $("#marker_fill_rest");
 
         let that = this;
 
@@ -105,6 +112,25 @@ var MarkerControls = (function () {
         this._canvasManager.addToVisualLayer(newMarker);
     };
 
+    MarkerControls.prototype._onMarkerSelected = function (marker) {
+        this._$markerManipulationArea.html(compiledTemplates["marker_selected_detail"]());
+
+        this._$markerEditButton = this._$markerManipulationArea.find(".marker-edit-button");
+        this._$markerDeleteButton = this._$markerManipulationArea.find(".marker-delete-button");
+
+        let that = this;
+        this._$markerEditButton.on('click', function(e) {that._startEditingMarker(marker)});
+        this._$markerDeleteButton.on('click', function(e) {that._deleteMarker(marker)});
+    };
+
+    MarkerControls.prototype._startEditingMarker = function (marker) {
+
+    };
+
+    MarkerControls.prototype._deleteMarker = function (marker) {
+        this._canvasManager.removeFromVisualLayer(marker);
+    };
+
     MarkerControls.prototype._onMapMouseDown = function (e) {
         let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
 
@@ -142,6 +168,7 @@ var MarkerControls = (function () {
             // re-positioned
         } else if (this._markerClicked) {
             // manipulate marker
+            this._onMarkerSelected(this._clickedMarker);
         }
 
         this._markerClicked = false;

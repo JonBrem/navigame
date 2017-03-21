@@ -33,7 +33,13 @@ var CanvasManager = (function () {
     };
 
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
+        fabricObj.angle = -this._visualsGroup.angle;
         this._visualsGroup.add(fabricObj);
+        this._fabricCanvas.renderAll();
+    };
+
+    CanvasManager.prototype.removeFromVisualLayer = function (fabricObj) {
+        this._visualsGroup.removeWithUpdate(fabricObj);
         this._fabricCanvas.renderAll();
     };
 
@@ -245,6 +251,7 @@ var CanvasManager = (function () {
         let prevRotation = this._visualsGroup.getAngle();
         this.rotateBy(-prevRotation, center, false);
         this.rotateBy(rotation, center, true);
+        this._rotateMarkersUpwards();
     };
 
 
@@ -289,6 +296,8 @@ var CanvasManager = (function () {
         this._visualsGroup.setTop(newCenter.y - this._visualsGroup.height / 2.0);
         this._visualsGroup.setAngle(prevRotation + rotation);
 
+        this._rotateMarkersUpwards();
+
         if (updateRender)
             this._fabricCanvas.renderAll();
     };
@@ -305,6 +314,19 @@ var CanvasManager = (function () {
             nx = (cos * (point.x - center.x)) + (sin * (point.y - center.y)) + center.x,
             ny = (cos * (point.y - center.y)) - (sin * (point.x - center.x)) + center.y;
         return {x: nx, y: ny};
+    };
+
+    CanvasManager.prototype._rotateMarkersUpwards = function () {
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 2; i < objects.length; i++) {
+            objects[i].setAngle(-this._visualsGroup.angle);
+            this._updatePartOfGroup(objects[i]);
+        }
+    };
+
+    CanvasManager.prototype._updatePartOfGroup = function (fabricObj) {
+        this._visualsGroup.remove(fabricObj);
+        this._visualsGroup.add(fabricObj);
     };
 
     CanvasManager.prototype._initVisualLayer = function () {
