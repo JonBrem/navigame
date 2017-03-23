@@ -1,4 +1,4 @@
-var MarkerControls = (function () {
+navigame.MarkerControls = (function () {
 
     let that = null;
 
@@ -108,6 +108,8 @@ var MarkerControls = (function () {
         });
 
         newMarker.tag = "marker";
+
+        $(this).trigger("markerCreated", [newMarker]);
 
         this._canvasManager.addToVisualLayer(newMarker);
     };

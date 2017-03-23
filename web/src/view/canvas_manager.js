@@ -1,4 +1,4 @@
-var CanvasManager = (function () {
+navigame.CanvasManager = (function () {
 
     let that = null;
 
@@ -197,7 +197,7 @@ var CanvasManager = (function () {
         moveBy.x /= zoomMultiplier;
         moveBy.y /= zoomMultiplier;
 
-        if (moveWhat != null) {
+        if (moveWhat != this._visualsGroup) {
             let newX = Math.cos(-this._visualsGroup.angle * Math.PI / 180) * moveBy.x - Math.sin(-this._visualsGroup.angle * Math.PI / 180) * moveBy.y;
             let newY = Math.sin(-this._visualsGroup.angle * Math.PI / 180) * moveBy.x + Math.cos(-this._visualsGroup.angle * Math.PI / 180) * moveBy.y;
             moveBy.x = newX;

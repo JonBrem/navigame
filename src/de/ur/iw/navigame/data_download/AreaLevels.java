@@ -41,6 +41,15 @@ public class AreaLevels implements ServletRequestHandler {
         String xmlPart = new JSONObject(jsonContents).getString("xml");
         JSONObject asObject = XML.toJSONObject(xmlPart);
 
+        // ensure the data structure is always the same:
+        JSONObject graph = asObject.getJSONObject("graph");
+        Object levelContainer = graph.get("level");
+        if (levelContainer instanceof JSONObject) {
+            JSONArray levelArray = new JSONArray();
+            levelArray.put(levelContainer);
+            graph.put("level", levelArray);
+        }
+
         downloadImagesUnlessLoaded(whichArea, asObject, response);
     }
 

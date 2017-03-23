@@ -1,4 +1,4 @@
-var MapVisuals = (function () {
+navigame.MapVisuals = (function () {
 
     let that = null;
 

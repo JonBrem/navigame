@@ -1,4 +1,4 @@
-var MapControls = (function () {
+navigame.MapControls = (function () {
 
     function MapControls() {
         this._canvasManager = null; 

@@ -1,6 +1,6 @@
 templates.marker_controls = 
        ['<div class="card small-12 columns" id="controls-section">',
-        '   <div class="card-divider">',
+        '   <div class="card-divider row">',
         '       Controls',
         '   </div>',
         '   <div class="card-section row">',

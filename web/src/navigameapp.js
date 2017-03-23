@@ -1,10 +1,16 @@
-var GameApp = (function () {
+var navigame = {};
+window.navigame = navigame;
+
+navigame.GameApp = (function () {
 
     function GameApp(mainAreaName) {
         this.canvasManager = null;
         this.mapVisuals = null;
         this.mapControls = null;
         this.markerControls = null;
+
+        this.pathManager = null;
+        this.mapSelectionHandler = null;
 
         this.mainHTMLObject = $("#" + mainAreaName);
     }
@@ -19,17 +25,22 @@ var GameApp = (function () {
 
         this._compileTemplates();
 
-        this.canvasManager = new CanvasManager();
+        this.canvasManager = new navigame.CanvasManager();
         this.canvasManager.init(this.mainHTMLObject);
 
-        this.mapVisuals = new MapVisuals();
+        this.mapVisuals = new navigame.MapVisuals();
         this.mapVisuals.init(this.canvasManager);
 
-        this.mapControls = new MapControls();
+        this.mapControls = new navigame.MapControls();
         this.mapControls.init(this.canvasManager);
 
-        this.markerControls = new MarkerControls();
+        this.markerControls = new navigame.MarkerControls();
         this.markerControls.init(this.mainHTMLObject, this.canvasManager);
+
+        this.pathManager = new navigame.PathManager();
+        this.pathManager.init(this.markerControls);
+
+        this.mapSelectionHandler = new navigame.MapSelectionHandler();
 
         Log.log("verbose", "setup finished: ", this);
     };
