@@ -8,6 +8,7 @@ navigame.GameApp = (function () {
         this.mapVisuals = null;
         this.mapControls = null;
         this.markerControls = null;
+        this.edgeControls = null;
         this.mapListVisuals = null;
 
         this.pathManager = null;
@@ -38,14 +39,18 @@ navigame.GameApp = (function () {
         this.markerControls = new navigame.MarkerControls();
         this.markerControls.init(this.$mainHTMLObject, this.canvasManager);
 
+        this.edgeControls = new navigame.EdgeControls();
+        this.edgeControls.init(this.$mainHTMLObject, this.canvasManager);
+
+        this.pathManager = new navigame.PathManager();
+        this.pathManager.init(this.markerControls, this.edgeControls);
+
         this.mapSelectionHandler = new navigame.MapSelectionHandler();
-        this.mapSelectionHandler.init(this.mapVisuals);
+        this.mapSelectionHandler.init(this.mapVisuals, this.pathManager);
 
         this.mapListVisuals = new navigame.MapList();
         this.mapListVisuals.init(this.$mainHTMLObject, this.mapSelectionHandler);
 
-        this.pathManager = new navigame.PathManager();
-        this.pathManager.init(this.markerControls);
 
 
         Log.log("verbose", "setup finished: ", this);

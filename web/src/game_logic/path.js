@@ -7,6 +7,14 @@ navigame.Path = (function () {
         this.endPoint = null;
     }
 
+    Path.prototype.addMap = function(areaName, storeyId) {
+        let newMap = new navigame.MapPath();
+        newMap.areaName = areaName;
+        newMap.storeyId = storeyId;
+
+        this.mapPaths.push(newMap);
+    };
+
     Path.prototype.toJson = function () {
         let asJson = {
             startPoint: this.startPoint,

@@ -3,11 +3,14 @@ navigame.MapSelectionHandler = (function () {
     function MapSelectionHandler() {
         this.mapSelectionDialog = null;
         this.currentArea = null;
+
         this.mapVisuals = null;
+        this.pathManager = null;
     }
 
-    MapSelectionHandler.prototype.init = function(mapVisuals) {
+    MapSelectionHandler.prototype.init = function(mapVisuals, pathManager) {
         this.mapVisuals = mapVisuals;
+        this.pathManager = pathManager;
     };
 
     MapSelectionHandler.prototype.setDialog = function(dialog) {
@@ -61,6 +64,7 @@ navigame.MapSelectionHandler = (function () {
     MapSelectionHandler.prototype.onMapChosen = function(area, storey, imgSrc) {
         this.mapSelectionDialog.closeDialog();
         this.mapVisuals.loadNewMap(imgSrc);
+        this.pathManager.addMap(storey, imgSrc);
     };
 
     MapSelectionHandler.prototype._onAreasLoaded = function(serverResponse) {

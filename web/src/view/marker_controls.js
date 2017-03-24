@@ -109,8 +109,11 @@ navigame.MarkerControls = (function () {
 
         newMarker.tag = "marker";
 
-        $(this).trigger("markerCreated", [newMarker]);
+        newMarker.additionalData = {
+            timeCreated: + new Date() // shorthand for: new Date().getTime()
+        };
 
+        $(this).trigger("markerCreated", [newMarker]);
         this._canvasManager.addToVisualLayer(newMarker);
     };
 
@@ -146,11 +149,16 @@ navigame.MarkerControls = (function () {
         } else {
             this._markerClicked = false;
             this._markerMoving = false;
+
+            if (!this._canvasManager.isClickOnRoute(positionOnMap)) {
+                this._$markerManipulationArea.html('');
+            }
         }
     };
 
     MarkerControls.prototype._onMapMouseMove = function (e) {
-        if (this._markerClicked) {
+        if (this._markerClicked && !(this._manipulationStart.x == e.offsetX &&
+            this._manipulationStart.y == e.offsetY)) {
             this._markerMoving = true;
 
             this._canvasManager.moveBy(

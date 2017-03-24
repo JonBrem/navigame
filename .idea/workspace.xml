@@ -2,18 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c7e893c5-d0f6-4414-b9ff-c7f82d86a1c4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/css/style.css" afterPath="$PROJECT_DIR$/web/css/style.css" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/index.html" afterPath="$PROJECT_DIR$/web/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_path.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_path.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_node.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_node.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/navigameapp.js" afterPath="$PROJECT_DIR$/web/src/navigameapp.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/canvas_manager.js" afterPath="$PROJECT_DIR$/web/src/view/canvas_manager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_list.js" afterPath="$PROJECT_DIR$/web/src/view/map_list.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_selection_dialog.js" afterPath="$PROJECT_DIR$/web/src/view/map_selection_dialog.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_visuals.js" afterPath="$PROJECT_DIR$/web/src/view/map_visuals.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view_templates/map_list.js" afterPath="$PROJECT_DIR$/web/src/view_templates/map_list.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view_templates/map_selection_dialog.js" afterPath="$PROJECT_DIR$/web/src/view_templates/map_selection_dialog.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/marker_controls.js" afterPath="$PROJECT_DIR$/web/src/view/marker_controls.js" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -42,8 +39,8 @@
       <file leaf-file-name="AppServlet.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="37" column="65" lean-forward="true" selection-start-line="37" selection-start-column="65" selection-end-line="37" selection-end-column="65" />
+            <state relative-caret-position="355">
+              <caret line="40" column="86" lean-forward="false" selection-start-line="40" selection-start-column="86" selection-end-line="40" selection-end-column="86" />
               <folding />
             </state>
           </provider>
@@ -719,12 +716,12 @@
       <workItem from="1490268362989" duration="9361000" />
       <workItem from="1490292378753" duration="103000" />
       <workItem from="1490312698592" duration="28000" />
-      <workItem from="1490312730201" duration="2703000" />
+      <workItem from="1490312730201" duration="7203000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="76722000" />
+    <option name="totallyTimeSpent" value="81222000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -1155,8 +1152,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="37" column="65" lean-forward="true" selection-start-line="37" selection-start-column="65" selection-end-line="37" selection-end-column="65" />
+        <state relative-caret-position="355">
+          <caret line="40" column="86" lean-forward="false" selection-start-line="40" selection-start-column="86" selection-end-line="40" selection-end-column="86" />
           <folding />
         </state>
       </provider>

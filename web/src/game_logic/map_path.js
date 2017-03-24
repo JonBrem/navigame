@@ -5,13 +5,35 @@ navigame.MapPath = (function () {
         this.pathEdges = [];
 
         this.areaName = null;
-        this.storyId = null;
+        this.storeyId = null;
     }
+
+    MapPath.prototype.addNode = function (x, y, additionalData) {
+        let newNode = new navigame.PathNode();
+        newNode.xPos = x;
+        newNode.yPos = y;
+        newNode.nodeData = additionalData;
+
+        this.pathNodes.push(newNode);
+
+        if (this.pathNodes.length > 1) {
+            let newEdge = new navigame.PathEdge();
+            newEdge.fromNodeIndex = this.pathNodes.length - 2;
+            newEdge.toNodeIndex = this.pathNodes.length - 1;
+            newEdge.edgeData = {
+                timeCreated: + new Date()
+            };
+
+            this.pathEdges.push(newEdge);
+
+            $(this).trigger('edgeCreated', [this, newEdge]);
+        }
+    };
 
     MapPath.prototype.toJson = function () {
         let asJson = {
             areaName: this.areaName,
-            storyId: this.storyId,
+            storeyId: this.storeyId,
             pathNodes: [],
             pathEdges: []
         };
@@ -29,7 +51,7 @@ navigame.MapPath = (function () {
 
     MapPath.prototype.fromJson = function (obj) {
         this.areaName = obj.areaName;
-        this.storyId = obj.storyId;
+        this.storeyId = obj.storeyId;
 
         this.pathNodes = [];
         for(let i = 0; i < obj.pathNodes.length; i++) {

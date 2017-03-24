@@ -309,6 +309,25 @@ navigame.CanvasManager = (function () {
             this._fabricCanvas.renderAll();
     };
 
+    CanvasManager.prototype.getMarkerByCreationTime = function (timeCreated) {
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 1; i < objects.length; i++) {
+            if ("tag" in objects[i] && objects[i].tag == "marker") {
+                if (objects[i].additionalData.timeCreated == timeCreated) {
+                    return objects[i];
+                }
+            }
+        }
+
+        return null;
+    };
+
+    CanvasManager.prototype.fixEdgeRotation = function (edge) {
+        edge.setAngle(0);
+        this._updatePartOfGroup(edge);
+        this._fabricCanvas.renderAll();
+    };
+
     /*
      * Awesome matrix multiplication ^_^
      * (adjusted, original: http://stackoverflow.com/questions/17410809/how-to-calculate-rotation-in-2d-in-javascript)
@@ -325,9 +344,11 @@ navigame.CanvasManager = (function () {
 
     CanvasManager.prototype._rotateMarkersUpwards = function () {
         let objects = this._visualsGroup.getObjects();
-        for(let i = 2; i < objects.length; i++) {
-            objects[i].setAngle(-this._visualsGroup.angle);
-            this._updatePartOfGroup(objects[i]);
+        for(let i = 1; i < objects.length; i++) {
+            if ("tag" in objects[i] && objects[i].tag == "marker") {
+                objects[i].setAngle(-this._visualsGroup.angle);
+                this._updatePartOfGroup(objects[i]);
+            }
         }
     };
 

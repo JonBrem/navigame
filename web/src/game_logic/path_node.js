@@ -8,6 +8,13 @@ navigame.PathNode = (function () {
         this.nodeData = {};
     }
 
+    PathNode.prototype.getPosition = function() {
+        return {
+            x: this.xPos,
+            y: this.yPos
+        };
+    };
+
     PathNode.prototype.toJson = function () {
         let asJson = {
             xPos: this.xPos,
