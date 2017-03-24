@@ -23,7 +23,7 @@ navigame.MapVisuals = (function () {
 
     MapVisuals.prototype.loadNewMap = function(imgSrc) {
         let that = this;
-        ImageLoader.loadImage(imgSrc, {success: that._imageLoaded,
+        ImageLoader.loadImage(WEBROOT + '/' + imgSrc, {success: that._imageLoaded,
                                  error: function() {Log.log("error", "image could not be loaded: " + imgSrc);} });
     };
 

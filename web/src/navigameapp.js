@@ -3,18 +3,22 @@ window.navigame = navigame;
 
 navigame.GameApp = (function () {
 
-    function GameApp(mainAreaName) {
+    function GameApp(mainAreaName, titleAreaName) {
         this.canvasManager = null;
         this.mapVisuals = null;
         this.mapControls = null;
         this.markerControls = null;
         this.edgeControls = null;
         this.mapListVisuals = null;
+        this.titleBar = null;
 
         this.pathManager = null;
         this.mapSelectionHandler = null;
 
+        this.newGameDialog = null;
+
         this.$mainHTMLObject = $("#" + mainAreaName);
+        this.$titleArea = $("#" + titleAreaName);
     }
 
     GameApp.prototype.startGame = function () {
@@ -24,8 +28,14 @@ navigame.GameApp = (function () {
 
     GameApp.prototype._setup = function () {
         Log.log("verbose", "setup: ", this);
+        let that = this;
 
         this._compileTemplates();
+
+        this.titleBar = new navigame.GameTitleBar();
+        this.titleBar.init(this.$titleArea);
+        $(this.titleBar).on('requestNewGameDialog', function(e) { that.showNewGameDialog(e); });
+        $(this.titleBar).on('requestSaveGame', function(e) { that.saveGame(e); });
 
         this.canvasManager = new navigame.CanvasManager();
         this.canvasManager.init(this.$mainHTMLObject);
@@ -43,6 +53,7 @@ navigame.GameApp = (function () {
         this.edgeControls.init(this.$mainHTMLObject, this.canvasManager);
 
         this.pathManager = new navigame.PathManager();
+        this.pathManager.newPath();
         this.pathManager.init(this.markerControls, this.edgeControls);
 
         this.mapSelectionHandler = new navigame.MapSelectionHandler();
@@ -53,10 +64,73 @@ navigame.GameApp = (function () {
 
 
 
+        this.newGameDialog = new navigame.NewGameDialog();
+        this.newGameDialog.show(false);
+        $(this.newGameDialog).on('newGameStartClicked', function(e, fromSavedState) { that.startNewGame(e, fromSavedState); });
+
         Log.log("verbose", "setup finished: ", this);
     };
 
-    GameApp.prototype._compileTemplates = function() {
+    GameApp.prototype.startNewGame = function (e, fromSavedState) {
+        this.pathManager.newPath();
+        let that = this;
+
+        if (!fromSavedState || fromSavedState == null || fromSavedState == "") {
+            navigame.PathSaveLoad.requestId(
+                function (sessionId) {
+                    that._onSessionCreated(sessionId);
+                }, 
+                function (error) {
+                    console.log(error);
+                });
+        } else {
+            navigame.PathSaveLoad.loadPath(fromSavedState,
+                function (pathData) {
+                    that._onSessionLoaded(pathData);
+                },
+                function (error) {
+                    console.log(error);
+                }
+            );
+        }
+    };
+
+    GameApp.prototype.showNewGameDialog = function (e) {
+        let that = this;
+
+        this.newGameDialog = new navigame.NewGameDialog();
+        this.newGameDialog.show(true);
+        $(this.newGameDialog).on('newGameStartClicked', function(e, fromSavedState) { that.startNewGame(e, fromSavedState); });
+    };
+
+    GameApp.prototype.saveGame = function (e) {
+        let that = this;
+
+        navigame.PathSaveLoad.savePath(this.pathManager.path.toJson(), 
+            function (e) {
+                Log.log("verbose", "Path saved", e);
+            },
+            function (error) {
+
+            }
+        );
+    };
+
+    GameApp.prototype._onSessionCreated = function (session) {
+        this.newGameDialog.closeDialog();
+        this.titleBar.setSession(session.session_id);
+        this.pathManager.setPathId(session.session_id);
+    };
+
+    GameApp.prototype._onSessionLoaded = function (pathData) {
+        this.newGameDialog.closeDialog();
+        console.log("YAAY");
+        console.log(pathData);
+        this.titleBar.setSession(pathData.pathId);
+        this.pathManager.setPathId(pathData.pathId);
+    };
+
+    GameApp.prototype._compileTemplates = function () {
         var keys = Object.getOwnPropertyNames(templates);
         for(let i = 0; i < keys.length; i++) {
             let key = keys[i];

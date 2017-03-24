@@ -85,10 +85,7 @@ public class UniversityAreas implements ServletRequestHandler{
     }
 
     private void onDownloadError(HttpServletResponse response) {
-
+        System.out.println("On download error :(");
     }
 
-    private boolean areasFileExists() {
-        return false;
-    }
 }

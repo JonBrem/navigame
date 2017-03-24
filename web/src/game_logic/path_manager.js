@@ -12,8 +12,6 @@ navigame.PathManager = (function () {
         this.markerControls = markerControls;
         this.edgeControls = edgeControls;
 
-        this.path = new navigame.Path();
-
         let that = this;
 
         $(this.markerControls).on("markerCreated", function(event, marker) {
@@ -21,7 +19,15 @@ navigame.PathManager = (function () {
         });
     };
 
-    PathManager.prototype.addMap = function(areaName, storeyId) {
+    PathManager.prototype.newPath = function () {
+        this.path = new navigame.Path();
+    };
+
+    PathManager.prototype.setPathId = function (pathId) {
+        this.path.pathId = pathId;
+    };
+
+    PathManager.prototype.addMap = function (areaName, storeyId) {
         this.path.addMap(areaName, storeyId);
         this.currentMapIndex = this.path.mapPaths.length - 1;
 
@@ -31,15 +37,15 @@ navigame.PathManager = (function () {
         });
     };
 
-    PathManager.prototype.setCurrentMapIndex = function(index) {
+    PathManager.prototype.setCurrentMapIndex = function (index) {
         this.currentMapIndex = index;
     };
 
-    PathManager.prototype.addNode = function(x, y, data) {
+    PathManager.prototype.addNode = function (x, y, data) {
         this.path.mapPaths[this.currentMapIndex].addNode(x, y, data);
     };
 
-    PathManager.prototype.onEdgeCreated = function(whichMapPath, fromNode, toNode, data) {
+    PathManager.prototype.onEdgeCreated = function (whichMapPath, fromNode, toNode, data) {
         let that = this;
 
         setTimeout(

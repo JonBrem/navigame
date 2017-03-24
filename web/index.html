@@ -13,8 +13,7 @@
 </head>
 <body>
     <div class="row">
-      <div class="small-12 columns">
-        <h1>Navigationsspiel</h1>
+      <div class="small-12 columns" id="title_bar_area">
       </div>
     </div>
 
@@ -43,6 +42,8 @@
     <script src="src/view_templates/marker.js"></script>
     <script src="src/view_templates/map_list.js"></script>
     <script src="src/view_templates/map_selection_dialog.js"></script>
+    <script src="src/view_templates/title_bar.js"></script>
+    <script src="src/view_templates/new_game_dialog.js"></script>
 
     <script src="src/view/canvas_manager.js"></script>
     <script src="src/view/map_visuals.js"></script>
@@ -51,8 +52,11 @@
     <script src="src/view/marker_controls.js"></script>
     <script src="src/view/edge_controls.js"></script>
     <script src="src/view/map_selection_dialog.js"></script>
+    <script src="src/view/game_title_bar.js"></script>
+    <script src="src/view/new_game_dialog.js"></script>
 
     <script src="src/game_logic/path_manager.js"></script>
+    <script src="src/game_logic/path_save_load.js"></script>
     <script src="src/game_logic/map_path.js"></script>
     <script src="src/game_logic/path.js"></script>
     <script src="src/game_logic/path_edge.js"></script>
@@ -60,7 +64,10 @@
     <script src="src/game_logic/map_selection_handler.js"></script>
 
     <script>
-        let gameApp = new navigame.GameApp("content_area");
+        var WEBROOT = "/navigame";
+        var NAVIGAME_API = "/navigame_api";  
+
+        let gameApp = new navigame.GameApp("content_area", "title_bar_area");
         gameApp.startGame();
     </script>
 </body>

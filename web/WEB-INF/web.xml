@@ -11,7 +11,7 @@
     
     <servlet-mapping>
         <servlet-name>AppServlet</servlet-name>
-        <url-pattern>/navigame/*</url-pattern>
+        <url-pattern>/navigame_api/*</url-pattern>
     </servlet-mapping>
 
     <listener>

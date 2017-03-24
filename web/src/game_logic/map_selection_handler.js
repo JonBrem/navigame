@@ -30,10 +30,12 @@ navigame.MapSelectionHandler = (function () {
         let that = this;
 
         $.ajax({
-            url: '/navigame?method=areas',
+            url: WEBROOT + NAVIGAME_API,
             type: 'GET',
             dataType: 'json',
-            data: {},
+            data: {
+                method: "areas"
+            },
             success: function(e) {
                 that._onAreasLoaded(e);
             },
@@ -48,10 +50,13 @@ navigame.MapSelectionHandler = (function () {
         this.currentArea = selectedArea;
 
         $.ajax({
-            url: '/navigame?method=area_levels&which_area=' + selectedArea,
+            url: WEBROOT + NAVIGAME_API,
             type: 'GET',
             dataType: 'json',
-            data: {},
+            data: {
+                method: "area_levels",
+                which_area: selectedArea
+            },
             success: function(e) {
                 that._onLevelsLoaded(e, selectedArea);
             },

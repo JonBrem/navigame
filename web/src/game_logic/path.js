@@ -3,6 +3,7 @@ navigame.Path = (function () {
     function Path() {
         this.mapPaths = [];
 
+        this.pathId = null;
         this.startPoint = null;
         this.endPoint = null;
     }
@@ -19,6 +20,7 @@ navigame.Path = (function () {
         let asJson = {
             startPoint: this.startPoint,
             endPoint: this.endPoint,
+            pathId: this.pathId,
             mapPaths: []
         };
 
@@ -32,6 +34,7 @@ navigame.Path = (function () {
     Path.prototype.fromJson = function (obj) {
         this.startPoint = obj.startPoint;
         this.endPoint = obj.endPoint;
+        this.pathId = obj.pathId;
 
         this.mapPaths = [];
         for(let i = 0; i < obj.mapPaths.length; i++) {

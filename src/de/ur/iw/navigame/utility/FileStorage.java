@@ -14,7 +14,7 @@ public class FileStorage {
 
     public static void storeFile(String name, String contents) {
         try {
-            FileWriter w = new FileWriter(sc.getRealPath("/") + name);
+            FileWriter w = new FileWriter(getPath() + name);
             w.write(contents);
             w.flush();
             w.close();
@@ -24,7 +24,7 @@ public class FileStorage {
     }
     public static void storeImageFile(String name, byte[] contents) {
         try {
-            FileOutputStream w = new FileOutputStream(sc.getRealPath("/") + name);
+            FileOutputStream w = new FileOutputStream(getPath() + name);
             w.write(contents);
             w.flush();
             w.close();
@@ -34,12 +34,12 @@ public class FileStorage {
     }
 
     public static boolean fileExists(String name) {
-        return new File(sc.getRealPath("/") + name).exists();
+        return new File(getPath() + name).exists();
     }
 
     public static void loadFile(String name, Consumer<String> onSuccess, Consumer<Void> onFail) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(sc.getRealPath("/") + name));
+            BufferedReader reader = new BufferedReader(new FileReader(getPath() + name));
             StringBuilder b = new StringBuilder();
             String line;
             while((line = reader.readLine()) != null) {
@@ -55,7 +55,7 @@ public class FileStorage {
 
     public static String loadFileNoCallback(String name) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(sc.getRealPath("/") + name));
+            BufferedReader reader = new BufferedReader(new FileReader(getPath() + name));
             StringBuilder b = new StringBuilder();
             String line;
             while((line = reader.readLine()) != null) {
@@ -67,6 +67,10 @@ public class FileStorage {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static String getPath() {
+        return sc.getRealPath("/");// + sc.getContextPath();
     }
 
 }

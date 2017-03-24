@@ -87,6 +87,37 @@ navigame.MarkerControls = (function () {
         }
     };
 
+    MarkerControls.prototype.loadMarker = function (savedMarker) {
+        Log.log("verbose", "loading marker ", JSON.stringify(savedMarker), this);
+
+        let position = {
+            x: savedMarker.xPos,
+            y: savedMarker.yPos
+        };
+
+        let adjustedPosition = this._canvasManager.calculatePositionOnMap(position);
+
+        // @todo check if adjustedPosition is within boundaries!!
+
+        let posOnMap = {
+            x: adjustedPosition.x - this._canvasManager.canvasWidth() / 2,
+            y: adjustedPosition.y - this._canvasManager.canvasHeight() / 2
+        };
+
+        let newMarker = new fabric.Text("Marker", {
+            left: posOnMap.x,
+            top: posOnMap.y,
+            fontSize: 14,
+            originX: "center",
+            originY: "center"
+        });
+
+        newMarker.tag = "marker";
+
+        newMarker.additionalData = savedMarker.nodeData;
+        this._canvasManager.addToVisualLayer(newMarker);
+    };
+
     MarkerControls.prototype._createMarkerAtMapPosition = function (position) {
         Log.log("verbose", "Creating marker at canvas position ", JSON.stringify(position), this);
 
