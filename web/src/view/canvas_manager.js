@@ -32,6 +32,18 @@ navigame.CanvasManager = (function () {
 
     };
 
+    CanvasManager.prototype.setMapImage = function (fabricObj) {
+        this._fabricCanvas.clear();
+        this.zoomTo(1.0, {
+            x: this._fabricCanvas.width / 2, 
+            y: this._fabricCanvas.height / 2
+        });
+        this._initVisualLayer();
+
+        this._visualsGroup.add(fabricObj);
+        this._fabricCanvas.renderAll();
+    };
+
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
         fabricObj.angle = -this._visualsGroup.angle;
         this._visualsGroup.add(fabricObj);
@@ -215,12 +227,7 @@ navigame.CanvasManager = (function () {
      * @param  {object with keys x, y} center center of the zoom.
      */
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
-        this._visualsGroup.setLeft(-center.x);
-        this._visualsGroup.setTop(-center.y);
-
-        this._visualsGroup.setScaleX(zoomLevel);
-        this._visualsGroup.setScaleY(zoomLevel);
-
+        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), zoomLevel);
         this._fabricCanvas.renderAll();
     };
 

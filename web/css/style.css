@@ -30,3 +30,8 @@ h1 {
 .new_marker_container {
     border-right: 2px solid #607d8b;
 }
+
+#map_selection_level_selection img {
+    height: 250px;
+    max-height: 250px;
+}

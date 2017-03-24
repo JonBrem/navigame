@@ -14,20 +14,35 @@ navigame.MapVisuals = (function () {
         this._canvasManager = canvasManager;
 
         let that = this;
-        let src = "mathematik-erdgeschoss.jpg.svg";
+        /*let src = "mathematik-erdgeschoss.jpg.svg";
         ImageLoader.loadImage(src, {success: that._imageLoaded,
-                                 error: function() {Log.log("error", "image could not be loaded: " + src);} })
+                                 error: function() {Log.log("error", "image could not be loaded: " + src);} });*/
 
         Log.log("verbose", "Finished Initializing Map visuals", this);
     };
 
+    MapVisuals.prototype.loadNewMap = function(imgSrc) {
+        let that = this;
+        ImageLoader.loadImage(imgSrc, {success: that._imageLoaded,
+                                 error: function() {Log.log("error", "image could not be loaded: " + imgSrc);} });
+    };
+
     MapVisuals.prototype._imageLoaded = function (image) {
+        let naturalWidth = image.naturalWidth;
+        let naturalHeight = image.naturalHeight;
+
+        let widthScaleFactor = naturalWidth > naturalHeight? 1 : naturalWidth / naturalHeight;
+        let heightScaleFactor = naturalHeight > naturalWidth? 1 : naturalHeight / naturalWidth;
+
+        let fabricWidth = that._canvasManager.canvasWidth() * widthScaleFactor;
+        let fabricHeight = that._canvasManager.canvasHeight() * heightScaleFactor;
+
         let imgInstance = new fabric.Image(image, {
-            left: -that._canvasManager.canvasWidth() / 2,
-            top: -that._canvasManager.canvasHeight() / 2,
+            left: -fabricWidth / 2,
+            top: -fabricHeight / 2,
             angle: 0,
-            width: that._canvasManager.canvasWidth(),
-            height: that._canvasManager.canvasHeight(),
+            width: fabricWidth,
+            height: fabricHeight,
             originX: 'left',
             originY: 'top'
         });
@@ -36,7 +51,7 @@ navigame.MapVisuals = (function () {
         imgInstance.hasControls = false;
         imgInstance.hasRotatingPoint = false;
 
-        that._canvasManager.addToVisualLayer(imgInstance);
+        that._canvasManager.setMapImage(imgInstance);
     };
 
     return MapVisuals;

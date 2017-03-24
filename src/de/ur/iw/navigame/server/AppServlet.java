@@ -32,6 +32,9 @@ public class AppServlet extends UnifiedServlet implements ServletContextListener
      */
     @Override
     protected void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         Map<String, String[]> params = request.getParameterMap();
 
         if (params.containsKey("method")) {
