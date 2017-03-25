@@ -52,17 +52,15 @@ navigame.GameApp = (function () {
         this.edgeControls = new navigame.EdgeControls();
         this.edgeControls.init(this.$mainHTMLObject, this.canvasManager);
 
+        this.mapListVisuals = new navigame.MapList();
+        this.mapListVisuals.init(this.$mainHTMLObject);
+
         this.pathManager = new navigame.PathManager();
         this.pathManager.newPath();
         this.pathManager.init(this.markerControls, this.edgeControls);
 
         this.mapSelectionHandler = new navigame.MapSelectionHandler();
-        this.mapSelectionHandler.init(this.mapVisuals, this.pathManager);
-
-        this.mapListVisuals = new navigame.MapList();
-        this.mapListVisuals.init(this.$mainHTMLObject, this.mapSelectionHandler);
-
-
+        this.mapSelectionHandler.init(this.mapVisuals, this.mapListVisuals, this.pathManager);
 
         this.newGameDialog = new navigame.NewGameDialog();
         this.newGameDialog.show(false);
@@ -120,14 +118,17 @@ navigame.GameApp = (function () {
         this.newGameDialog.closeDialog();
         this.titleBar.setSession(session.session_id);
         this.pathManager.setPathId(session.session_id);
+        
+        // user _has_ to choose the first map:
+        this.mapListVisuals.showAddMapDialog(false);
     };
 
     GameApp.prototype._onSessionLoaded = function (pathData) {
         this.newGameDialog.closeDialog();
-        console.log("YAAY");
-        console.log(pathData);
         this.titleBar.setSession(pathData.pathId);
         this.pathManager.setPathId(pathData.pathId);
+
+        this.pathManager.loadPathFromJson(pathData);
     };
 
     GameApp.prototype._compileTemplates = function () {

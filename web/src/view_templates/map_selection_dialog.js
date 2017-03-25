@@ -4,9 +4,11 @@ templates.map_selection_dialog =
     '   <div id="map_selection_area_selection">&nbsp;</div>',
     '   <div id="map_selection_level_selection">&nbsp;</div>',
     '   <div style="display: none"><button id="map_selection_confirm" class="button">Ausw&auml;hlen</button></div>',
+    '   <% if (data.closable) { %>',
     '   <button class="close-button" data-close aria-label="Close modal" type="button">',
     '        <span aria-hidden="true">&times;</span>',
     '   </button>',
+    '   <% } %>',
     '</div>'].join('\n');
 
 templates.map_selection_dialog_select_area = 

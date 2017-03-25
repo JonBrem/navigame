@@ -95,18 +95,18 @@ navigame.MarkerControls = (function () {
             y: savedMarker.yPos
         };
 
-        let adjustedPosition = this._canvasManager.calculatePositionOnMap(position);
+        // let adjustedPosition = this._canvasManager.calculatePositionOnMap(position);
 
-        // @todo check if adjustedPosition is within boundaries!!
+        // // @todo check if adjustedPosition is within boundaries!!
 
-        let posOnMap = {
-            x: adjustedPosition.x - this._canvasManager.canvasWidth() / 2,
-            y: adjustedPosition.y - this._canvasManager.canvasHeight() / 2
-        };
+        // let posOnMap = {
+        //     x: adjustedPosition.x + this._canvasManager.canvasWidth() / 2,
+        //     y: adjustedPosition.y + this._canvasManager.canvasHeight() / 2
+        // };
 
         let newMarker = new fabric.Text("Marker", {
-            left: posOnMap.x,
-            top: posOnMap.y,
+            left: position.x,
+            top: position.y,
             fontSize: 14,
             originX: "center",
             originY: "center"
@@ -164,6 +164,9 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype._deleteMarker = function (marker) {
+        this._$markerManipulationArea.html('');
+        $(this).trigger('markerDeleted', [this._canvasManager.getMarkerIndex(this._clickedMarker)]);
+        
         this._canvasManager.removeFromVisualLayer(marker);
     };
 
@@ -197,6 +200,8 @@ navigame.MarkerControls = (function () {
                 x: e.offsetX - this._manipulationStart.x,
                 y: e.offsetY - this._manipulationStart.y
              }, this._clickedMarker);
+
+            $(this).trigger('markerMoved', [this._clickedMarker, this._canvasManager.getMarkerIndex(this._clickedMarker)]);
 
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
         } else {

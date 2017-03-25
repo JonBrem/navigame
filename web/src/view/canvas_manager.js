@@ -22,6 +22,7 @@ navigame.CanvasManager = (function () {
         this._canvas = $('#my_canvas').eq(0)[0];
         this._ctx = this._canvas.getContext('2d');
         this._fabricCanvas = new fabric.Canvas('my_canvas');
+        this._fabricCanvas.skipOffscreen = true;
 
         this._initVisualLayer();
 
@@ -33,25 +34,42 @@ navigame.CanvasManager = (function () {
     };
 
     CanvasManager.prototype.setMapImage = function (fabricObj) {
+        $(this).trigger('clearCanvas');
+
         this._fabricCanvas.clear();
         this.zoomTo(1.0, {
             x: this._fabricCanvas.width / 2, 
             y: this._fabricCanvas.height / 2
         });
+        this._fabricCanvas.absolutePan(new fabric.Point(0, 0));
         this._initVisualLayer();
 
         this._visualsGroup.add(fabricObj);
+        this.centerImage();
         this._fabricCanvas.renderAll();
     };
 
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
         fabricObj.angle = -this._visualsGroup.angle;
+        
+        if ("tag" in fabricObj && fabricObj.tag == "marker") {
+            let zoomLevel = this._fabricCanvas.getZoom();
+            fabricObj.set({
+                scaleX: 1 / zoomLevel,
+                scaleY: 1 / zoomLevel
+            });
+        }
+
         this._visualsGroup.add(fabricObj);
         this._fabricCanvas.renderAll();
     };
 
     CanvasManager.prototype.removeFromVisualLayer = function (fabricObj) {
-        this._visualsGroup.removeWithUpdate(fabricObj);
+        this._visualsGroup.remove(fabricObj);
+        this._fabricCanvas.renderAll();
+    };
+    
+    CanvasManager.prototype.triggerReRender = function () {
         this._fabricCanvas.renderAll();
     };
 
@@ -130,12 +148,17 @@ navigame.CanvasManager = (function () {
 
     CanvasManager.prototype.isClickOnMarker = function (mapPosition) {
         let objects = this._visualsGroup.getObjects();
+
+        let asPoint = new fabric.Point(mapPosition.x, mapPosition.y);
+
         for(let i = 0; i < objects.length; i++) {
             let obj = objects[i];
 
             if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
                 let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
                 let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
+
+                console.log(markerLeft, markerTop, mapPosition.x, mapPosition.y);
 
                 if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
                     mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
@@ -227,7 +250,11 @@ navigame.CanvasManager = (function () {
      * @param  {object with keys x, y} center center of the zoom.
      */
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
-        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), zoomLevel);
+        let newZoom = Math.min(zoomLevel, 4);
+        newZoom = Math.max(0.25, newZoom);
+
+        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
+        this._unScaleMarkersAndEdges(newZoom);
         this._fabricCanvas.renderAll();
     };
 
@@ -242,9 +269,12 @@ navigame.CanvasManager = (function () {
         //this._visualsGroup.setTop(-center.y);
 
         let zoomBefore = this._fabricCanvas.getZoom();
+        
+        let newZoom = Math.min(zoomDelta + zoomBefore, 4);
+        newZoom = Math.max(0.25, newZoom);
 
-        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), zoomDelta + zoomBefore);
-
+        this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
+        this._unScaleMarkersAndEdges(newZoom);
         this._fabricCanvas.renderAll();
     };
 
@@ -328,6 +358,29 @@ navigame.CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
+    CanvasManager.prototype.getMarkerIndex = function (marker) {
+        let objects = this._visualsGroup.getObjects();
+
+        let markers = [];
+
+        for(let i = 1; i < objects.length; i++) {                    
+            if ("tag" in objects[i] && objects[i].tag == "marker") {
+                markers.push(objects[i]);
+            }
+        }
+
+        markers.sort(function(a, b) {
+            return a.additionalData.timeCreated >= b.additionalData.timeCreated;
+        });
+
+        for(let i = 0; i < markers.length; i++) {
+            if (markers[i] == marker)
+                return i;
+        }
+
+        return -1;
+    };
+
     /*
      * Awesome matrix multiplication ^_^
      * (adjusted, original: http://stackoverflow.com/questions/17410809/how-to-calculate-rotation-in-2d-in-javascript)
@@ -351,6 +404,20 @@ navigame.CanvasManager = (function () {
             }
         }
     };
+
+    CanvasManager.prototype._unScaleMarkersAndEdges = function (zoomLevel) {
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 1; i < objects.length; i++) {
+            if ("tag" in objects[i] && objects[i].tag == "marker") {
+                objects[i].set({
+                    scaleX: 1 / zoomLevel,
+                    scaleY: 1 / zoomLevel
+                });
+                this._updatePartOfGroup(objects[i]);
+            }
+        }
+    };
+
 
     CanvasManager.prototype._updatePartOfGroup = function (fabricObj) {
         this._visualsGroup.remove(fabricObj);

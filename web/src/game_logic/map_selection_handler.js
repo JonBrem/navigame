@@ -6,27 +6,43 @@ navigame.MapSelectionHandler = (function () {
 
         this.mapVisuals = null;
         this.pathManager = null;
+        this.mapListVisuals = null;
     }
 
-    MapSelectionHandler.prototype.init = function(mapVisuals, pathManager) {
+    MapSelectionHandler.prototype.init = function (mapVisuals, mapListVisuals, pathManager) {
         this.mapVisuals = mapVisuals;
         this.pathManager = pathManager;
+        this.mapListVisuals = mapListVisuals;
+
+        let that = this;
+        $(this.mapListVisuals).on('dialogCreated', function (e, dialog) {
+            that.setDialog(dialog);
+            that.loadAreas();
+        });
+
+        $(this.mapListVisuals).on('onMapSelected', function (e, data) {
+            that.setSelectedMap(data.mapIndex, data.imgSrc);
+        });
+
+        $(this.pathManager).on('triggerLoadMaps', function (e, data) {
+            that.loadMaps(data);
+        });
     };
 
-    MapSelectionHandler.prototype.setDialog = function(dialog) {
+    MapSelectionHandler.prototype.setDialog = function (dialog) {
         this.mapSelectionDialog = dialog;
         let that = this;
 
-        $(this.mapSelectionDialog).on('onAreaSelected', function(e, selectedArea) {
+        $(this.mapSelectionDialog).on('onAreaSelected', function (e, selectedArea) {
             that.loadLevels(selectedArea);
         });
 
-        $(this.mapSelectionDialog).on('storeySelectd', function(e, selectedStorey, imgSrc) {
+        $(this.mapSelectionDialog).on('storeySelectd', function (e, selectedStorey, imgSrc) {
             that.onMapChosen(that.currentArea, selectedStorey, imgSrc);
         });
     };
 
-    MapSelectionHandler.prototype.loadAreas = function() {
+    MapSelectionHandler.prototype.loadAreas = function () {
         let that = this;
 
         $.ajax({
@@ -36,16 +52,16 @@ navigame.MapSelectionHandler = (function () {
             data: {
                 method: "areas"
             },
-            success: function(e) {
+            success: function (e) {
                 that._onAreasLoaded(e);
             },
-            error: function(e) {
+            error: function (e) {
                 console.log(e);
             }
         });        
     };
 
-    MapSelectionHandler.prototype.loadLevels = function(selectedArea) {
+    MapSelectionHandler.prototype.loadLevels = function (selectedArea) {
         let that = this;
         this.currentArea = selectedArea;
 
@@ -57,22 +73,43 @@ navigame.MapSelectionHandler = (function () {
                 method: "area_levels",
                 which_area: selectedArea
             },
-            success: function(e) {
+            success: function (e) {
                 that._onLevelsLoaded(e, selectedArea);
             },
-            error: function(e) {
+            error: function (e) {
                 console.log(e);
             }
         });
     };
 
-    MapSelectionHandler.prototype.onMapChosen = function(area, storey, imgSrc) {
+    MapSelectionHandler.prototype.onMapChosen = function (area, storey, imgSrc) {
         this.mapSelectionDialog.closeDialog();
         this.mapVisuals.loadNewMap(imgSrc);
         this.pathManager.addMap(storey, imgSrc);
+
+        this.mapListVisuals.addMap(this.pathManager.currentMapIndex, imgSrc);
     };
 
-    MapSelectionHandler.prototype._onAreasLoaded = function(serverResponse) {
+    MapSelectionHandler.prototype.loadMaps = function (maps, callback) {
+        for(let i = 0; i < maps.length; i++) {
+            this.mapListVisuals.addMap(i, maps[i].imgSrc);
+
+            if (i == maps.length - 1) {
+                this.setSelectedMap(i, maps[i].imgSrc);
+            }
+        }
+    };
+
+    MapSelectionHandler.prototype.setSelectedMap = function (mapIndex, imgSrc) {
+        this.pathManager.setCurrentMapIndex(mapIndex);
+        
+        let that = this;
+        this.mapVisuals.loadNewMap(imgSrc, function() {
+            that.pathManager.loadDataIntoView();
+        });        
+    };
+
+    MapSelectionHandler.prototype._onAreasLoaded = function (serverResponse) {
         this.mapSelectionDialog.setAreas(serverResponse);
     };
 

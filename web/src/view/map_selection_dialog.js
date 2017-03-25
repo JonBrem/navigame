@@ -5,12 +5,22 @@ navigame.MapSelectionDialog = (function () {
         let _$areaSelectElement = null;
     }
 
-    MapSelectionDialog.prototype.show = function() {
-        let dialogElement = compiledTemplates['map_selection_dialog']();
+    MapSelectionDialog.prototype.show = function(closeable) {
+        if (!closeable && closeable !== false)
+            closeable = true;
+
+        let dialogElement = compiledTemplates['map_selection_dialog']({
+            data: {
+                closeable: closeable
+            }
+        });
         $("body").append(dialogElement);
 
         this._$dialogElement = $("#map_selection_modal");
-        let revealElement = new Foundation.Reveal(this._$dialogElement, {});
+        let revealElement = new Foundation.Reveal(this._$dialogElement, {
+            "closeOnClick": closeable,
+            "closeOnEsc": closeable
+        });
 
         let that = this;
         this._$dialogElement.on("closed.zf.reveal", function(e) {that._onDialogClose(e);});

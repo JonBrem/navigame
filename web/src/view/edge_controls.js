@@ -19,20 +19,24 @@ navigame.EdgeControls = (function () {
         this._clickedEdge = null;
         this._manipulationStart = null;
 
+        this._edgesOnDisplay = [];
+
         that = this;
     }
 
     EdgeControls.prototype.init = function ($contentArea, canvasManager) {
         Log.log("verbose", "Initializing Edge controls", this);
 
+        let that = this;
         this._canvasManager = canvasManager;
+        $(this._canvasManager).on('clearCanvas', function(e) {
+            that._edgesOnDisplay = [];
+        });
 
         this._$controlsWrapper = $("#controls-section");
         this._$mapControlsDiv = $("#map_controls_inv_layer");
 
         this._$edgeManipulationArea = $("#marker_fill_rest");
-
-        let that = this;
 
         this._setupMapEdgeControls();
 
@@ -53,7 +57,41 @@ navigame.EdgeControls = (function () {
         let markerStart = this._canvasManager.getMarkerByCreationTime(markerTime1);
         let markerEnd = this._canvasManager.getMarkerByCreationTime(markerTime2);
 
-        console.log(markerStart, markerEnd);
+        // @todo check if adjustedPosition is within boundaries!!
+
+        let posOnMapStart = {
+            x: markerStart.left + 0,
+            y: markerStart.top + 0
+        };
+        let posOnMapEnd = {
+            x: markerEnd.left + 0,
+            y: markerEnd.top + 0
+        };
+
+        let points = [posOnMapStart.x, posOnMapStart.y, posOnMapEnd.x, posOnMapEnd.y];
+
+        let newEdge = new fabric.Line(points, {
+            strokeWidth: 4,
+            fill: 'red',
+            stroke: 'red',
+            originX: "center",
+            originY: "center"
+        });
+
+        newEdge.tag = "route";
+
+        newEdge.additionalData = data;
+        this._canvasManager.addToVisualLayer(newEdge);
+        this._canvasManager.fixEdgeRotation(newEdge);
+
+        that._edgesOnDisplay.push(newEdge);
+    };
+
+    EdgeControls.prototype.updateEdgePositions = function (edgeIndex, markerTime1, markerTime2) {
+        let edge = this._edgesOnDisplay[edgeIndex];
+
+        let markerStart = this._canvasManager.getMarkerByCreationTime(markerTime1);
+        let markerEnd = this._canvasManager.getMarkerByCreationTime(markerTime2);
 
         // @todo check if adjustedPosition is within boundaries!!
 
@@ -69,18 +107,24 @@ navigame.EdgeControls = (function () {
         let points = [posOnMapStart.x, posOnMapStart.y, posOnMapEnd.x, posOnMapEnd.y];
 
         let newEdge = new fabric.Line(points, {
-            strokeWidth: 10,
+            strokeWidth: 4,
             fill: 'red',
             stroke: 'red',
             originX: "center",
             originY: "center"
         });
+        newEdge.tag = "route";
 
-        newEdge.tag = "edge";
-
-        newEdge.additionalData = data;
+        this._canvasManager.removeFromVisualLayer(edge);
         this._canvasManager.addToVisualLayer(newEdge);
         this._canvasManager.fixEdgeRotation(newEdge);
+
+        this._edgesOnDisplay[edgeIndex] = newEdge;
+    };
+
+    EdgeControls.prototype.deleteEdge = function (edgeIndex) {
+        let deleted = this._edgesOnDisplay.splice(edgeIndex, 1);
+        this._canvasManager.removeFromVisualLayer(deleted[0]);
     };
 
     EdgeControls.prototype._onEdgeSelected = function (edge) {

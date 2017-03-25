@@ -18,7 +18,7 @@ navigame.NewGameDialog = (function () {
         this._$dialogElement = $("#new_game_modal");
         let revealElement = new Foundation.Reveal(this._$dialogElement, {
             "closeOnClick": closeable,
-            "closeOnEscape": closeable
+            "closeOnEsc": closeable
         });
 
         let that = this;

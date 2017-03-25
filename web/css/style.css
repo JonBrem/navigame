@@ -35,3 +35,17 @@ h1 {
     height: 250px;
     max-height: 250px;
 }
+
+.map_item {
+    background: white;
+    display: inline;
+}
+
+.map_item img {
+    max-height: 150px;
+}
+
+.map_list_scroll_wrapper {
+    overflow-x: scroll;
+    white-space: nowrap;
+}

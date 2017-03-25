@@ -30,6 +30,16 @@ navigame.MapPath = (function () {
         }
     };
 
+    MapPath.prototype.getNodeByTime = function (time) {
+        for (let i = 0; i < this.pathNodes.length; i++) {
+            if (this.pathNodes[i].nodeData.timeCreated == time) {
+                return this.pathNodes[i];
+            }
+        }
+
+        return null;
+    };
+
     MapPath.prototype.toJson = function () {
         let asJson = {
             areaName: this.areaName,

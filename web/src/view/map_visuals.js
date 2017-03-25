@@ -21,10 +21,19 @@ navigame.MapVisuals = (function () {
         Log.log("verbose", "Finished Initializing Map visuals", this);
     };
 
-    MapVisuals.prototype.loadNewMap = function(imgSrc) {
+    MapVisuals.prototype.loadNewMap = function(imgSrc, callback) {
         let that = this;
-        ImageLoader.loadImage(WEBROOT + '/' + imgSrc, {success: that._imageLoaded,
-                                 error: function() {Log.log("error", "image could not be loaded: " + imgSrc);} });
+        ImageLoader.loadImage(WEBROOT + '/' + imgSrc, 
+            {
+                success: function (image) {
+                    that._imageLoaded(image);
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function() {Log.log("error", "image could not be loaded: " + imgSrc);} 
+            }
+        );
     };
 
     MapVisuals.prototype._imageLoaded = function (image) {
@@ -50,6 +59,8 @@ navigame.MapVisuals = (function () {
         imgInstance.hasBorders = false;
         imgInstance.hasControls = false;
         imgInstance.hasRotatingPoint = false;
+
+        that._canvasManager.setA
 
         that._canvasManager.setMapImage(imgInstance);
     };
