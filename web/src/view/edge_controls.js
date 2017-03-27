@@ -115,6 +115,7 @@ navigame.EdgeControls = (function () {
             originY: "center"
         });
         newEdge.tag = "route";
+        newEdge.additionalData = edge.additionalData;
 
         this._canvasManager.removeFromVisualLayer(edge);
         this._canvasManager.addToVisualLayer(newEdge);
@@ -138,18 +139,33 @@ navigame.EdgeControls = (function () {
     };
 
     EdgeControls.prototype._startEditingEdge = function (edge) {
-        console.log(edge);
+        let dataDialog = new navigame.AdditionalDataDialog();
+        dataDialog.show("Edge", edge);
+        let that = this;
+        $(dataDialog).on('okSelected', function(e, edgeTime, edgeData) {
+            that._setEdgeData(edge, edgeTime, edgeData);
+            dataDialog.closeDialog();
+        });
+    };
+
+    EdgeControls.prototype._setEdgeData = function (edge, edgeTime, edgeData) {
+        edge.additionalData = edgeData;
+        edge.additionalData["timeCreated"] = edgeTime;
+
+        $(this).trigger('edgeDataChanged', [this._edgesOnDisplay.indexOf(edge), edge.additionalData]);
     };
 
     EdgeControls.prototype._onMapMouseDown = function (e) {
         let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
 
-        if (this._canvasManager.isClickOnRoute(positionOnMap)) {
+        if (this._canvasManager.isClickOnRoute(positionOnMap) && !this._canvasManager.isClickOnMarker(positionOnMap)) {
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
         
             this._edgeClicked = true;
+            this._clickedEdge = this._canvasManager.getClickedRoute(positionOnMap);
             this._edgeMoving = false;
-        
+
+            $(".marker-delete.button").addClass('disabled');        
         } else {
             this._edgeClicked = false;
             this._edgeMoving = false;

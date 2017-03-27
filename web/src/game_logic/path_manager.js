@@ -24,8 +24,16 @@ navigame.PathManager = (function () {
             that.onMarkerMoved(marker, markerIndex);
         });
 
+        $(this.markerControls).on("markerDataChanged", function(event, markerIndex, markerData) {
+            that.onMarkerDataChanged(markerIndex, markerData);
+        });
+
         $(this.markerControls).on("markerDeleted", function(event, markerIndex) {
             that.onMarkerDeleted(markerIndex);
+        });
+
+        $(this.edgeControls).on("edgeDataChanged", function(event, edgeIndex, edgeData) {
+            that.onEdgeDataChanged(edgeIndex, edgeData);
         });
 
         Log.log("verbose", "Finished Initializing Path Manager", this);
@@ -126,6 +134,14 @@ navigame.PathManager = (function () {
             this.edgeControls.updateEdgePositions(markerIndex - 1, prevMarkerTime, markerTime);
             this.edgeControls.updateEdgePositions(markerIndex, markerTime, nextMarkerTime);
         }
+    };
+
+    PathManager.prototype.onMarkerDataChanged = function (markerIndex, markerData) {
+        let markerModel = this.path.mapPaths[this.currentMapIndex].pathNodes[markerIndex].nodeData = markerData;
+    };
+
+    PathManager.prototype.onEdgeDataChanged = function (edgeIndex, edgeData) {
+        let markerModel = this.path.mapPaths[this.currentMapIndex].pathEdges[edgeIndex].edgeData = edgeData;
     };
 
     PathManager.prototype.onMarkerDeleted = function (markerIndex) {

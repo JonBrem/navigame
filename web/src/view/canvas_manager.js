@@ -147,13 +147,44 @@ navigame.CanvasManager = (function () {
                     Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
 
                 if (distance <= 10) {
-                    // this._visualsGroup.remove(testRect);
+                    this._visualsGroup.remove(testCircle);
                     return true;
                 }
             }
         }
 
-        // this._visualsGroup.remove(testRect);
+        this._visualsGroup.remove(testCircle);
+        return false;
+    };
+
+    CanvasManager.prototype.getClickedRoute = function (mapPosition) {
+        let testCircle = new fabric.Circle({
+            left: mapPosition.x - 0.5 - this._visualsGroup.width / 2,
+            top: mapPosition.y - 0.5 - this._visualsGroup.height / 2,
+            radius: 1 / this._visualsGroup.zoomX, 
+            fill: "rgba(0, 0, 0, 0)"
+        });
+
+        this._visualsGroup.add(testCircle);
+        testCircle.setCoords();
+
+        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
+            let obj = this._visualsGroup._objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "route") {
+                obj.setCoords();
+
+                let distance = Math.abs((obj.y2 - obj.y1) * testCircle.left - (obj.x2 - obj.x1) * testCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
+                    Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
+
+                if (distance <= 10) {
+                    this._visualsGroup.remove(testCircle);
+                    return obj;
+                }
+            }
+        }
+
+        this._visualsGroup.remove(testCircle);
         return false;
     };
 

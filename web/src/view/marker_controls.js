@@ -161,7 +161,20 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype._startEditingMarker = function (marker) {
+        let dataDialog = new navigame.AdditionalDataDialog();
+        dataDialog.show("Marker", marker);
+        let that = this;
+        $(dataDialog).on('okSelected', function(e, markerTime, markerData) {
+            that._setMarkerData(marker, markerTime, markerData);
+            dataDialog.closeDialog();
+        });
+    };
 
+    MarkerControls.prototype._setMarkerData = function (marker, markerTime, markerData) {
+        marker.additionalData = markerData;
+        marker.additionalData["timeCreated"] = markerTime;
+
+        $(this).trigger('markerDataChanged', [this._canvasManager.getMarkerIndex(this._clickedMarker), marker.additionalData]);
     };
 
     MarkerControls.prototype._deleteMarker = function (marker) {
