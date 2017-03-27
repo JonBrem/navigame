@@ -34,6 +34,11 @@
     <script src="src/utility/load_image.js"></script>
 
     <!-- Application parts -->
+    <script>
+        var WEBROOT = "/navigame";
+        var NAVIGAME_API = "/navigame_api";  
+    </script>
+
     <script src="src/navilogger.js"></script>
     <script src="src/navigameapp.js"></script>
 
@@ -46,6 +51,7 @@
     <script src="src/view_templates/title_bar.js"></script>
     <script src="src/view_templates/new_game_dialog.js"></script>
 
+    <script src="src/view/scale_elements.js"></script>
     <script src="src/view/canvas_manager.js"></script>
     <script src="src/view/map_visuals.js"></script>
     <script src="src/view/map_list.js"></script>
@@ -65,8 +71,6 @@
     <script src="src/game_logic/map_selection_handler.js"></script>
 
     <script>
-        var WEBROOT = "/navigame";
-        var NAVIGAME_API = "/navigame_api";  
 
         let gameApp = new navigame.GameApp("content_area", "title_bar_area");
         gameApp.startGame();

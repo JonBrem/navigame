@@ -35,6 +35,8 @@ navigame.MarkerControls = (function () {
         this._$mapControlsDiv = $("#map_controls_inv_layer");
 
         this._$markerManipulationArea = $("#marker_fill_rest");
+        this._$markerEditButton = this._$markerManipulationArea.find(".marker-edit-button");
+        this._$markerDeleteButton = this._$markerManipulationArea.find(".marker-delete-button");
 
         let that = this;
 
@@ -50,8 +52,8 @@ navigame.MarkerControls = (function () {
             appendTo: "body", // <- draggable everywhere (not only in container)
             helper: "clone", // <- don't drag the original element
             cursorAt: { // <- so the "preview" of the marker's position when dragging the object on the canvas is correct
-                left: this._$newMarkerDroppable.width() / 2.0,
-                top: this._$newMarkerDroppable.height() / 2.0
+                left: this._$newMarkerDroppable.width() / 10, // <- trial&error
+                top: this._$newMarkerDroppable.height() * 1.1
             }
         });
 
@@ -64,7 +66,7 @@ navigame.MarkerControls = (function () {
         let that = this;
 
         this._$mapControlsDiv.on("mousedown", function(e) {that._onMapMouseDown(e);});
-        $("body").on("mousemove", function(e) {that._onMapMouseMove(e);});
+        this._$mapControlsDiv.on("mousemove", function(e) {that._onMapMouseMove(e);});
         $("body").on("mouseup", function(e) {that._onMapMouseUp(e);});
     };
 
@@ -104,12 +106,13 @@ navigame.MarkerControls = (function () {
         //     y: adjustedPosition.y + this._canvasManager.canvasHeight() / 2
         // };
 
-        let newMarker = new fabric.Text("Marker", {
+        let newMarker = new fabric.Image(document.getElementById('marker_droppable_img'), {
             left: position.x,
             top: position.y,
-            fontSize: 14,
             originX: "center",
-            originY: "center"
+            originY: "center",
+            width: 12,
+            height: 12
         });
 
         newMarker.tag = "marker";
@@ -130,12 +133,13 @@ navigame.MarkerControls = (function () {
             y: adjustedPosition.y - this._canvasManager.canvasHeight() / 2
         };
 
-        let newMarker = new fabric.Text("Marker", {
+        let newMarker = new fabric.Image(document.getElementById('marker_droppable_img'), {
             left: posOnMap.x,
             top: posOnMap.y,
-            fontSize: 14,
             originX: "center",
-            originY: "center"
+            originY: "center",
+            width: 12,
+            height: 12
         });
 
         newMarker.tag = "marker";
@@ -149,14 +153,11 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype._onMarkerSelected = function (marker) {
-        this._$markerManipulationArea.html(compiledTemplates["marker_selected_detail"]());
-
-        this._$markerEditButton = this._$markerManipulationArea.find(".marker-edit-button");
-        this._$markerDeleteButton = this._$markerManipulationArea.find(".marker-delete-button");
-
         let that = this;
         this._$markerEditButton.on('click', function(e) {that._startEditingMarker(marker)});
+        this._$markerEditButton.removeClass('disabled');
         this._$markerDeleteButton.on('click', function(e) {that._deleteMarker(marker)});
+        this._$markerDeleteButton.removeClass('disabled');
     };
 
     MarkerControls.prototype._startEditingMarker = function (marker) {
@@ -164,7 +165,11 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype._deleteMarker = function (marker) {
-        this._$markerManipulationArea.html('');
+        this._$markerEditButton.unbind('click');
+        this._$markerEditButton.addClass('disabled');
+        this._$markerDeleteButton.unbind('click');
+        this._$markerDeleteButton.addClass('disabled');
+
         $(this).trigger('markerDeleted', [this._canvasManager.getMarkerIndex(this._clickedMarker)]);
         
         this._canvasManager.removeFromVisualLayer(marker);
@@ -184,8 +189,11 @@ navigame.MarkerControls = (function () {
             this._markerClicked = false;
             this._markerMoving = false;
 
-            if (!this._canvasManager.isClickOnRoute(positionOnMap)) {
-                this._$markerManipulationArea.html('');
+            if (!this._canvasManager.isClickOnRoute(positionOnMap, e)) {
+                this._$markerEditButton.unbind('click');
+                this._$markerEditButton.addClass('disabled');
+                this._$markerDeleteButton.unbind('click');
+                this._$markerDeleteButton.addClass('disabled');
             }
         }
     };
@@ -195,10 +203,12 @@ navigame.MarkerControls = (function () {
             this._manipulationStart.y == e.offsetY)) {
             this._markerMoving = true;
 
+            let scale = this._canvasManager.getViewportScale();
+
             this._canvasManager.moveBy(
              {
-                x: e.offsetX - this._manipulationStart.x,
-                y: e.offsetY - this._manipulationStart.y
+                x: (e.offsetX - this._manipulationStart.x) * scale,
+                y: (e.offsetY - this._manipulationStart.y) * scale
              }, this._clickedMarker);
 
             $(this).trigger('markerMoved', [this._clickedMarker, this._canvasManager.getMarkerIndex(this._clickedMarker)]);

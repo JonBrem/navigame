@@ -31,12 +31,13 @@ navigame.MapControls = (function () {
             position: 'absolute',
         });
 
-        $("body").append(this._$controlsDiv);
+        let $body = $("body");
+        $body.append(this._$controlsDiv);
 
         this._$controlsDiv.on("mousedown", function(e) {that._onMouseDown(e);});
         this._$controlsDiv.on("wheel", function(e) {that._onScroll(e);});
-        $("body").on("mousemove", function(e) {that._onMouseMove(e);});
-        $("body").on("mouseup", function(e) {that._onMouseUp(e);});
+        $body.on("mousemove", function(e) {that._onMouseMove(e);});
+        $body.on("mouseup", function(e) {that._onMouseUp(e);});
 
         setInterval(function() {that._scaleControlsDiv();}, 20);
     };
@@ -64,12 +65,13 @@ navigame.MapControls = (function () {
         // console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
 
         if (this._canvasManager.isClickOnMap(positionOnMap)) {
-            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
             if (isCtrl) {
                 this._rotating = true;
                 this._rotationAngle = 0;
+                this._manipulationStart = {x: e.pageX, y: e.pageY};
             } else {
                 this._translating = true;
+                this._manipulationStart = {x: e.offsetX, y: e.offsetY};
             }
         }
 
@@ -95,10 +97,10 @@ navigame.MapControls = (function () {
 
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
         } else if (this._rotating) {
-            this._rotationAngle = (this._manipulationStart.x - e.offsetX) / 2;
+            this._rotationAngle = (this._manipulationStart.x - e.pageX) / 2;
             this._canvasManager.rotateBy(this._rotationAngle, this._canvasCenter());
 
-            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+            this._manipulationStart = {x: e.pageX, y: e.pageY};
         }
     };
 

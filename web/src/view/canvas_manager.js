@@ -23,6 +23,7 @@ navigame.CanvasManager = (function () {
         this._ctx = this._canvas.getContext('2d');
         this._fabricCanvas = new fabric.Canvas('my_canvas');
         this._fabricCanvas.skipOffscreen = true;
+        this._fabricCanvas.perPixelTargetFind = true;
 
         this._initVisualLayer();
 
@@ -49,16 +50,13 @@ navigame.CanvasManager = (function () {
         this._fabricCanvas.renderAll();
     };
 
+    CanvasManager.prototype.getViewportScale = function () {
+        return this._fabricCanvas.width / $(this._fabricCanvas.upperCanvasEl).width();
+    };
+
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
         fabricObj.angle = -this._visualsGroup.angle;
         
-        if ("tag" in fabricObj && fabricObj.tag == "marker") {
-            let zoomLevel = this._fabricCanvas.getZoom();
-            fabricObj.set({
-                scaleX: 1 / zoomLevel,
-                scaleY: 1 / zoomLevel
-            });
-        }
 
         this._visualsGroup.add(fabricObj);
         this._fabricCanvas.renderAll();
@@ -113,8 +111,8 @@ navigame.CanvasManager = (function () {
      * @return {[canvas.Point]} point in transformed coordinates.
      */
     CanvasManager.prototype.calculatePositionOnMap = function (canvasPos) {
-        let originalPositionFractionX = canvasPos.x / this._fabricCanvas.width;
-        let originalPositionFractionY = canvasPos.y / this._fabricCanvas.height;
+        let originalPositionFractionX = canvasPos.x / $(this._fabricCanvas.upperCanvasEl).width();
+        let originalPositionFractionY = canvasPos.y / $(this._fabricCanvas.upperCanvasEl).height();
 
         let boundaries = this._fabricCanvas.calcViewportBoundaries();
 
@@ -129,20 +127,33 @@ navigame.CanvasManager = (function () {
     };
 
     CanvasManager.prototype.isClickOnRoute = function (mapPosition) {
+        let testCircle = new fabric.Circle({
+            left: mapPosition.x - 0.5 - this._visualsGroup.width / 2,
+            top: mapPosition.y - 0.5 - this._visualsGroup.height / 2,
+            radius: 1 / this._visualsGroup.zoomX, 
+            fill: "rgba(0, 0, 0, 0)"
+        });
+
+        this._visualsGroup.add(testCircle);
+        testCircle.setCoords();
+
         for(let i = 0; i < this._visualsGroup._objects.length; i++) {
             let obj = this._visualsGroup._objects[i];
 
             if (obj.hasOwnProperty("tag") && obj.tag == "route") {
-                let routeLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
-                let routeTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
+                obj.setCoords();
 
-                if (mapPosition.x >= routeLeft && mapPosition.x <= routeLeft + obj.width &&
-                    mapPosition.y >= routeTop && mapPosition.y <= routeTop + obj.height) {
+                let distance = Math.abs((obj.y2 - obj.y1) * testCircle.left - (obj.x2 - obj.x1) * testCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
+                    Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
+
+                if (distance <= 10) {
+                    // this._visualsGroup.remove(testRect);
                     return true;
                 }
             }
         }
 
+        // this._visualsGroup.remove(testRect);
         return false;
     };
 
@@ -157,8 +168,6 @@ navigame.CanvasManager = (function () {
             if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
                 let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
                 let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
-
-                console.log(markerLeft, markerTop, mapPosition.x, mapPosition.y);
 
                 if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
                     mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
@@ -254,8 +263,12 @@ navigame.CanvasManager = (function () {
         newZoom = Math.max(0.25, newZoom);
 
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
-        this._unScaleMarkersAndEdges(newZoom);
         this._fabricCanvas.renderAll();
+        let that = this;
+        setTimeout(function() {
+            that._unScaleMarkersAndEdges(newZoom);
+            that._fabricCanvas.renderAll();
+        }, 2);
     };
 
 
@@ -274,8 +287,13 @@ navigame.CanvasManager = (function () {
         newZoom = Math.max(0.25, newZoom);
 
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
-        this._unScaleMarkersAndEdges(newZoom);
         this._fabricCanvas.renderAll();
+
+        let that = this;
+        setTimeout(function() {
+            that._unScaleMarkersAndEdges(newZoom);
+            that._fabricCanvas.renderAll();
+        }, 2);
     };
 
     /**

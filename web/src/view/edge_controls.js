@@ -37,6 +37,7 @@ navigame.EdgeControls = (function () {
         this._$mapControlsDiv = $("#map_controls_inv_layer");
 
         this._$edgeManipulationArea = $("#marker_fill_rest");
+        this._$edgeEditButton = this._$edgeManipulationArea.find(".marker-edit-button");
 
         this._setupMapEdgeControls();
 
@@ -122,22 +123,22 @@ navigame.EdgeControls = (function () {
         this._edgesOnDisplay[edgeIndex] = newEdge;
     };
 
+    // only to be called after a marker was deleted! 
     EdgeControls.prototype.deleteEdge = function (edgeIndex) {
         let deleted = this._edgesOnDisplay.splice(edgeIndex, 1);
         this._canvasManager.removeFromVisualLayer(deleted[0]);
     };
 
     EdgeControls.prototype._onEdgeSelected = function (edge) {
-        /*this._$edgeManipulationArea.html(compiledTemplates["edge_selected_detail"]());
-
-        this._$edgeEditButton = this._$edgeManipulationArea.find(".edge-edit-button");
-        this._$edgeDeleteButton = this._$edgeManipulationArea.find(".edge-delete-button");
-
         let that = this;
-        this._$edgeEditButton.on('click', function(e) {that._startEditingedge(edge)}); */
+
+        this._$edgeEditButton.unbind('click');
+        this._$edgeEditButton.on('click', function(e) {that._startEditingEdge(edge)});
+        this._$edgeEditButton.removeClass('disabled');
     };
 
     EdgeControls.prototype._startEditingEdge = function (edge) {
+        console.log(edge);
     };
 
     EdgeControls.prototype._onMapMouseDown = function (e) {
@@ -147,7 +148,6 @@ navigame.EdgeControls = (function () {
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
         
             this._edgeClicked = true;
-          //  this._clickedEdge = this._canvasManager.getClickedMarker(positionOnMap);
             this._edgeMoving = false;
         
         } else {
@@ -155,7 +155,8 @@ navigame.EdgeControls = (function () {
             this._edgeMoving = false;
 
             if (!this._canvasManager.isClickOnMarker(positionOnMap)) {
-                this._$edgeManipulationArea.html('');
+                this._$edgeEditButton.unbind('click');
+                this._$edgeEditButton.addClass('disabled');
             }
         }
     };
