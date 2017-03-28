@@ -4,6 +4,9 @@ navigame.MapControls = (function () {
         this._canvasManager = null; 
         this._$controlsDiv = null;
 
+        this._markerControls = null;
+        this._edgeControls = null;
+
         this._translating = false;
         this._rotating = false;
         this._scaling = false;
@@ -13,9 +16,12 @@ navigame.MapControls = (function () {
         this._rotationAngle = 0;
     }
 
-    MapControls.prototype.init = function (canvasManager) {
+    MapControls.prototype.init = function (canvasManager, markerControls, edgeControls) {
         Log.log("verbose", "initializing map controls", this);
         this._canvasManager = canvasManager;
+
+        this._markerControls = markerControls;
+        this._edgeControls = edgeControls;
 
         this._createInvisibleControlsDiv();
 
@@ -60,31 +66,67 @@ navigame.MapControls = (function () {
         } else {
             isCtrl = !!ev.ctrlKey;
         }
+        
+        if (isCtrl) {
+            this._rotating = true;
+            this._rotationAngle = 0;
+            this._manipulationStart = {x: e.pageX, y: e.pageY};
+        } else {
+            let controlsOffset = this._$controlsDiv.offset();
+            let that = this;
 
-        let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
-        // console.log(this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY}));
-
-        if (this._canvasManager.isClickOnMap(positionOnMap)) {
-            if (isCtrl) {
-                this._rotating = true;
-                this._rotationAngle = 0;
-                this._manipulationStart = {x: e.pageX, y: e.pageY};
-            } else {
-                this._translating = true;
-                this._manipulationStart = {x: e.offsetX, y: e.offsetY};
-            }
+            this._canvasManager.moveCursor({
+                x: e.pageX - controlsOffset.left, 
+                y: e.pageY - controlsOffset.top
+            }, {
+                markerHit: function(marker) {that._onMarkerHitClick(marker);},
+                routeHit: function(route) {that._onRouteHitClick(route);},
+                nothingHit: function() {that._onNothingHitClick(e);}
+            });
         }
-
+    
         e.preventDefault();
         e.stopPropagation();
     };
 
-    MapControls.prototype.onMarkerMouseDown = function() {
+    MapControls.prototype.onSelectionCollision = function () {
 
     };
 
-    MapControls.prototype.onRouteMouseDown = function() {
+    MapControls.prototype.onMarkerMouseDown = function (e) {
+    };
 
+    MapControls.prototype.onRouteMouseDown = function () {
+
+    };
+
+    MapControls.prototype._onMarkerHitMove = function (marker) {
+        console.log(marker);
+    };
+
+    MapControls.prototype._onRouteHitMove = function (route) {
+        console.log(route);
+    };
+
+    MapControls.prototype._onNothingHitMove = function () {
+    };
+
+    MapControls.prototype._onMarkerHitClick = function (marker) {
+        this._edgeControls.onOtherClicked(marker);
+        this._markerControls.onMarkerClicked(marker);
+    };
+
+    MapControls.prototype._onRouteHitClick = function (route) {
+        this._markerControls.onOtherClicked(route);
+        this._edgeControls.onEdgeClicked(route);
+    };
+
+    MapControls.prototype._onNothingHitClick = function (e) {
+        this._translating = true;
+        this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+
+        this._markerControls.onOtherClicked(null);
+        this._edgeControls.onOtherClicked(null);
     };
 
     MapControls.prototype._onMouseMove = function (e) {
@@ -101,6 +143,24 @@ navigame.MapControls = (function () {
             this._canvasManager.rotateBy(this._rotationAngle, this._canvasCenter());
 
             this._manipulationStart = {x: e.pageX, y: e.pageY};
+        } else {
+            let controlsOffset = this._$controlsDiv.offset();
+
+            if (e.pageX >= controlsOffset.left && e.pageX <= controlsOffset.left + this._$controlsDiv.width() &&
+                    e.pageY >= controlsOffset.top && e.pageY <= controlsOffset.top + this._$controlsDiv.height()) {
+                let that = this;
+
+                this._markerControls.onCanvasMouseMove({x: e.pageX, y: e.pageY});
+
+                /*this._canvasManager.moveCursor({
+                    x: e.pageX - controlsOffset.left, 
+                    y: e.pageY - controlsOffset.top
+                }, {
+                    markerHit: function(marker) {that._onMarkerHitMove(marker);},
+                    routeHit: function(route) {that._onRouteHitMove(route);},
+                    nothingHit: function() {that._onNothingHitMove();}
+                }); */
+            }
         }
     };
 
@@ -122,6 +182,8 @@ navigame.MapControls = (function () {
         this._translating = false;
         this._rotating = false;
         this._scaling = false;
+
+        this._markerControls.onMouseUp();
     };
 
     return MapControls;

@@ -9,6 +9,7 @@ navigame.CanvasManager = (function () {
         this._fabricCanvas = null; // this is the fancy canvas library in use here :)
 
         this._visualsGroup = null;
+        this._selectionCircle = null;
 
         that = this;
     }
@@ -48,6 +49,8 @@ navigame.CanvasManager = (function () {
         this._visualsGroup.add(fabricObj);
         this.centerImage();
         this._fabricCanvas.renderAll();
+
+        this._updatePartOfGroup(this._selectionCircle);
     };
 
     CanvasManager.prototype.getViewportScale = function () {
@@ -126,6 +129,59 @@ navigame.CanvasManager = (function () {
         return !(this.isClickOnRoute(mapPosition) || this.isClickOnMarker(mapPosition));
     };
 
+    CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
+        this._setCursorPosition(elementCoordinates);
+        this._checkCursorCollisions(collisionCallback);
+        this._fabricCanvas.renderAll();
+    };
+
+    CanvasManager.prototype.cursorDown = function (elementCoordinates, collisionCallback) {
+        this._setCursorPosition(elementCoordinates);
+        this._checkCursorCollisions(collisionCallback);
+    };
+
+    CanvasManager.prototype._setCursorPosition = function (elementCoordinates) {
+        let mapPos = this.calculatePositionOnMap(elementCoordinates);
+
+        this._selectionCircle.setLeft(mapPos.x - this._selectionCircle.width / 2 - this._visualsGroup.width / 2);
+        this._selectionCircle.setTop(mapPos.y - this._selectionCircle.height / 2 - this._visualsGroup.height / 2);
+
+        this._updatePartOfGroup(this._selectionCircle);
+        this._selectionCircle.setCoords();
+    };
+
+    CanvasManager.prototype._checkCursorCollisions = function (callback) {
+        for (let i = 0; i < this._visualsGroup._objects.length; i++) {
+            let obj = this._visualsGroup._objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
+                obj.setCoords();
+
+                if (this._selectionCircle.intersectsWithObject(obj)) {
+                    callback.markerHit(obj);
+                    return;
+                }
+            }
+        }
+
+        for (let i = 0; i < this._visualsGroup._objects.length; i++) {
+            let obj = this._visualsGroup._objects[i];
+
+            if (obj.hasOwnProperty("tag") && obj.tag == "route") {
+                obj.setCoords();
+                let distance = Math.abs((obj.y2 - obj.y1) * this._selectionCircle.left - (obj.x2 - obj.x1) * this._selectionCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
+                Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
+
+                if (distance <= 10) {
+                    callback.routeHit(obj);
+                    return;
+                }
+            }
+        }
+
+        callback.nothingHit();
+    };
+
     CanvasManager.prototype.isClickOnRoute = function (mapPosition) {
         let testCircle = new fabric.Circle({
             left: mapPosition.x - 0.5 - this._visualsGroup.width / 2,
@@ -147,13 +203,13 @@ navigame.CanvasManager = (function () {
                     Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
 
                 if (distance <= 10) {
-                    this._visualsGroup.remove(testCircle);
+                   // this._visualsGroup.remove(testCircle);
                     return true;
                 }
             }
         }
 
-        this._visualsGroup.remove(testCircle);
+       // this._visualsGroup.remove(testCircle);
         return false;
     };
 
@@ -497,6 +553,16 @@ navigame.CanvasManager = (function () {
             height: this._visualsGroup.height,
             fill: "#ffffff"
         }));
+
+
+        this._selectionCircle = new fabric.Circle({
+            left: 0,
+            top: 0,
+            radius: 5 / this._visualsGroup.zoomX, 
+            fill: "rgba(255, 0, 0, 1)"
+        });
+
+        this._visualsGroup.add(this._selectionCircle);
 
         this._visualsGroup.hasBorders = false;
         this._visualsGroup.hasControls = false;

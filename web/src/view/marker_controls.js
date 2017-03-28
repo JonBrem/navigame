@@ -6,7 +6,6 @@ navigame.MarkerControls = (function () {
         this._canvasManager = null;
         this._htmlElement = null;
 
-        this._$mapControlsDiv = null;
         this._$controlsWrapper = null;
         this._$newMarkerDroppable = null;
 
@@ -32,7 +31,6 @@ navigame.MarkerControls = (function () {
         $contentArea.append(this._htmlElement);
 
         this._$controlsWrapper = $("#controls-section");
-        this._$mapControlsDiv = $("#map_controls_inv_layer");
 
         this._$markerManipulationArea = $("#marker_fill_rest");
         this._$markerEditButton = this._$markerManipulationArea.find(".marker-edit-button");
@@ -65,9 +63,7 @@ navigame.MarkerControls = (function () {
     MarkerControls.prototype._setupMapMarkerControls = function () {
         let that = this;
 
-        this._$mapControlsDiv.on("mousedown", function(e) {that._onMapMouseDown(e);});
-        this._$mapControlsDiv.on("mousemove", function(e) {that._onMapMouseMove(e);});
-        $("body").on("mouseup", function(e) {that._onMapMouseUp(e);});
+        // $("body").on("mouseup", function(e) {that._onMapMouseUp(e);});
     };
 
     MarkerControls.prototype._onNewMarkerDragStart = function (event, ui) {
@@ -121,6 +117,70 @@ navigame.MarkerControls = (function () {
         this._canvasManager.addToVisualLayer(newMarker);
     };
 
+    MarkerControls.prototype.onMarkerMouseOver = function (marker) {
+
+    };
+
+    MarkerControls.prototype.onMarkerClicked = function (marker) {
+        let that = this;
+
+        this._$markerEditButton.unbind('click');
+        this._$markerDeleteButton.unbind('click');
+        
+        this._$markerEditButton.on('click', function(e) {that._startEditingMarker(marker)});
+        this._$markerEditButton.removeClass('disabled');
+        this._$markerDeleteButton.on('click', function(e) {that._deleteMarker(marker)});
+        this._$markerDeleteButton.removeClass('disabled');
+
+
+        this._markerClicked = true;
+        this._clickedMarker = marker;
+        this._markerMoving = false;
+    };
+
+    MarkerControls.prototype.onOtherMouseOver = function () {
+
+    };
+
+    MarkerControls.prototype.onOtherClicked = function (what) {
+        let that = this;
+        this._markerClicked = false;
+        this._markerMoving = false;
+
+        if (!what) { // <- this means "what" is not set, i.e. the click went nowhere!
+            this._$markerEditButton.unbind('click');
+            this._$markerDeleteButton.unbind('click');
+            this._$markerEditButton.addClass('disabled');
+        }
+
+        this._$markerDeleteButton.addClass('disabled');
+    };
+
+    MarkerControls.prototype.onMouseUp = function () {
+        this._markerClicked = false;
+        this._markerMoving = false;
+    };
+
+    MarkerControls.prototype.onCanvasMouseMove = function (position) {
+        if (this._markerClicked && !(this._manipulationStart.x == position.x &&
+                this._manipulationStart.y == position.y)) {
+            this._markerMoving = true;
+            let scale = this._canvasManager.getViewportScale();
+            this._canvasManager.moveBy(
+             {
+                x: (position.x - this._manipulationStart.x) * scale,
+                y: (position.y - this._manipulationStart.y) * scale
+             }, this._clickedMarker);
+
+            $(this).trigger('markerMoved', [this._clickedMarker, this._canvasManager.getMarkerIndex(this._clickedMarker)]);
+
+        } else {
+            this._markerMoving = false;
+        }
+
+        this._manipulationStart = {x: position.x, y: position.y};
+    };
+
     MarkerControls.prototype._createMarkerAtMapPosition = function (position) {
         Log.log("verbose", "Creating marker at canvas position ", JSON.stringify(position), this);
 
@@ -152,14 +212,6 @@ navigame.MarkerControls = (function () {
         this._canvasManager.addToVisualLayer(newMarker);
     };
 
-    MarkerControls.prototype._onMarkerSelected = function (marker) {
-        let that = this;
-        this._$markerEditButton.on('click', function(e) {that._startEditingMarker(marker)});
-        this._$markerEditButton.removeClass('disabled');
-        this._$markerDeleteButton.on('click', function(e) {that._deleteMarker(marker)});
-        this._$markerDeleteButton.removeClass('disabled');
-    };
-
     MarkerControls.prototype._startEditingMarker = function (marker) {
         let dataDialog = new navigame.AdditionalDataDialog();
         dataDialog.show("Marker", marker);
@@ -186,62 +238,6 @@ navigame.MarkerControls = (function () {
         $(this).trigger('markerDeleted', [this._canvasManager.getMarkerIndex(this._clickedMarker)]);
         
         this._canvasManager.removeFromVisualLayer(marker);
-    };
-
-    MarkerControls.prototype._onMapMouseDown = function (e) {
-        let positionOnMap = this._canvasManager.calculatePositionOnMap({x: e.offsetX, y: e.offsetY});
-
-        if (this._canvasManager.isClickOnMarker(positionOnMap)) {
-            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
-        
-            this._markerClicked = true;
-            this._clickedMarker = this._canvasManager.getClickedMarker(positionOnMap);
-            this._markerMoving = false;
-        
-        } else {
-            this._markerClicked = false;
-            this._markerMoving = false;
-
-            if (!this._canvasManager.isClickOnRoute(positionOnMap, e)) {
-                this._$markerEditButton.unbind('click');
-                this._$markerEditButton.addClass('disabled');
-                this._$markerDeleteButton.unbind('click');
-                this._$markerDeleteButton.addClass('disabled');
-            }
-        }
-    };
-
-    MarkerControls.prototype._onMapMouseMove = function (e) {
-        if (this._markerClicked && !(this._manipulationStart.x == e.offsetX &&
-            this._manipulationStart.y == e.offsetY)) {
-            this._markerMoving = true;
-
-            let scale = this._canvasManager.getViewportScale();
-
-            this._canvasManager.moveBy(
-             {
-                x: (e.offsetX - this._manipulationStart.x) * scale,
-                y: (e.offsetY - this._manipulationStart.y) * scale
-             }, this._clickedMarker);
-
-            $(this).trigger('markerMoved', [this._clickedMarker, this._canvasManager.getMarkerIndex(this._clickedMarker)]);
-
-            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
-        } else {
-            this._markerMoving = false;
-        }
-    };
-
-    MarkerControls.prototype._onMapMouseUp = function (e) {
-        if (this._markerMoving) {
-            // re-positioned
-        } else if (this._markerClicked) {
-            // manipulate marker
-            this._onMarkerSelected(this._clickedMarker);
-        }
-
-        this._markerClicked = false;
-        this._markerMoving = false;
     };
 
     return MarkerControls;

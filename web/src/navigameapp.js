@@ -24,6 +24,11 @@ navigame.GameApp = (function () {
     GameApp.prototype.startGame = function () {
         Log.log("verbose", "starting game", this);
         this._setup();
+
+        let that = this;
+        setInterval(function() {
+            that._removeEmptyReveals();
+        }, 50);
     }; 
 
     GameApp.prototype._setup = function () {
@@ -43,14 +48,14 @@ navigame.GameApp = (function () {
         this.mapVisuals = new navigame.MapVisuals();
         this.mapVisuals.init(this.canvasManager);
 
-        this.mapControls = new navigame.MapControls();
-        this.mapControls.init(this.canvasManager);
-
         this.markerControls = new navigame.MarkerControls();
         this.markerControls.init(this.$mainHTMLObject, this.canvasManager);
 
         this.edgeControls = new navigame.EdgeControls();
         this.edgeControls.init(this.$mainHTMLObject, this.canvasManager);
+
+        this.mapControls = new navigame.MapControls();
+        this.mapControls.init(this.canvasManager, this.markerControls, this.edgeControls);
 
         this.mapListVisuals = new navigame.MapList();
         this.mapListVisuals.init(this.$mainHTMLObject);
@@ -67,7 +72,7 @@ navigame.GameApp = (function () {
         $(this.newGameDialog).on('newGameStartClicked', function(e, fromSavedState) { that.startNewGame(e, fromSavedState); });
 
 
-        let elementScaler = new navigame.ElementScaler();
+       let elementScaler = new navigame.ElementScaler();
 
         Log.log("verbose", "setup finished: ", this);
     };
@@ -144,6 +149,16 @@ navigame.GameApp = (function () {
 
     GameApp.prototype._compileTemplate = function (str) {
         return _.template(str);
+    };
+
+    // bugfix, because Reveal modals are created dynamically and that causes trouble
+    GameApp.prototype._removeEmptyReveals = function () {
+        $overlays = $(".reveal-overlay");
+        for (let i = 0; i < $overlays.length; i++) {
+            if ($overlays.eq(i).css("display") == "none") {
+                $overlays.eq(i).remove();
+            }
+        }
     };
 
     return GameApp;
