@@ -186,16 +186,13 @@ navigame.CanvasManager = (function () {
      * Positions the map at the center of the canvas.
      */
     CanvasManager.prototype.centerImage = function () {
-        let centerAfterZoomX = this._fabricCanvas.width / 2 - this._visualsGroup.width / 2;
-        let centerAfterZoomY = this._fabricCanvas.height / 2 - this._visualsGroup.height / 2;
+        this._visualsGroup.center();
 
+        // magic number 1.25: I just don't know why, but this is the initial scale and it needs to be accounted for.
         this._fabricCanvas.absolutePan(new fabric.Point(
-            this._fabricCanvas.width / 2 * this._visualsGroup.zoomX - this._fabricCanvas.width / 2,
-            this._fabricCanvas.height / 2 * this._visualsGroup.zoomY - this._fabricCanvas.width / 2
+            -(this._fabricCanvas.width / 2 - this._visualsGroup.width / 2 * (this._visualsGroup.zoomX / 1.25)), 
+            -(this._fabricCanvas.height / 2 - this._visualsGroup.height / 2 * (this._visualsGroup.zoomX / 1.25))
         ));
-
-        this._visualsGroup.setLeft(this._fabricCanvas.width / 2 * this._visualsGroup.zoomX - this._fabricCanvas.width / 2);
-        this._visualsGroup.setTop(this._fabricCanvas.height / 2 * this._visualsGroup.zoomY - this._fabricCanvas.width / 2);
 
         this._fabricCanvas.renderAll();
     };

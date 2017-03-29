@@ -72,7 +72,7 @@ navigame.GameApp = (function () {
         $(this.newGameDialog).on('newGameStartClicked', function(e, fromSavedState) { that.startNewGame(e, fromSavedState); });
 
 
-       let elementScaler = new navigame.ElementScaler();
+        let elementScaler = new navigame.ElementScaler();
 
         Log.log("verbose", "setup finished: ", this);
     };
