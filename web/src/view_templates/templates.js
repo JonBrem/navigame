@@ -1,8 +1,7 @@
 templates = {};
 compiledTemplates = {};
 
-// templates must very much remain a globally accessible object - don't ever, ever create another global variable
-// called "templates"!!
+// templates must remain a globally accessible object - don't create another global variable called "templates"!!
 // same goes for compiledTemplates. compiledTemplates is filled a runtime, don't bother putting anything in there manually.
 
 /*

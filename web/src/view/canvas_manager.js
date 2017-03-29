@@ -182,116 +182,20 @@ navigame.CanvasManager = (function () {
         callback.nothingHit();
     };
 
-    CanvasManager.prototype.isClickOnRoute = function (mapPosition) {
-        let testCircle = new fabric.Circle({
-            left: mapPosition.x - 0.5 - this._visualsGroup.width / 2,
-            top: mapPosition.y - 0.5 - this._visualsGroup.height / 2,
-            radius: 1 / this._visualsGroup.zoomX, 
-            fill: "rgba(0, 0, 0, 0)"
-        });
-
-        this._visualsGroup.add(testCircle);
-        testCircle.setCoords();
-
-        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
-            let obj = this._visualsGroup._objects[i];
-
-            if (obj.hasOwnProperty("tag") && obj.tag == "route") {
-                obj.setCoords();
-
-                let distance = Math.abs((obj.y2 - obj.y1) * testCircle.left - (obj.x2 - obj.x1) * testCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
-                    Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
-
-                if (distance <= 10) {
-                   // this._visualsGroup.remove(testCircle);
-                    return true;
-                }
-            }
-        }
-
-       // this._visualsGroup.remove(testCircle);
-        return false;
-    };
-
-    CanvasManager.prototype.getClickedRoute = function (mapPosition) {
-        let testCircle = new fabric.Circle({
-            left: mapPosition.x - 0.5 - this._visualsGroup.width / 2,
-            top: mapPosition.y - 0.5 - this._visualsGroup.height / 2,
-            radius: 1 / this._visualsGroup.zoomX, 
-            fill: "rgba(0, 0, 0, 0)"
-        });
-
-        this._visualsGroup.add(testCircle);
-        testCircle.setCoords();
-
-        for(let i = 0; i < this._visualsGroup._objects.length; i++) {
-            let obj = this._visualsGroup._objects[i];
-
-            if (obj.hasOwnProperty("tag") && obj.tag == "route") {
-                obj.setCoords();
-
-                let distance = Math.abs((obj.y2 - obj.y1) * testCircle.left - (obj.x2 - obj.x1) * testCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
-                    Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
-
-                if (distance <= 10) {
-                    this._visualsGroup.remove(testCircle);
-                    return obj;
-                }
-            }
-        }
-
-        this._visualsGroup.remove(testCircle);
-        return false;
-    };
-
-    CanvasManager.prototype.isClickOnMarker = function (mapPosition) {
-        let objects = this._visualsGroup.getObjects();
-
-        let asPoint = new fabric.Point(mapPosition.x, mapPosition.y);
-
-        for(let i = 0; i < objects.length; i++) {
-            let obj = objects[i];
-
-            if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
-                let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
-                let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
-
-                if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
-                    mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    };
-
-    CanvasManager.prototype.getClickedMarker = function (mapPosition) {
-        let objects = this._visualsGroup.getObjects();
-        for(let i = 0; i < objects.length; i++) {
-            let obj = objects[i];
-
-            if (obj.hasOwnProperty("tag") && obj.tag == "marker") {
-                let markerLeft = obj.left + this._fabricCanvas.width / 2 - obj.width / 2;
-                let markerTop = obj.top + this._fabricCanvas.height / 2 - obj.height / 2;
-
-                if (mapPosition.x >= markerLeft && mapPosition.x <= markerLeft + obj.width &&
-                    mapPosition.y >= markerTop && mapPosition.y <= markerTop + obj.height) {
-                    return obj;
-                }
-            }
-        }
-
-        return false;
-    };
-
-
     /**
      * Positions the map at the center of the canvas.
      */
     CanvasManager.prototype.centerImage = function () {
-        this._visualsGroup.setLeft(0);
-        this._visualsGroup.setTop(0);
+        let centerAfterZoomX = this._fabricCanvas.width / 2 - this._visualsGroup.width / 2;
+        let centerAfterZoomY = this._fabricCanvas.height / 2 - this._visualsGroup.height / 2;
+
+        this._fabricCanvas.absolutePan(new fabric.Point(
+            this._fabricCanvas.width / 2 * this._visualsGroup.zoomX - this._fabricCanvas.width / 2,
+            this._fabricCanvas.height / 2 * this._visualsGroup.zoomY - this._fabricCanvas.width / 2
+        ));
+
+        this._visualsGroup.setLeft(this._fabricCanvas.width / 2 * this._visualsGroup.zoomX - this._fabricCanvas.width / 2);
+        this._visualsGroup.setTop(this._fabricCanvas.height / 2 * this._visualsGroup.zoomY - this._fabricCanvas.width / 2);
 
         this._fabricCanvas.renderAll();
     };

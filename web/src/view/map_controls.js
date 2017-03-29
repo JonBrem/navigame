@@ -13,6 +13,11 @@ navigame.MapControls = (function () {
 
         this._manipulationStart = null;
 
+        this._$compasButton = null;
+        this._$centerMapButton = null;
+        this._$zoomInButton = null;
+        this._$zoomOutButton = null;
+
         this._rotationAngle = 0;
     }
 
@@ -23,13 +28,13 @@ navigame.MapControls = (function () {
         this._markerControls = markerControls;
         this._edgeControls = edgeControls;
 
-        this._createInvisibleControlsDiv();
+        this._createControlsDiv();
 
         Log.log("verbose", "finished initializing map controls", this);
     };
 
-    MapControls.prototype._createInvisibleControlsDiv = function () {
-        this._$controlsDiv = $('<div id="map_controls_inv_layer">&nbsp;</div>');
+    MapControls.prototype._createControlsDiv = function () {
+        this._$controlsDiv = $(compiledTemplates['map_controls']());
 
         let that = this;
 
@@ -44,6 +49,18 @@ navigame.MapControls = (function () {
         this._$controlsDiv.on("wheel", function(e) {that._onScroll(e);});
         $body.on("mousemove", function(e) {that._onMouseMove(e);});
         $body.on("mouseup", function(e) {that._onMouseUp(e);});
+
+        
+        this._$compasButton = $("#map_controls_compass");
+        this._$compasButton.on('click', function(e) {that._resetMapRotation();});
+
+        this._$centerMapButton = $("#map_controls_position_reset");
+        this._$centerMapButton.on('click', function(e) {that._resetMapPosition();});
+
+        this._$zoomInButton = $("#map_controls_zoom_in");
+        this._$zoomInButton.on('click', function(e) {that._zoomInViaButton();});
+        this._$zoomOutButton = $("#map_controls_zoom_out");
+        this._$zoomOutButton.on('click', function(e) {that._zoomOutViaButton();});
 
         setInterval(function() {that._scaleControlsDiv();}, 20);
     };
@@ -131,10 +148,11 @@ navigame.MapControls = (function () {
 
     MapControls.prototype._onMouseMove = function (e) {
         if (this._translating) {
+            let scale = this._canvasManager.getViewportScale();
             this._canvasManager.moveBy(
              {
-                x: e.offsetX - this._manipulationStart.x,
-                y: e.offsetY - this._manipulationStart.y
+                x: (e.offsetX - this._manipulationStart.x) * scale,
+                y: (e.offsetY - this._manipulationStart.y) * scale
              });
 
             this._manipulationStart = {x: e.offsetX, y: e.offsetY};
@@ -184,6 +202,22 @@ navigame.MapControls = (function () {
         this._scaling = false;
 
         this._markerControls.onMouseUp();
+    };
+
+    MapControls.prototype._resetMapRotation = function (e) {
+    };
+
+    MapControls.prototype._resetMapPosition = function (e) {
+        this._canvasManager.centerImage();
+
+    };
+
+    MapControls.prototype._zoomInViaButton = function (e) {
+
+    };
+
+    MapControls.prototype._zoomOutViaButton = function (e) {
+
     };
 
     return MapControls;

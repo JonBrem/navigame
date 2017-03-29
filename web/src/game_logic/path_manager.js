@@ -179,5 +179,20 @@ navigame.PathManager = (function () {
         }
     };
 
+    PathManager.prototype.resortMaps = function (newIndices) {
+        let maps = this.path.mapPaths;
+        let newMapPaths = [];
+
+        for (let i = 0; i < newIndices.length; i++) {
+            newMapPaths[i] = maps[newIndices[i]];
+
+            if (newIndices[i] == this.currentMapIndex) {
+                this.currentMapIndex = i;
+            }
+        }
+
+        this.path.mapPaths = newMapPaths;
+    };
+
     return PathManager;
 }());

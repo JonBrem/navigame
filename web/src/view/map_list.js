@@ -13,16 +13,20 @@ navigame.MapList = (function () {
         this._$contentArea = $contentArea;
         this._$contentArea.append(compiledTemplates['map_list']());
 
+        let that = this;
+
         this._$mapListElement = $("#map_list");
         this._$mapListElement.sortable({
             axis: "x",
             delay: 50,
             distance: 10,
+            update: function (e, ui) {
+                that._onMapListResorted();
+            }
         });
         this._$mapListElement.disableSelection();
         this._$addMapButton = $("#add_map_button");
 
-        let that = this;
         this._$addMapButton.on("click", function(e) {
             that.showAddMapDialog(true);
         });
@@ -59,6 +63,18 @@ navigame.MapList = (function () {
             mapIndex: $mapItem.attr('data-map-index'),
             imgSrc: $mapItem.find('img').attr('src')
         }]);
+    };
+
+    MapList.prototype._onMapListResorted = function () {
+        let indices = [];
+        let $sortedItems = $(".map_item");
+
+        for (let i = 0; i < $sortedItems.length; i++) {
+            indices.push(Number($sortedItems.eq(i).attr("data-map-index")));
+            $sortedItems.eq(i).attr("data-map-index", i);
+        }
+
+        $(this).trigger('onMapsResorted', [indices]);
     };
 
     return MapList;

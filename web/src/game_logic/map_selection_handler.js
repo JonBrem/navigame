@@ -24,6 +24,10 @@ navigame.MapSelectionHandler = (function () {
             that.setSelectedMap(data.mapIndex, data.imgSrc);
         });
 
+        $(this.mapListVisuals).on('onMapsResorted', function (e, data) {
+            that.pathManager.resortMaps(data);
+        });
+
         $(this.pathManager).on('triggerLoadMaps', function (e, data) {
             that.loadMaps(data);
         });
