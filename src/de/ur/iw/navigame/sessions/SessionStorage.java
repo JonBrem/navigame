@@ -42,17 +42,21 @@ public class SessionStorage implements ServletRequestHandler {
     private void loadSession(Map<String, String[]> params, HttpServletResponse response) {
         String pathId = params.get("path_id")[0];
 
-        FileStorage.loadFile("session" + pathId + ".txt",
-                s -> {
-                    printSession(s, response);
-                },
-                v -> {
-                    try {
-                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+        if (FileStorage.fileExists("session" + pathId + ".txt")) {
+            FileStorage.loadFile("session" + pathId + ".txt",
+                    s -> {
+                        printSession(s, response);
+                    },
+                    v -> {
+                        try {
+                            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } else {
+            // @todo some error that the session could not be loaded!
+        }
     }
 
     private  void printSession(String json, HttpServletResponse response) {

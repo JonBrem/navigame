@@ -93,9 +93,6 @@ body {
 }
 
 #map_controls_compass, #map_controls_position_reset, #map_controls_zoom {
-    background-color: #607D8B;
-    border-radius: 3px;
-    padding: 3px;
     display: inline-block;
     position: absolute;
 }
@@ -108,15 +105,32 @@ body {
     width: 20px;
 }
 
-#map_controls_compass span, #map_controls_position_reset span {
+#map_controls_compass span, #map_controls_position_reset span, #map_controls_zoom span {
+    background-color: #607D8B;
+
     line-height: 0;
     display: block;
-    color: #ffffff;
+    color: #ddd;
+    border-radius: 3px;
+    width: 100%;
+    height: 100%;
+}
+
+#map_controls_inv_layer span:hover {
+    color: #fff !important;
+    background-color: #708DAB;
+}
+
+#map_controls_inv_layer span i {
+    display: inline-block;
 }
 
 #map_controls_compass span {
     font-size: 17px;
-    margin-top: -1.5px;
+}
+
+#map_controls_compass span i {
+    margin-top: 1.5px;
 }
 
 .fi-compass:before {
@@ -134,9 +148,49 @@ body {
     font-size: 14px;
 }
 
+#map_controls_position_reset span i {
+    margin-top: 2px;
+    margin-left: 2px;
+}
+
 #map_controls_zoom {
     height: 30px;
     width: 20px;
     right: 3px;
     bottom: 3px;
+    font-size: 13px;
+}
+
+#map_controls_zoom span i {
+    height: 15px;
+    margin-left: 5px;
+}
+
+#map_controls_zoom_in {
+    border-bottom: 1px solid #333;
+    margin-top: -1px;
+}
+
+#map_controls_zoom_in span {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#map_controls_zoom_in span i {
+    margin-top: 2px;
+    margin-bottom: -2px;
+}
+
+#map_controls_zoom_out {
+    font-size: 11px;
+}
+
+#map_controls_zoom_out span {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+#map_controls_zoom_out span i {
+    margin-top: 3px;
+    margin-bottom: -3px;
 }

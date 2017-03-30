@@ -125,8 +125,8 @@ navigame.CanvasManager = (function () {
         return this._visualsGroup.toLocalPoint(new fabric.Point(newPosX, newPosY), "left", "top");
     };
 
-    CanvasManager.prototype.isClickOnMap = function (mapPosition) {
-        return !(this.isClickOnRoute(mapPosition) || this.isClickOnMarker(mapPosition));
+    CanvasManager.prototype.getCurrentZoom = function () {
+        return this._visualsGroup.zoomX;
     };
 
     CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
@@ -274,6 +274,13 @@ navigame.CanvasManager = (function () {
         let newZoom = Math.min(zoomDelta + zoomBefore, 4);
         newZoom = Math.max(0.25, newZoom);
 
+        if (!center) {
+            center = {
+                x: this._fabricCanvas.width / 2,
+                y: this._fabricCanvas.height / 2
+            }
+        }
+
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
         this._fabricCanvas.renderAll();
 
@@ -292,6 +299,14 @@ navigame.CanvasManager = (function () {
      */
     CanvasManager.prototype.setRotation = function (rotation, center) {
         let prevRotation = this._visualsGroup.getAngle();
+
+        if (!center) {
+            center = {
+                x: this._fabricCanvas.width / 2,
+                y: this._fabricCanvas.height / 2
+            }
+        }
+
         this.rotateBy(-prevRotation, center, false);
         this.rotateBy(rotation, center, true);
         this._rotateMarkersUpwards();
@@ -340,6 +355,8 @@ navigame.CanvasManager = (function () {
         this._visualsGroup.setAngle(prevRotation + rotation);
 
         this._rotateMarkersUpwards();
+
+        $(this).trigger('rotationChange', [prevRotation + rotation]);
 
         if (updateRender)
             this._fabricCanvas.renderAll();

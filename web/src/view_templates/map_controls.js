@@ -1,7 +1,7 @@
 templates.map_controls = [
     '<div id="map_controls_inv_layer">',
     '   <div id="map_controls_compass">',
-    '       <span><i class="fi-compass" style="transform: rotate(-45deg)"></i></span>',
+    '       <span><i class="fi-compass"></i></span>',
     '   </div>', // /#map_controls_compass
     '   <div id="map_controls_position_reset">',
     '       <span><i class="fi-arrows-in"></i></span>',

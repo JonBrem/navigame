@@ -13,7 +13,7 @@ navigame.MapControls = (function () {
 
         this._manipulationStart = null;
 
-        this._$compasButton = null;
+        this._$compassButton = null;
         this._$centerMapButton = null;
         this._$zoomInButton = null;
         this._$zoomOutButton = null;
@@ -24,6 +24,10 @@ navigame.MapControls = (function () {
     MapControls.prototype.init = function (canvasManager, markerControls, edgeControls) {
         Log.log("verbose", "initializing map controls", this);
         this._canvasManager = canvasManager;
+        let that = this;
+        $(this._canvasManager).on('rotationChange', function (e, rotation) {
+            that._onCanvasRotationChanged(rotation);
+        });
 
         this._markerControls = markerControls;
         this._edgeControls = edgeControls;
@@ -51,8 +55,8 @@ navigame.MapControls = (function () {
         $body.on("mouseup", function(e) {that._onMouseUp(e);});
 
         
-        this._$compasButton = $("#map_controls_compass");
-        this._$compasButton.on('click', function(e) {that._resetMapRotation();});
+        this._$compassButton = $("#map_controls_compass");
+        this._$compassButton.on('click', function(e) {that._resetMapRotation();});
 
         this._$centerMapButton = $("#map_controls_position_reset");
         this._$centerMapButton.on('click', function(e) {that._resetMapPosition();});
@@ -140,7 +144,7 @@ navigame.MapControls = (function () {
 
     MapControls.prototype._onNothingHitClick = function (e) {
         this._translating = true;
-        this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+        this._manipulationStart = {x: e.pageX, y: e.pageY};
 
         this._markerControls.onOtherClicked(null);
         this._edgeControls.onOtherClicked(null);
@@ -151,11 +155,11 @@ navigame.MapControls = (function () {
             let scale = this._canvasManager.getViewportScale();
             this._canvasManager.moveBy(
              {
-                x: (e.offsetX - this._manipulationStart.x) * scale,
-                y: (e.offsetY - this._manipulationStart.y) * scale
+                x: (e.pageX - this._manipulationStart.x) * scale,
+                y: (e.pageY - this._manipulationStart.y) * scale
              });
 
-            this._manipulationStart = {x: e.offsetX, y: e.offsetY};
+            this._manipulationStart = {x: e.pageX, y: e.pageY};
         } else if (this._rotating) {
             this._rotationAngle = (this._manipulationStart.x - e.pageX) / 2;
             this._canvasManager.rotateBy(this._rotationAngle, this._canvasCenter());
@@ -205,6 +209,11 @@ navigame.MapControls = (function () {
     };
 
     MapControls.prototype._resetMapRotation = function (e) {
+        this._canvasManager.setRotation(0);
+    };
+
+    MapControls.prototype._onCanvasRotationChanged = function (rotation) {
+        this._$compassButton.children(0).children(0).css('transform', 'rotate(' + rotation + 'deg)');
     };
 
     MapControls.prototype._resetMapPosition = function (e) {
@@ -213,11 +222,11 @@ navigame.MapControls = (function () {
     };
 
     MapControls.prototype._zoomInViaButton = function (e) {
-
+        this._canvasManager.zoomBy(0.3);
     };
 
     MapControls.prototype._zoomOutViaButton = function (e) {
-
+        this._canvasManager.zoomBy(-0.3);
     };
 
     return MapControls;
