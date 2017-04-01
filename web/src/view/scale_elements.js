@@ -7,14 +7,18 @@ navigame.ElementScaler = (function() {
         }, 100));
 
         this._$title = null;
-        this._$gameControls = null;
+        this._$titleElements = {};
+        this._$gameControlsElements = {};
 
         this._$lowerCanvas = null;
         this._$upperCanvas = null;
         this._$canvasContainer = null;
 
         this._$controlsDiv = null;
+        this._$controlsElements = {};
+        
         this._$mapControlsDiv = null;
+        this._$mapControlsElements = {};
 
         setTimeout(function() {
             that.referenceElements();
@@ -24,8 +28,17 @@ navigame.ElementScaler = (function() {
 
     ElementScaler.prototype.referenceElements = function () {
         this._$title = $("#title_bar_area");
-        this._$gameControls = null;
+        this._$titleElements = {
+            titleHeader: this._$title.find('h1'),
+            titleBar: this._$title.find('.title-bar')
+        };
 
+        this._$gameControlsElements = {
+            saveButton: this._$title.find('#save_button'),
+            sessionDisplay: this._$title.find('#session_id_container'),
+            newGameButton: this._$title.find('#new_game_button')
+        };
+        
         this._$canvasContainer = $(".canvas-container");
         this._$lowerCanvas = this._$canvasContainer.children().eq(0);
         this._$upperCanvas = this._$canvasContainer.children().eq(1);
@@ -35,8 +48,8 @@ navigame.ElementScaler = (function() {
     };
 
     ElementScaler.prototype.rescale = function () {
-        let windowWidth = $(window.top).width();
-        let windowHeight = $(window.top).height();
+        let windowWidth = Math.max($(window.top).width(), 300);
+        let windowHeight = Math.max($(window.top).height(), 500);
 
         // max. 3 / 16 of height
         this._rescaleTitle(windowWidth, windowHeight);
@@ -54,7 +67,7 @@ navigame.ElementScaler = (function() {
     ElementScaler.prototype._rescaleTitle = function(windowWidth, windowHeight) {
         // bottom most element minus start element
         let desiredHeight = ($("#from_node").offset().top + $("#from_node").height()) - $("#game_name").offset().top;
-        let height = Math.min(desiredHeight, windowHeight * (3 / 16.0));
+        let height = Math.min(windowHeight * (3 / 16.0));
 
         this._$title.height(height);
     };

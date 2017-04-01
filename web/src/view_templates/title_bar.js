@@ -1,6 +1,6 @@
 templates.title_bar = 
    ['<div class="row title-bar">',
-    '   <div class="small-12 medium-12 large-5 columns" id="game_name">',
+    '   <div class="small-12 medium-5 large-5 columns" id="game_name">',
     '       <h1>Navigationsspiel</h1>',
     '   </div>',
     '   <div class="small-3 medium-2 columns" id="save_wrapper">',
@@ -8,7 +8,7 @@ templates.title_bar =
     '           <button class="button" id="save_button"><i class="fi-save"></i> Save</button>',
     '       </div>',
     '   </div>',
-    '   <div class="small-6 medium-6 large-3 columns" id="session_id_wrapper">',
+    '   <div class="small-6 medium-3 large-3 columns" id="session_id_wrapper">',
     '       <div id="session_id_container">&nbsp;',
     '       </div>',
     '   </div>',
