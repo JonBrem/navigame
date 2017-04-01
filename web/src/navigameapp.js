@@ -62,7 +62,8 @@ navigame.GameApp = (function () {
 
         this.pathManager = new navigame.PathManager();
         this.pathManager.newPath();
-        this.pathManager.init(this.markerControls, this.edgeControls);
+        this.pathManager.init(this.markerControls, this.edgeControls, this.mapListVisuals);
+        $(this.pathManager).on('onScoreCalculated', function(e, data) { that._onScoreCalculated(data); });
 
         this.mapSelectionHandler = new navigame.MapSelectionHandler();
         this.mapSelectionHandler.init(this.mapVisuals, this.mapListVisuals, this.pathManager);
@@ -79,6 +80,8 @@ navigame.GameApp = (function () {
 
     GameApp.prototype.startNewGame = function (e, fromSavedState) {
         this.pathManager.newPath();
+        this.mapListVisuals.clear();
+        
         let that = this;
 
         if (!fromSavedState || fromSavedState == null || fromSavedState == "") {
@@ -137,6 +140,18 @@ navigame.GameApp = (function () {
         this.pathManager.setPathId(pathData.pathId);
 
         this.pathManager.loadPathFromJson(pathData);
+    };
+
+    GameApp.prototype._onScoreCalculated = function (scoreData) {
+        let scoreDialog = new navigame.ScoreDialog();
+        let that = this;
+
+        $(scoreDialog).on('newGameStartClicked', function (e) {
+            scoreDialog.closeDialog();
+            that.showNewGameDialog();
+        });
+
+        scoreDialog.show(scoreData);
     };
 
     GameApp.prototype._compileTemplates = function () {

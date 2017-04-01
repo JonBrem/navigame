@@ -5,6 +5,8 @@ navigame.MapList = (function () {
 
         this._$mapListElement = null;
         this._$addMappButton = null;
+        this._$removeMapButton = null;
+        this._$submitPathButton = null;
 
         this.mapSelectionHandler = null;
     }
@@ -25,10 +27,20 @@ navigame.MapList = (function () {
             }
         });
         this._$mapListElement.disableSelection();
-        this._$addMapButton = $("#add_map_button");
 
+        this._$addMapButton = $("#add_map_button");
         this._$addMapButton.on("click", function(e) {
             that.showAddMapDialog(true);
+        });
+
+        this._$removeMapButton = $("#remove_map_button");
+        this._$removeMapButton.on("click", function(e) {
+            that.deleteMapButtonClicked();
+        });
+
+        this._$submitPathButton = $("#submit_path_button");
+        this._$submitPathButton.on("click", function(e) {
+            that.submitPathClicked();
         });
     };
 
@@ -54,8 +66,49 @@ navigame.MapList = (function () {
         
         let that = this;
         newMapItem.on('click', function (e) {
-            that._onMapClicked($(this)); // <-- this is not that in this case :) #JavaScript
+            that._onMapClicked($(this)); // <-- "this" is not "that" in this case!
         });
+    };
+
+    MapList.prototype.deleteMapButtonClicked = function () {
+        $(this).trigger('requestDeleteMap'); // <- because the view can't just delete things!
+    };
+
+    MapList.prototype.submitPathClicked = function () {
+        $(this).trigger("requestSubmitPath");
+    };
+
+    MapList.prototype.deleteMap = function (index, newSelectedIndex) {
+        Log.log("verbose", "deleting map at index: " + index, this);
+
+        let $mapItem = $('.map_item').eq(index);
+        $mapItem.remove();
+
+        let that = this;
+
+        setTimeout(function() { // <- insure this happens after DOM is updated
+            let $remainingItems = $(".map_item");
+
+            for (let i = 0; i < $remainingItems.length; i++) {
+                $remainingItems.eq(i).attr("data-map-index", i);
+            }
+
+            that.setSelectedMapIndex(newSelectedIndex);
+        }, 1);
+    };
+
+    MapList.prototype.setSelectedMapIndex = function (newSelectedIndex) {
+        let $mapItem = $('.map_item').eq(newSelectedIndex);
+
+        $(this).trigger('onMapSelected', [{
+            mapIndex: $mapItem.attr('data-map-index'),
+            imgSrc: $mapItem.find('img').attr('src')
+        }]);
+    };
+
+    MapList.prototype.clear = function () {
+        let $mapItems = $('.map_item');
+        $mapItems.remove();
     };
 
     MapList.prototype._onMapClicked = function ($mapItem) {

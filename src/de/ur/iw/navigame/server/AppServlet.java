@@ -2,6 +2,7 @@ package de.ur.iw.navigame.server;
 
 import de.ur.iw.navigame.data_download.AreaLevels;
 import de.ur.iw.navigame.data_download.UniversityAreas;
+import de.ur.iw.navigame.game_logic.Scorer;
 import de.ur.iw.navigame.sessions.SessionIDs;
 import de.ur.iw.navigame.sessions.SessionStorage;
 import de.ur.iw.navigame.utility.FileStorage;
@@ -74,6 +75,8 @@ public class AppServlet extends UnifiedServlet implements ServletContextListener
 
         requestHandlers.put("save_path", new SessionStorage());
         requestHandlers.put("load_path", new SessionStorage());
+
+        requestHandlers.put("submit_path", new Scorer());
     }
 
     /**

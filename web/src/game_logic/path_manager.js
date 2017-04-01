@@ -5,14 +5,17 @@ navigame.PathManager = (function () {
         this.edgeControls = null;
         this.path = null;
 
+        this.mapListVisuals = null;
+
         this.currentMapIndex = -1;
     }
 
-    PathManager.prototype.init = function(markerControls, edgeControls) {
+    PathManager.prototype.init = function(markerControls, edgeControls, mapListVisuals) {
         Log.log("verbose", "Initializing Path Manager", this);
 
         this.markerControls = markerControls;
         this.edgeControls = edgeControls;
+        this.mapListVisuals = mapListVisuals;
 
         let that = this;
 
@@ -34,6 +37,14 @@ navigame.PathManager = (function () {
 
         $(this.edgeControls).on("edgeDataChanged", function(event, edgeIndex, edgeData) {
             that.onEdgeDataChanged(edgeIndex, edgeData);
+        });
+
+        $(this.mapListVisuals).on('requestDeleteMap', function (e, mapIndex) {
+            that.deleteMap(mapIndex);
+        });
+
+        $(this.mapListVisuals).on('requestSubmitPath', function (e) {
+            that.submitPath();
         });
 
         Log.log("verbose", "Finished Initializing Path Manager", this);
@@ -72,6 +83,18 @@ navigame.PathManager = (function () {
         $(this.path.mapPaths[this.currentMapIndex]).on('edgeCreated', function(e, whichMapPath, edge) {
             that.onEdgeCreated(whichMapPath, edge.fromNodeIndex, edge.toNodeIndex, edge.edgeData);
         });
+    };
+
+    PathManager.prototype.deleteMap = function (mapIndex) {
+        Log.log("verbose", "deleting map at index: " + mapIndex, this);
+
+        mapIndex = mapIndex? mapIndex : this.currentMapIndex;
+
+        this.path.mapPaths.splice(mapIndex, 1);
+
+        let newMapIndex = (mapIndex == this.path.mapPaths.length)? mapIndex - 1 : mapIndex;
+        this.currentMapIndex = newMapIndex;
+        this.mapListVisuals.deleteMap(mapIndex, newMapIndex);
     };
 
     PathManager.prototype.setCurrentMapIndex = function (index) {
@@ -192,6 +215,25 @@ navigame.PathManager = (function () {
         }
 
         this.path.mapPaths = newMapPaths;
+    };
+
+    PathManager.prototype.submitPath = function () {
+        let that = this;
+
+        $.ajax({
+            url: WEBROOT + NAVIGAME_API,
+            type: 'GET',
+            dataType: 'json',
+            data: {
+                method: 'submit_path',
+                path_data: JSON.stringify(that.path.toJson())
+            },
+            success: function (e) {
+                $(that).trigger('onScoreCalculated', [e]);
+            },
+            error: function (e) {
+            }
+        });
     };
 
     return PathManager;
