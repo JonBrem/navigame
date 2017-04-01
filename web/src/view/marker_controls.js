@@ -19,6 +19,8 @@ navigame.MarkerControls = (function () {
         this._clickedMarker = null;
         this._manipulationStart = null;
 
+        this._highlightedMarker = null;
+
         that = this;
     }
 
@@ -118,7 +120,18 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype.onMarkerMouseOver = function (marker) {
+        if (this._highlightedMarker != null && this._highlightedMarker != marker) {
+            this.onOtherMouseOver();
+        }
 
+        this._highlightedMarker = marker;
+
+        this._highlightedMarker.set({
+            width: 15,
+            height: 15
+        });
+
+        this._canvasManager.updateMarker(this._highlightedMarker);
     };
 
     MarkerControls.prototype.onMarkerClicked = function (marker) {
@@ -139,7 +152,16 @@ navigame.MarkerControls = (function () {
     };
 
     MarkerControls.prototype.onOtherMouseOver = function () {
+        if (this._highlightedMarker != null) {
+            this._highlightedMarker.set({
+                width: 12,
+                height: 12
+            });
 
+            this._canvasManager.updateMarker(this._highlightedMarker);
+
+            this._highlightedMarker = null;
+        }
     };
 
     MarkerControls.prototype.onOtherClicked = function (what) {

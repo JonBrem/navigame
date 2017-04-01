@@ -17,6 +17,7 @@ navigame.EdgeControls = (function () {
         this._clickedEdge = null;
 
         this._edgesOnDisplay = [];
+        this._highlightedEdge = null;
 
         that = this;
     }
@@ -152,7 +153,17 @@ navigame.EdgeControls = (function () {
     };  
 
     EdgeControls.prototype.onEdgeMouseOver = function (edge) {
+        if (this._highlightedEdge != null && this._highlightedEdge != edge) {
+            this.onOtherMouseOver();
+        }
 
+        this._highlightedEdge = edge;
+
+        this._highlightedEdge.set({
+            strokeWidth: 7
+        });
+
+        this._canvasManager.updateEdge(this._highlightedEdge);
     };
 
     EdgeControls.prototype.onEdgeClicked = function (edge) {
@@ -168,7 +179,15 @@ navigame.EdgeControls = (function () {
     };
 
     EdgeControls.prototype.onOtherMouseOver = function () {
+        if (this._highlightedEdge != null) {
+            this._highlightedEdge.set({
+                strokeWidth: 4,
+            });
 
+            this._canvasManager.updateEdge(this._highlightedEdge);
+
+            this._highlightedEdge = null;
+        }
     };
 
     EdgeControls.prototype.onOtherClicked = function (what) {

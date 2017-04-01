@@ -122,14 +122,18 @@ navigame.MapControls = (function () {
     };
 
     MapControls.prototype._onMarkerHitMove = function (marker) {
-        console.log(marker);
+        this._edgeControls.onOtherMouseOver(marker);
+        this._markerControls.onMarkerMouseOver(marker);
     };
 
     MapControls.prototype._onRouteHitMove = function (route) {
-        console.log(route);
+        this._markerControls.onOtherMouseOver(route);
+        this._edgeControls.onEdgeMouseOver(route);
     };
 
     MapControls.prototype._onNothingHitMove = function () {
+        this._markerControls.onOtherMouseOver();
+        this._edgeControls.onOtherMouseOver();
     };
 
     MapControls.prototype._onMarkerHitClick = function (marker) {
@@ -174,14 +178,14 @@ navigame.MapControls = (function () {
 
                 this._markerControls.onCanvasMouseMove({x: e.pageX, y: e.pageY});
 
-                /*this._canvasManager.moveCursor({
+                this._canvasManager.moveCursor({
                     x: e.pageX - controlsOffset.left, 
                     y: e.pageY - controlsOffset.top
                 }, {
                     markerHit: function(marker) {that._onMarkerHitMove(marker);},
                     routeHit: function(route) {that._onRouteHitMove(route);},
                     nothingHit: function() {that._onNothingHitMove();}
-                }); */
+                });
             }
         }
     };

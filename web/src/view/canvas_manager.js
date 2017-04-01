@@ -132,7 +132,7 @@ navigame.CanvasManager = (function () {
     CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
         this._setCursorPosition(elementCoordinates);
         this._checkCursorCollisions(collisionCallback);
-        this._fabricCanvas.renderAll();
+        //this._fabricCanvas.renderAll();
     };
 
     CanvasManager.prototype.cursorDown = function (elementCoordinates, collisionCallback) {
@@ -169,8 +169,17 @@ navigame.CanvasManager = (function () {
 
             if (obj.hasOwnProperty("tag") && obj.tag == "route") {
                 obj.setCoords();
-                let distance = Math.abs((obj.y2 - obj.y1) * this._selectionCircle.left - (obj.x2 - obj.x1) * this._selectionCircle.top + obj.x2 * obj.y1 - obj.y2 * obj.x1) / 
-                Math.sqrt(Math.pow(obj.y2 - obj.y1, 2) + Math.pow(obj.x2 - obj.x1, 2));
+
+                let distance = this._distToSegment({
+                    x: this._selectionCircle.left,
+                    y: this._selectionCircle.top
+                }, {
+                    x: obj.x1,
+                    y: obj.y1
+                }, {
+                    x: obj.x2,
+                    y: obj.y2
+                });
 
                 if (distance <= 10) {
                     callback.routeHit(obj);
@@ -404,6 +413,16 @@ navigame.CanvasManager = (function () {
         return -1;
     };
 
+    CanvasManager.prototype.updateMarker = function (marker) {
+        this._updatePartOfGroup(marker);
+        this._fabricCanvas.renderAll();
+    };
+
+    CanvasManager.prototype.updateEdge = function (edge) {
+        this._updatePartOfGroup(edge);
+        this._fabricCanvas.renderAll();
+    };
+
     /*
      * Awesome matrix multiplication ^_^
      * (adjusted, original: http://stackoverflow.com/questions/17410809/how-to-calculate-rotation-in-2d-in-javascript)
@@ -477,7 +496,7 @@ navigame.CanvasManager = (function () {
             left: 0,
             top: 0,
             radius: 5 / this._visualsGroup.zoomX, 
-            fill: "rgba(255, 0, 0, 1)"
+            fill: "rgba(255, 0, 0, 0)"
         });
 
         this._visualsGroup.add(this._selectionCircle);
@@ -486,6 +505,30 @@ navigame.CanvasManager = (function () {
         this._visualsGroup.hasControls = false;
         this._visualsGroup.hasRotatingPoint = false;
         this._fabricCanvas.add(this._visualsGroup);
+    };
+
+    // helpers for calculating distance of point to a line, http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    
+
+    CanvasManager.prototype._sqr = function (x) { 
+        return x * x 
+    };
+
+    CanvasManager.prototype._dist2 = function (v, w) { 
+        return this._sqr(v.x - w.x) + this._sqr(v.y - w.y);
+    };
+
+    CanvasManager.prototype._distToSegmentSquared = function (p, v, w) {
+        var l2 = this._dist2(v, w);
+        if (l2 == 0) return this._dist2(p, v);
+        var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+        t = Math.max(0, Math.min(1, t));
+        return this._dist2(p, {x: v.x + t * (w.x - v.x),
+                         y: v.y + t * (w.y - v.y) });
+    };
+
+    CanvasManager.prototype._distToSegment = function (p, v, w) { 
+        return Math.sqrt(this._distToSegmentSquared(p, v, w)); 
     };
 
     return CanvasManager;
