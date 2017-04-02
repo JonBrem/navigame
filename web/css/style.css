@@ -213,6 +213,10 @@ body > * {
     margin-bottom: -3px;
 }
 
+#load_session_error {
+    color: red;
+}
+
 /* for scaling things */
 
 .map_list_scroll_wrapper {

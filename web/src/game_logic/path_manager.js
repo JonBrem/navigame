@@ -19,8 +19,8 @@ navigame.PathManager = (function () {
 
         let that = this;
 
-        $(this.markerControls).on("markerCreated", function(event, marker) {
-            that.addNode(marker.left, marker.top, marker.additionalData);
+        $(this.markerControls).on("markerCreated", function(event, marker, onEdge) {
+            that.addNode(marker.left, marker.top, marker.additionalData, onEdge);
         });
 
         $(this.markerControls).on("markerMoved", function(event, marker, markerIndex) {
@@ -66,9 +66,19 @@ navigame.PathManager = (function () {
 
         this.currentMapIndex = this.path.mapPaths.length - 1;
 
+        let that = this;
+
         for (let i = 0; i < this.path.mapPaths.length; i++) {
             maps.push({
                 imgSrc: this.path.mapPaths[i].storeyId
+            });
+
+            $(this.path.mapPaths[i]).on('edgeCreated', function(e, whichMapPath, edge) {
+                that.onEdgeCreated(whichMapPath, edge.fromNodeIndex, edge.toNodeIndex, edge.edgeData);
+            });
+
+            $(this.path.mapPaths[i]).on('edgesUpdated', function(e, whichMapPath, edges) {
+                that.onEdgesUpdated(whichMapPath, edges);
             });
         }
 
@@ -80,15 +90,19 @@ navigame.PathManager = (function () {
         this.currentMapIndex = this.path.mapPaths.length - 1;
 
         let that = this;
+
         $(this.path.mapPaths[this.currentMapIndex]).on('edgeCreated', function(e, whichMapPath, edge) {
             that.onEdgeCreated(whichMapPath, edge.fromNodeIndex, edge.toNodeIndex, edge.edgeData);
+        });
+
+        $(this.path.mapPaths[this.currentMapIndex]).on('edgesUpdated', function(e, whichMapPath, edges) {
+            that.onEdgesUpdated(whichMapPath, edges);
         });
     };
 
     PathManager.prototype.deleteMap = function (mapIndex) {
-        Log.log("verbose", "deleting map at index: " + mapIndex, this);
-
         mapIndex = mapIndex? mapIndex : this.currentMapIndex;
+        Log.log("verbose", "deleting map at index: " + mapIndex, this);
 
         this.path.mapPaths.splice(mapIndex, 1);
 
@@ -118,8 +132,27 @@ navigame.PathManager = (function () {
         }
     };
 
-    PathManager.prototype.addNode = function (x, y, data) {
-        this.path.mapPaths[this.currentMapIndex].addNode(x, y, data);
+    PathManager.prototype.addNode = function (x, y, data, onEdge) {
+        if (onEdge == null) { // = create new marker and append at the end
+            this.path.mapPaths[this.currentMapIndex].addNode(x, y, data);
+            this.markerControls.addMarkerData(data.timeCreated, {
+                "markerIndex": this.path.mapPaths[this.currentMapIndex].pathNodes.length - 1
+            });
+        } else { // = create new marker and insert between two others
+            let newMarkerIndex = onEdge.additionalData.edgeIndex + 1;
+            this.path.mapPaths[this.currentMapIndex].addNodeAtIndex(x, y, data, newMarkerIndex);
+
+            let that = this;
+            setTimeout(function() {
+                for (let i = 0; i < that.path.mapPaths[that.currentMapIndex].pathNodes.length; i++) {
+                    that.markerControls.addMarkerData(
+                        that.path.mapPaths[that.currentMapIndex].pathNodes[i].nodeData.timeCreated,
+                        {
+                            "markerIndex": i
+                        });
+                }
+            }, 5);
+        }
     };
 
     PathManager.prototype.onEdgeCreated = function (whichMapPath, fromNode, toNode, data) {
@@ -131,8 +164,36 @@ navigame.PathManager = (function () {
                     whichMapPath.pathNodes[fromNode].nodeData.timeCreated,
                     whichMapPath.pathNodes[toNode].nodeData.timeCreated,
                     data
-                )},
+                );
+
+                that.edgeControls.addEdgeData(data.timeCreated, {
+                    "edgeIndex": that.path.mapPaths[that.currentMapIndex].pathEdges.length - 1
+                });
+            },
         5);
+    };
+
+    PathManager.prototype.onEdgesUpdated = function (whichMapPath, newEdges) {
+        let that = this;
+        that.edgeControls.clearEdges();
+
+        setTimeout(
+            function() {
+                console.log(newEdges);
+
+                for (let i = 0; i < newEdges.length; i++) {
+                    that.edgeControls.createEdgeAtMapPosition(
+                        whichMapPath.pathNodes[i].nodeData.timeCreated,
+                        whichMapPath.pathNodes[i + 1].nodeData.timeCreated,
+                        newEdges[i].edgeData 
+                    );
+
+                    that.edgeControls.addEdgeData(newEdges[i].edgeData.timeCreated, {
+                        "edgeIndex": i
+                    });
+                }
+            },
+        10);
     };
 
     PathManager.prototype.onMarkerMoved = function (marker, markerIndex) {

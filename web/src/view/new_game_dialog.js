@@ -28,6 +28,10 @@ navigame.NewGameDialog = (function () {
         $("#new_game_start_button").on("click", function (e) {that._onStartClicked(e);});
     };
 
+    NewGameDialog.prototype.showSessionError = function () {
+        $("#load_session_error").text('Session konnte nicht geladen werden!');
+    };
+
     NewGameDialog.prototype._onStartClicked = function (e) {
         $(this).trigger('newGameStartClicked', [$("#session_input").val()]);
     }

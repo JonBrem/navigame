@@ -8,7 +8,7 @@ navigame.AdditionalDataDialog = (function () {
     AdditionalDataDialog.prototype.show = function(whichType, item) {
         let dataItems = [];
         for(key in item.additionalData) {
-            if (key != "timeCreated") {
+            if (key != "timeCreated" && key != "markerIndex" && key != "edgeIndex") {
                 dataItems.push({
                     "key": key, 
                     "value": item.additionalData[key]

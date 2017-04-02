@@ -135,11 +135,15 @@ navigame.GameApp = (function () {
     };
 
     GameApp.prototype._onSessionLoaded = function (pathData) {
-        this.newGameDialog.closeDialog();
-        this.titleBar.setSession(pathData.pathId);
-        this.pathManager.setPathId(pathData.pathId);
+        if ("status" in pathData && pathData.status == 'session_404') {
+            this.newGameDialog.showSessionError();
+        } else {
+            this.newGameDialog.closeDialog();
+            this.titleBar.setSession(pathData.pathId);
+            this.pathManager.setPathId(pathData.pathId);
 
-        this.pathManager.loadPathFromJson(pathData);
+            this.pathManager.loadPathFromJson(pathData);
+        }
     };
 
     GameApp.prototype._onScoreCalculated = function (scoreData) {

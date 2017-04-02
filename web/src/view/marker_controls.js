@@ -20,6 +20,7 @@ navigame.MarkerControls = (function () {
         this._manipulationStart = null;
 
         this._highlightedMarker = null;
+        this._hightlightedRoute = null;
 
         that = this;
     }
@@ -52,7 +53,7 @@ navigame.MarkerControls = (function () {
             appendTo: "body", // <- draggable everywhere (not only in container)
             helper: "clone", // <- don't drag the original element
             cursorAt: { // <- so the "preview" of the marker's position when dragging the object on the canvas is correct
-                left: this._$newMarkerDroppable.width() / 10, // <- trial&error
+                left: this._$newMarkerDroppable.width() / 15, // <- trial&error
                 top: this._$newMarkerDroppable.height() * 1.1
             }
         });
@@ -132,6 +133,8 @@ navigame.MarkerControls = (function () {
         });
 
         this._canvasManager.updateMarker(this._highlightedMarker);
+
+        this._hightlightedRoute = null;
     };
 
     MarkerControls.prototype.onMarkerClicked = function (marker) {
@@ -151,7 +154,7 @@ navigame.MarkerControls = (function () {
         this._markerMoving = false;
     };
 
-    MarkerControls.prototype.onOtherMouseOver = function () {
+    MarkerControls.prototype.onOtherMouseOver = function (what) {
         if (this._highlightedMarker != null) {
             this._highlightedMarker.set({
                 width: 12,
@@ -161,6 +164,12 @@ navigame.MarkerControls = (function () {
             this._canvasManager.updateMarker(this._highlightedMarker);
 
             this._highlightedMarker = null;
+        }
+
+        if (what != null && 'tag' in what && what.tag == 'route') {
+            this._hightlightedRoute = what;
+        } else {
+            this._hightlightedRoute = null;
         }
     };
 
@@ -194,13 +203,23 @@ navigame.MarkerControls = (function () {
                 y: (position.y - this._manipulationStart.y) * scale
              }, this._clickedMarker);
 
-            $(this).trigger('markerMoved', [this._clickedMarker, this._canvasManager.getMarkerIndex(this._clickedMarker)]);
+            $(this).trigger('markerMoved', [this._clickedMarker, this._clickedMarker.additionalData.markerIndex]);
 
         } else {
             this._markerMoving = false;
         }
 
         this._manipulationStart = {x: position.x, y: position.y};
+    };
+
+    MarkerControls.prototype.addMarkerData = function (creationTime, toAdd) {
+        let marker = this._canvasManager.getMarkerByCreationTime(creationTime);
+
+        if (marker != null) {
+            for (let key in toAdd) {
+                marker.additionalData[key] = toAdd[key];
+            }
+        }
     };
 
     MarkerControls.prototype._createMarkerAtMapPosition = function (position) {
@@ -230,7 +249,7 @@ navigame.MarkerControls = (function () {
             timeCreated: + new Date() // shorthand for: new Date().getTime()
         };
 
-        $(this).trigger("markerCreated", [newMarker]);
+        $(this).trigger("markerCreated", [newMarker, this._hightlightedRoute]);
         this._canvasManager.addToVisualLayer(newMarker);
     };
 
@@ -248,7 +267,7 @@ navigame.MarkerControls = (function () {
         marker.additionalData = markerData;
         marker.additionalData["timeCreated"] = markerTime;
 
-        $(this).trigger('markerDataChanged', [this._canvasManager.getMarkerIndex(this._clickedMarker), marker.additionalData]);
+        $(this).trigger('markerDataChanged', [marker.additionalData.markerIndex, marker.additionalData]);
     };
 
     MarkerControls.prototype._deleteMarker = function (marker) {
@@ -257,7 +276,7 @@ navigame.MarkerControls = (function () {
         this._$markerDeleteButton.unbind('click');
         this._$markerDeleteButton.addClass('disabled');
 
-        $(this).trigger('markerDeleted', [this._canvasManager.getMarkerIndex(this._clickedMarker)]);
+        $(this).trigger('markerDeleted', [marker.additionalData.markerIndex]);
         
         this._canvasManager.removeFromVisualLayer(marker);
     };

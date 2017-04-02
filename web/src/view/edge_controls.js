@@ -125,6 +125,24 @@ navigame.EdgeControls = (function () {
     EdgeControls.prototype.deleteEdge = function (edgeIndex) {
         let deleted = this._edgesOnDisplay.splice(edgeIndex, 1);
         this._canvasManager.removeFromVisualLayer(deleted[0]);
+
+        if (this._highlightedEdge == deleted) {
+            this._highlightedEdge = null;
+        }
+    };
+
+    /**
+     * [clearEdges obviously, use with caution! Deletes all edges on the canvas.]
+     */
+    EdgeControls.prototype.clearEdges = function () {
+        for (let edgeIndex = this._edgesOnDisplay.length - 1; edgeIndex >= 0; edgeIndex--) {
+            this.deleteEdge(edgeIndex);
+        }
+
+        this._edgesOnDisplay = [];
+        this._canvasManager.deleteAllEdges();
+
+        this._highlightedEdge = null;
     };
 
     EdgeControls.prototype._onEdgeSelected = function (edge) {
@@ -202,6 +220,16 @@ navigame.EdgeControls = (function () {
 
     EdgeControls.prototype.onMouseUp = function () {
         this._edgeClicked = false;
+    };
+
+    EdgeControls.prototype.addEdgeData = function (creationTime, toAdd) {
+        let edge = this._canvasManager.getEdgeByCreationTime(creationTime);
+
+        if (edge != null) {
+            for (let key in toAdd) {
+                edge.additionalData[key] = toAdd[key];
+            }
+        }
     };
 
     return EdgeControls;

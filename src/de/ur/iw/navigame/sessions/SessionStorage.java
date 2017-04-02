@@ -55,7 +55,15 @@ public class SessionStorage implements ServletRequestHandler {
                         }
                     });
         } else {
-            // @todo some error that the session could not be loaded!
+            try {
+                JSONObject sessionNotFoundResponse = new JSONObject();
+                sessionNotFoundResponse.put("status", "session_404");
+                response.getWriter().write(sessionNotFoundResponse.toString());
+                response.getWriter().flush();
+                response.getWriter().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

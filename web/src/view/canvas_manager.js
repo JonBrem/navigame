@@ -384,33 +384,23 @@ navigame.CanvasManager = (function () {
         return null;
     };
 
+    CanvasManager.prototype.getEdgeByCreationTime = function (timeCreated) {
+        let objects = this._visualsGroup.getObjects();
+        for(let i = 1; i < objects.length; i++) {
+            if ("tag" in objects[i] && objects[i].tag == "route") {
+                if (objects[i].additionalData.timeCreated == timeCreated) {
+                    return objects[i];
+                }
+            }
+        }
+
+        return null;
+    };
+
     CanvasManager.prototype.fixEdgeRotation = function (edge) {
         edge.setAngle(0);
         this._updatePartOfGroup(edge);
         this._fabricCanvas.renderAll();
-    };
-
-    CanvasManager.prototype.getMarkerIndex = function (marker) {
-        let objects = this._visualsGroup.getObjects();
-
-        let markers = [];
-
-        for(let i = 1; i < objects.length; i++) {                    
-            if ("tag" in objects[i] && objects[i].tag == "marker") {
-                markers.push(objects[i]);
-            }
-        }
-
-        markers.sort(function(a, b) {
-            return a.additionalData.timeCreated >= b.additionalData.timeCreated;
-        });
-
-        for(let i = 0; i < markers.length; i++) {
-            if (markers[i] == marker)
-                return i;
-        }
-
-        return -1;
     };
 
     CanvasManager.prototype.updateMarker = function (marker) {
@@ -420,6 +410,19 @@ navigame.CanvasManager = (function () {
 
     CanvasManager.prototype.updateEdge = function (edge) {
         this._updatePartOfGroup(edge);
+        this._fabricCanvas.renderAll();
+    };
+
+    CanvasManager.prototype.deleteAllEdges = function () {        
+        let objects = this._visualsGroup.getObjects();
+        for(let i = objects.length - 1; i >= 0; i--) {
+            if ("tag" in objects[i] && objects[i].tag == "route") {
+                this._visualsGroup.remove(objects[i]);
+
+                console.log("ay");
+            }
+        }
+
         this._fabricCanvas.renderAll();
     };
 

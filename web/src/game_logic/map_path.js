@@ -13,6 +13,7 @@ navigame.MapPath = (function () {
         newNode.xPos = x;
         newNode.yPos = y;
         newNode.nodeData = additionalData;
+        newNode.nodeData.markerIndex = this.pathNodes.length;
 
         this.pathNodes.push(newNode);
 
@@ -27,6 +28,39 @@ navigame.MapPath = (function () {
             this.pathEdges.push(newEdge);
 
             $(this).trigger('edgeCreated', [this, newEdge]);
+        }
+    };
+
+    MapPath.prototype.addNodeAtIndex = function (x, y, additionalData, index) {
+        let newNode = new navigame.PathNode();
+        newNode.xPos = x;
+        newNode.yPos = y;
+        newNode.nodeData = additionalData;
+
+        this.pathNodes.splice(index, 0, newNode);
+
+        for (let i = 0; i < this.pathNodes.length; i++) {
+            this.pathNodes[i].nodeData.markerIndex = i;
+        }
+
+        if (this.pathNodes.length > 1) {
+            let newEdge = new navigame.PathEdge();
+            newEdge.fromNodeIndex = index - 1;
+            newEdge.toNodeIndex = index;
+            newEdge.edgeData = {
+                timeCreated: + new Date()
+            };
+
+            this.pathEdges.splice(index - 1, 0, newEdge);
+
+            for (let i = 0; i < this.pathEdges.length; i++) {
+                this.pathEdges[i].fromNodeIndex = i;
+                this.pathEdges[i].toNodeIndex = i + 1;
+                this.pathEdges[i].edgeData.edgeIndex = i;
+
+            }
+
+            $(this).trigger('edgesUpdated', [this, this.pathEdges]);
         }
     };
 
