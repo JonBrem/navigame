@@ -74,6 +74,10 @@ body > * {
     height: 100%;
 }
 
+#map_list_area {
+    overflow-y: hidden;
+}
+
 .map_list_scroll_wrapper {
     overflow-x: scroll;
     white-space: nowrap;
@@ -211,6 +215,14 @@ body > * {
 
 /* for scaling things */
 
+.map_list_scroll_wrapper {
+    height: 100%;
+}
+
+.map_item {
+    height: 100%;
+}
+
 @media (min-width: 0em) and (max-width: 39.9375em),
     (min-height: 0em) and (max-height: 33.9375em) {
 
@@ -233,6 +245,43 @@ body > * {
         padding-left: 0;
         padding-right: 0;
     }
+
+    .new_marker_container {
+        font-size: 12px;
+    }
+
+    .new_marker_droppable {
+        padding: 3px;
+    }
+
+    .row .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .row.title-bar {
+        margin-left: -0.9375rem;
+        margin-right: -0.9375rem;
+    }
+
+    #controls-section > .row {
+        margin: 5px;
+        margin-bottom: -15px;
+    }
+
+    .map_item img {
+        max-height: 100%;
+    }
+
+    .marker_controls_button_container .button {
+        padding: 5px;
+    }
+
+    #map_list_area .button {
+        font-size: 12px;
+        margin-bottom: 5px;
+        padding: 3px;
+    }
 }
 
 @media (min-width: 40em) and (max-width: 63.9375em),
@@ -251,6 +300,33 @@ body > * {
 
     #session_id_container, #title_bar_area .button {
         font-size: 12px;
+    }
+
+    .new_marker_container {
+        font-size: 12px;
+    }
+
+    .new_marker_droppable {
+        padding: 3px;
+    }
+
+    #controls-section > .row {
+        margin: 5px;
+        margin-bottom: -15px;
+    }
+
+    .map_item img {
+        max-height: 100%;
+    }
+
+    .marker_controls_button_container .button {
+        padding: 5px;
+    }
+
+    #map_list_area .button {
+        font-size: 12px;
+        margin-bottom: 5px;
+        padding: 3px;
     }
 }
 
