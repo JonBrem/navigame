@@ -137,7 +137,7 @@ navigame.MarkerControls = (function () {
         this._hightlightedRoute = null;
     };
 
-    MarkerControls.prototype.onMarkerClicked = function (marker) {
+    MarkerControls.prototype.onMarkerClicked = function (marker, position) {
         let that = this;
 
         this._$markerEditButton.unbind('click');
@@ -152,6 +152,8 @@ navigame.MarkerControls = (function () {
         this._markerClicked = true;
         this._clickedMarker = marker;
         this._markerMoving = false;
+
+        this._manipulationStart = {x: position.x, y: position.y};
     };
 
     MarkerControls.prototype.onOtherMouseOver = function (what) {

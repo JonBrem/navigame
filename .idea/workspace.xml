@@ -5,15 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7e893c5-d0f6-4414-b9ff-c7f82d86a1c4" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionIDs.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/AreaLevels.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/AreaLevels.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/UniversityAreas.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/UniversityAreas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/navigameapp.js" afterPath="$PROJECT_DIR$/web/src/navigameapp.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java" afterPath="$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/canvas_manager.js" afterPath="$PROJECT_DIR$/web/src/view/canvas_manager.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/game_title_bar.js" afterPath="$PROJECT_DIR$/web/src/view/game_title_bar.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_controls.js" afterPath="$PROJECT_DIR$/web/src/view/map_controls.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_list.js" afterPath="$PROJECT_DIR$/web/src/view/map_list.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_selection_dialog.js" afterPath="$PROJECT_DIR$/web/src/view/map_selection_dialog.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/marker_controls.js" afterPath="$PROJECT_DIR$/web/src/view/marker_controls.js" />
@@ -46,18 +42,18 @@
       <file leaf-file-name="AppServlet.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
+            <state relative-caret-position="1176">
               <caret line="73" column="39" lean-forward="false" selection-start-line="73" selection-start-column="29" selection-end-line="73" selection-end-column="39" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SessionStorage.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SessionStorage.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionStorage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="59" column="66" lean-forward="false" selection-start-line="59" selection-start-column="55" selection-end-line="59" selection-end-column="66" />
+            <state relative-caret-position="483">
+              <caret line="66" column="9" lean-forward="true" selection-start-line="66" selection-start-column="9" selection-end-line="66" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -65,11 +61,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SessionCreation.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SessionCreation.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
-              <caret line="131" column="42" lean-forward="false" selection-start-line="131" selection-start-column="34" selection-end-line="131" selection-end-column="42" />
+            <state relative-caret-position="458">
+              <caret line="137" column="0" lean-forward="true" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -78,7 +74,7 @@
       <file leaf-file-name="FileStorage.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/utility/FileStorage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-298">
+            <state relative-caret-position="21">
               <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding />
             </state>
@@ -88,8 +84,8 @@
       <file leaf-file-name="AreaLevels.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/AreaLevels.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-882">
-              <caret line="45" column="56" lean-forward="true" selection-start-line="45" selection-start-column="56" selection-end-line="45" selection-end-column="56" />
+            <state relative-caret-position="-1302">
+              <caret line="45" column="56" lean-forward="false" selection-start-line="45" selection-start-column="56" selection-end-line="45" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -98,7 +94,7 @@
       <file leaf-file-name="UniversityAreas.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/UniversityAreas.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1008">
+            <state relative-caret-position="966">
               <caret line="59" column="38" lean-forward="false" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="38" />
               <folding>
                 <element signature="e#1496#1497#0" expanded="true" />
@@ -211,6 +207,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -331,9 +330,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -898,12 +894,13 @@
       <workItem from="1490807923906" duration="6012000" />
       <workItem from="1491071642515" duration="9243000" />
       <workItem from="1491136538484" duration="599000" />
-      <workItem from="1491157576642" duration="8990000" />
+      <workItem from="1491157576642" duration="8993000" />
+      <workItem from="1491213866246" duration="1756000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="162501000" />
+    <option name="totallyTimeSpent" value="164260000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="7" />
@@ -911,7 +908,7 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611416" sideWeight="0.39739582" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611416" sideWeight="0.4" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -929,10 +926,10 @@
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611416" sideWeight="0.60260415" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3611416" sideWeight="0.6" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15364583" sideWeight="0.6082474" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15364583" sideWeight="0.39175257" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15364583" sideWeight="0.59965634" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15364583" sideWeight="0.40034366" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -960,14 +957,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/WEB-INF/web.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
@@ -1299,7 +1288,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/UniversityAreas.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1008">
+        <state relative-caret-position="966">
           <caret line="59" column="38" lean-forward="false" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="38" />
           <folding>
             <element signature="e#1496#1497#0" expanded="true" />
@@ -1310,43 +1299,51 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/server/AppServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
+        <state relative-caret-position="1176">
           <caret line="73" column="39" lean-forward="false" selection-start-line="73" selection-start-column="29" selection-end-line="73" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/utility/FileStorage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-298">
-          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/AreaLevels.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-882">
-          <caret line="45" column="56" lean-forward="true" selection-start-line="45" selection-start-column="56" selection-end-line="45" selection-end-column="56" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="131" column="42" lean-forward="false" selection-start-line="131" selection-start-column="34" selection-end-line="131" selection-end-column="42" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionStorage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="59" column="66" lean-forward="false" selection-start-line="59" selection-start-column="55" selection-end-line="59" selection-end-column="66" />
+        <state relative-caret-position="483">
+          <caret line="66" column="9" lean-forward="true" selection-start-line="66" selection-start-column="9" selection-end-line="66" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_91/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="110" column="25" lean-forward="false" selection-start-line="110" selection-start-column="19" selection-end-line="110" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/data_download/AreaLevels.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1302">
+          <caret line="45" column="56" lean-forward="false" selection-start-line="45" selection-start-column="56" selection-end-line="45" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/utility/FileStorage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21">
+          <caret line="41" column="0" lean-forward="false" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="137" column="0" lean-forward="true" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

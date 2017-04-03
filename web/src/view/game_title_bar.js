@@ -24,8 +24,8 @@ navigame.GameTitleBar = (function () {
     };
 
     GameTitleBar.prototype.setStartGoal = function (start, goal) {
-        $("#from_node").text("Start: " + start);
-        $("#to_node").text("Ziel: " + goal);
+        $("#from_node").text("Start: " + start.roomid + " (" + start.area + ")");
+        $("#to_node").text("Ziel: " + goal.roomid + " (" + goal.area + ")");
     };
 
     GameTitleBar.prototype.setSession = function (sessionId) {

@@ -8,7 +8,7 @@ navigame.MapSelectionDialog = (function () {
     MapSelectionDialog.prototype.show = function(closeable, showPathPoints, start, goal) {
         let data = {};
 
-        if (!closeable && closeable !== false)
+        if (closeable || (!closeable && closeable !== false))
             data.closeable = true;
         else
             data.closeable = false;

@@ -20,15 +20,15 @@ public class SessionCreation implements ServletRequestHandler {
 
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        pickRandomPointsInMaps(strings -> {
+        pickRandomPointsInMaps(objects -> {
             try {
                 PrintWriter writer = response.getWriter();
 
                 JSONObject obj = new JSONObject();
                 obj.put("session_id", UUID.randomUUID().toString());
 
-                obj.put("from_room", strings[0]);
-                obj.put("to_room", strings[1]);
+                obj.put("from_room", objects[0]);
+                obj.put("to_room", objects[1]);
 
                 writer.write(obj.toString());
 
@@ -52,11 +52,11 @@ public class SessionCreation implements ServletRequestHandler {
         });
     }
 
-    private void pickRandomPointsInMaps(Consumer<String[]> onSuccess, Consumer<Void> onError) {
+    private void pickRandomPointsInMaps(Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         new UniversityAreas().loadAreasFile((String s) -> onAreasFileLoaded(s, onSuccess, onError), onError);
     }
 
-    private void onAreasFileLoaded(String jsonContents, Consumer<String[]> onSuccess, Consumer<Void> onError) {
+    private void onAreasFileLoaded(String jsonContents, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         JSONObject areasFile = new JSONObject(jsonContents);
         JSONArray areasData = new UniversityAreas().readAreasFromFile(areasFile);
 
@@ -79,30 +79,30 @@ public class SessionCreation implements ServletRequestHandler {
         loadFirstRoom(areaOne, areaTwo, onSuccess, onError);
     }
 
-    private void loadFirstRoom(JSONObject areaOne, JSONObject areaTwo, Consumer<String[]> onSuccess, Consumer<Void> onError) {
+    private void loadFirstRoom(JSONObject areaOne, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
          new AreaLevels().loadAreaFile(areaOne.getString("filename"),
-                s -> onFirstRoomFileLoaded(s, areaTwo, onSuccess, onError),
+                s -> onFirstRoomFileLoaded(s, areaOne.getString("filename"), areaTwo, onSuccess, onError),
                 onError);
     }
 
-    private void onFirstRoomFileLoaded(String areaOneFile, JSONObject areaTwo, Consumer<String[]> onSuccess, Consumer<Void> onError) {
+    private void onFirstRoomFileLoaded(String areaOneFile, String areaOneName, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         JSONObject areaFile = new JSONObject(areaOneFile);
-        String roomId = getRandomRoomId(areaFile);
+        JSONObject roomId = getRandomRoomId(areaOneName, areaFile);
 
         new AreaLevels().loadAreaFile(areaTwo.getString("filename"),
-                s -> onSecondRoomFileLoaded(roomId, s, onSuccess),
+                s -> onSecondRoomFileLoaded(roomId, s, areaTwo.getString("filename"), onSuccess),
                 onError);
 
     }
 
-    private void onSecondRoomFileLoaded(String roomOne, String areaTwoFile, Consumer<String[]> onSuccess) {
+    private void onSecondRoomFileLoaded(JSONObject roomOne, String areaTwoFile, String areaTwoName, Consumer<JSONObject[]> onSuccess) {
         JSONObject areaFile = new JSONObject(areaTwoFile);
-        String roomTwo = getRandomRoomId(areaFile);
+        JSONObject roomTwo = getRandomRoomId(areaTwoName, areaFile);
 
-        onSuccess.accept(new String[]{roomOne, roomTwo});
+        onSuccess.accept(new JSONObject[]{roomOne, roomTwo});
     }
 
-    private String getRandomRoomId(JSONObject areaFile) {
+    private JSONObject getRandomRoomId(String areaName, JSONObject areaFile) {
         String xml = areaFile.getString("xml");
         JSONObject graph = XML.toJSONObject(xml).getJSONObject("graph");
 
@@ -117,7 +117,6 @@ public class SessionCreation implements ServletRequestHandler {
                 level = (JSONObject) ((JSONArray) levelContainer).get((int) (((JSONArray) levelContainer).length() * Math.random()));
             }
 
-
             Object nodeContainer = level.get("node");
             if (nodeContainer instanceof JSONObject) {
                 node = (JSONObject) nodeContainer;
@@ -129,7 +128,11 @@ public class SessionCreation implements ServletRequestHandler {
                 break;
         }
 
-        return node.get("roomid").toString();
+        JSONObject roomData = new JSONObject();
+        roomData.put("area", areaName);
+        roomData.put("level", level.get("id"));
+        roomData.put("roomid", node.get("roomid").toString());
+        return roomData;
     }
 
 

@@ -46,7 +46,7 @@ navigame.MapList = (function () {
 
     MapList.prototype.showAddMapDialog = function (closeable, start, goal) {
         if (!closeable && closeable !== false)
-            closeable = true;
+            closeable = true; // <- default is true, unless "false" is explicitly set.
 
         let addMapDialog = new navigame.MapSelectionDialog();
 

@@ -49,10 +49,10 @@ navigame.MapControls = (function () {
         let $body = $("body");
         $body.append(this._$controlsDiv);
 
-        this._$controlsDiv.on("mousedown", function(e) {that._onMouseDown(e);});
+        this._$controlsDiv.on("mousedown touchstart", function(e) {that._onMouseDown(e);});
         this._$controlsDiv.on("wheel", function(e) {that._onScroll(e);});
-        $body.on("mousemove", function(e) {that._onMouseMove(e);});
-        $body.on("mouseup", function(e) {that._onMouseUp(e);});
+        $body.on("mousemove touchmove", function(e) {that._onMouseMove(e);});
+        $body.on("mouseup touchend touchcancel", function(e) {that._onMouseUp(e);});
 
         
         this._$compassButton = $("#map_controls_compass");
@@ -85,9 +85,9 @@ navigame.MapControls = (function () {
         if (window.event) {
             isCtrl = !!window.event.ctrlKey; // typecast to boolean
         } else {
-            isCtrl = !!ev.ctrlKey;
+            isCtrl = !!e.ctrlKey;
         }
-        
+
         if (isCtrl) {
             this._rotating = true;
             this._rotationAngle = 0;
@@ -96,11 +96,20 @@ navigame.MapControls = (function () {
             let controlsOffset = this._$controlsDiv.offset();
             let that = this;
 
+            let hitPosX, hitPosY;
+            if (e.type == 'mousedown') {
+                hitPosX = e.pageX;
+                hitPosY = e.pageY;
+            } else if (e.type == 'touchstart') {
+                hitPosX = e.originalEvent.touches[0].pageX;
+                hitPosY = e.originalEvent.touches[0].pageY;
+            } 
+
             this._canvasManager.moveCursor({
-                x: e.pageX - controlsOffset.left, 
-                y: e.pageY - controlsOffset.top
+                x: hitPosX - controlsOffset.left, 
+                y: hitPosY - controlsOffset.top
             }, {
-                markerHit: function(marker) {that._onMarkerHitClick(marker);},
+                markerHit: function(marker) {that._onMarkerHitClick(marker, e);},
                 routeHit: function(route) {that._onRouteHitClick(route);},
                 nothingHit: function() {that._onNothingHitClick(e);}
             });
@@ -108,17 +117,6 @@ navigame.MapControls = (function () {
     
         e.preventDefault();
         e.stopPropagation();
-    };
-
-    MapControls.prototype.onSelectionCollision = function () {
-
-    };
-
-    MapControls.prototype.onMarkerMouseDown = function (e) {
-    };
-
-    MapControls.prototype.onRouteMouseDown = function () {
-
     };
 
     MapControls.prototype._onMarkerHitMove = function (marker) {
@@ -136,9 +134,20 @@ navigame.MapControls = (function () {
         this._edgeControls.onOtherMouseOver();
     };
 
-    MapControls.prototype._onMarkerHitClick = function (marker) {
+    MapControls.prototype._onMarkerHitClick = function (marker, e) {
+
+        let hitPosX, hitPosY;
+        if (e.type == 'mousedown') {
+            hitPosX = e.pageX;
+            hitPosY = e.pageY;
+        } else if (e.type == 'touchstart') {
+            hitPosX = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageX;
+            hitPosY = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageY;
+        } 
+        let controlsOffset = this._$controlsDiv.offset();
+
         this._edgeControls.onOtherClicked(marker);
-        this._markerControls.onMarkerClicked(marker);
+        this._markerControls.onMarkerClicked(marker, {x: hitPosX - controlsOffset.left, y: hitPosY - controlsOffset.top});
     };
 
     MapControls.prototype._onRouteHitClick = function (route) {
@@ -148,22 +157,44 @@ navigame.MapControls = (function () {
 
     MapControls.prototype._onNothingHitClick = function (e) {
         this._translating = true;
-        this._manipulationStart = {x: e.pageX, y: e.pageY};
+
+
+        let hitPosX, hitPosY;
+        if (e.type == 'mousedown') {
+            hitPosX = e.pageX;
+            hitPosY = e.pageY;
+        } else if (e.type == 'touchstart') {
+            hitPosX = e.originalEvent.touches[0].pageX;
+            hitPosY = e.originalEvent.touches[0].pageY;
+        } 
+
+        this._manipulationStart = {x: hitPosX, y: hitPosY};
 
         this._markerControls.onOtherClicked(null);
         this._edgeControls.onOtherClicked(null);
     };
 
     MapControls.prototype._onMouseMove = function (e) {
+        let hitPosX, hitPosY;
+        if (e.type == 'mousemove') {
+            hitPosX = e.pageX;
+            hitPosY = e.pageY;
+        } else if (e.type == 'touchmove') {
+            hitPosX = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageX;
+            hitPosY = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageY;
+        } 
+
         if (this._translating) {
             let scale = this._canvasManager.getViewportScale();
+
+
             this._canvasManager.moveBy(
              {
-                x: (e.pageX - this._manipulationStart.x) * scale,
-                y: (e.pageY - this._manipulationStart.y) * scale
+                x: (hitPosX - this._manipulationStart.x) * scale,
+                y: (hitPosY - this._manipulationStart.y) * scale
              });
 
-            this._manipulationStart = {x: e.pageX, y: e.pageY};
+            this._manipulationStart = {x: hitPosX, y: hitPosY};
         } else if (this._rotating) {
             this._rotationAngle = (this._manipulationStart.x - e.pageX) / 2;
             this._canvasManager.rotateBy(this._rotationAngle, this._canvasCenter());
@@ -172,15 +203,15 @@ navigame.MapControls = (function () {
         } else {
             let controlsOffset = this._$controlsDiv.offset();
 
-            if (e.pageX >= controlsOffset.left && e.pageX <= controlsOffset.left + this._$controlsDiv.width() &&
-                    e.pageY >= controlsOffset.top && e.pageY <= controlsOffset.top + this._$controlsDiv.height()) {
+            if (hitPosX >= controlsOffset.left && hitPosX <= controlsOffset.left + this._$controlsDiv.width() &&
+                    hitPosY >= controlsOffset.top && hitPosY <= controlsOffset.top + this._$controlsDiv.height()) {
                 let that = this;
 
-                this._markerControls.onCanvasMouseMove({x: e.pageX, y: e.pageY});
+                this._markerControls.onCanvasMouseMove({x: hitPosX - controlsOffset.left, y: hitPosY - controlsOffset.top});
 
                 this._canvasManager.moveCursor({
-                    x: e.pageX - controlsOffset.left, 
-                    y: e.pageY - controlsOffset.top
+                    x: hitPosX - controlsOffset.left, 
+                    y: hitPosY - controlsOffset.top
                 }, {
                     markerHit: function(marker) {that._onMarkerHitMove(marker);},
                     routeHit: function(route) {that._onRouteHitMove(route);},
