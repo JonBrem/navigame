@@ -256,8 +256,8 @@ navigame.CanvasManager = (function () {
      * @param  {object with keys x, y} center center of the zoom.
      */
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
-        let newZoom = Math.min(zoomLevel, 4);
-        newZoom = Math.max(0.25, newZoom);
+        let newZoom = Math.min(zoomLevel, 6);
+        newZoom = Math.max(1 / 6.0, newZoom);
 
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
         this._fabricCanvas.renderAll();
@@ -418,12 +418,26 @@ navigame.CanvasManager = (function () {
         for(let i = objects.length - 1; i >= 0; i--) {
             if ("tag" in objects[i] && objects[i].tag == "route") {
                 this._visualsGroup.remove(objects[i]);
-
-                console.log("ay");
             }
         }
 
         this._fabricCanvas.renderAll();
+    };
+
+    CanvasManager.prototype.toImageFraction = function (coordVal, isX) {
+        if (isX) {
+            return coordVal / this._visualsGroup.getObjects()[1].width;
+        } else {
+            return coordVal / this._visualsGroup.getObjects()[1].height;
+        }
+    };
+
+    CanvasManager.prototype.toImageCoord = function (fractionVal, isX) {
+        if (isX) {
+            return fractionVal * this._visualsGroup.getObjects()[1].width;
+        } else {
+            return fractionVal * this._visualsGroup.getObjects()[1].height;
+        }
     };
 
     /*

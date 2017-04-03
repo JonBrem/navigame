@@ -23,6 +23,11 @@ navigame.GameTitleBar = (function () {
         });
     };
 
+    GameTitleBar.prototype.setStartGoal = function (start, goal) {
+        $("#from_node").text("Start: " + start);
+        $("#to_node").text("Ziel: " + goal);
+    };
+
     GameTitleBar.prototype.setSession = function (sessionId) {
         $("#session_id_container").html(sessionId);
     };

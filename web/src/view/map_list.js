@@ -44,12 +44,17 @@ navigame.MapList = (function () {
         });
     };
 
-    MapList.prototype.showAddMapDialog = function (closeable) {
+    MapList.prototype.showAddMapDialog = function (closeable, start, goal) {
         if (!closeable && closeable !== false)
             closeable = true;
 
         let addMapDialog = new navigame.MapSelectionDialog();
-        addMapDialog.show(closeable);
+
+        if (start || goal) {
+            addMapDialog.show(closeable, true, start, goal);
+        } else {
+            addMapDialog.show(closeable, false);
+        }
 
         $(this).trigger('dialogCreated', [addMapDialog]);
     };

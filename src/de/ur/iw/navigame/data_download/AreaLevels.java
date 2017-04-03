@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class AreaLevels implements ServletRequestHandler {
 
@@ -19,25 +20,28 @@ public class AreaLevels implements ServletRequestHandler {
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
         String whichArea = params.get("which_area")[0];
 
-        if (FileStorage.fileExists("area_" + whichArea + ".json") && !params.containsKey("force_fresh_download")) {
-            FileStorage.loadFile("area_" + whichArea + ".json",
-                    s -> onAreaFileLoaded(whichArea, s, response, false),
-                    v -> onDownloadError(response));
-        } else {
-            downloadAreaFile(whichArea, response);
-        }
-    }
-
-    private void downloadAreaFile(String whichArea, HttpServletResponse response) {
-        new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?getxml=" + whichArea,
-                s -> onAreaFileLoaded(whichArea, s, response, true),
+        loadAreaFile(whichArea,
+                s -> onAreaFileLoaded(whichArea, s, response),
                 v -> onDownloadError(response));
     }
 
-    private void onAreaFileLoaded(String whichArea, String jsonContents, HttpServletResponse response, boolean store) {
-        if(store)
-            FileStorage.storeFile("area_" + whichArea + ".json", jsonContents);
+    public void loadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
+        if (FileStorage.fileExists("area_" + whichArea + ".json")) {
+            FileStorage.loadFile("area_" + whichArea + ".json", onSuccess, onError);
+        } else {
+            downloadAreaFile(whichArea, onSuccess, onError);
+        }
+    }
 
+    private void downloadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
+        new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?getxml=" + whichArea,
+                s -> {
+                    FileStorage.storeFile("area_" + whichArea + ".json", s);
+                    onSuccess.accept(s);
+                }, onError);
+    }
+
+    private void onAreaFileLoaded(String whichArea, String jsonContents, HttpServletResponse response) {
         String xmlPart = new JSONObject(jsonContents).getString("xml");
         JSONObject asObject = XML.toJSONObject(xmlPart);
 

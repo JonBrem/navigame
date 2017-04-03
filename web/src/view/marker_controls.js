@@ -92,8 +92,8 @@ navigame.MarkerControls = (function () {
         Log.log("verbose", "loading marker ", JSON.stringify(savedMarker), this);
 
         let position = {
-            x: savedMarker.xPos,
-            y: savedMarker.yPos
+            x: this._canvasManager.toImageCoord(savedMarker.xPos, true),
+            y: this._canvasManager.toImageCoord(savedMarker.yPos, false)
         };
 
         // let adjustedPosition = this._canvasManager.calculatePositionOnMap(position);

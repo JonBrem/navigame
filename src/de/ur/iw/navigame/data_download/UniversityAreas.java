@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class UniversityAreas implements ServletRequestHandler{
 
@@ -18,24 +19,28 @@ public class UniversityAreas implements ServletRequestHandler{
 
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        if (FileStorage.fileExists(UNI_AREAS_FILE_NAME) && !params.containsKey("force_fresh_download")) {
-            FileStorage.loadFile(UNI_AREAS_FILE_NAME,
-                    s -> readAndPrintAreasInfo(s, response),
-                    v -> onDownloadError(response));
-        } else {
-            downloadAreasFile(response);
-        }
-    }
-
-    private void downloadAreasFile(HttpServletResponse response) {
-        new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
-                s -> onAreasFileLoaded(s, response),
+        loadAreasFile(s -> readAndPrintAreasInfo(s, response),
                 v -> onDownloadError(response));
     }
 
-    private void onAreasFileLoaded(String jsonContents, HttpServletResponse response) {
+    public void loadAreasFile(Consumer<String> onSuccess, Consumer<Void> onError) {
+        if (FileStorage.fileExists(UNI_AREAS_FILE_NAME)) {
+            FileStorage.loadFile(UNI_AREAS_FILE_NAME, onSuccess, onError);
+        } else {
+            downloadAreasFile(onSuccess, onError);
+        }
+    }
+
+    private void downloadAreasFile(Consumer<String> onSuccessfulDownload, Consumer<Void> onError) {
+        new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
+                s -> {
+                    onAreasFileLoaded(s);
+                    onSuccessfulDownload.accept(s);
+                }, onError);
+    }
+
+    private void onAreasFileLoaded(String jsonContents) {
         FileStorage.storeFile(UNI_AREAS_FILE_NAME, jsonContents);
-        readAndPrintAreasInfo(jsonContents, response);
     }
 
     private void readAndPrintAreasInfo(String jsonContents, HttpServletResponse response) {
@@ -52,7 +57,7 @@ public class UniversityAreas implements ServletRequestHandler{
         }
     }
 
-    private JSONArray readAreasFromFile(JSONObject fromFile) {
+    public JSONArray readAreasFromFile(JSONObject fromFile) {
         JSONArray responseArray = new JSONArray();
 
         if (fromFile.has("territories")) {

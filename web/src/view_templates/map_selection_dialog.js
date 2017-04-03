@@ -1,6 +1,9 @@
 templates.map_selection_dialog = 
    ['<div class="reveal" id="map_selection_modal">',
     '   <h1>Kartenauswahl</h1>',
+    '   <% if ("showPathPoints" in data && data.showPathPoints) { %>',
+    '       <div>Wählen Sie die erste Karte auf dem Weg von <strong><%= data.start %></strong> nach <strong><%= data.goal %></strong>.</div>',
+    '   <% } %>',
     '   <div id="map_selection_area_selection">&nbsp;</div>',
     '   <div id="map_selection_level_selection">&nbsp;</div>',
     '   <div style="display: none"><button id="map_selection_confirm" class="button">Ausw&auml;hlen</button></div>',

@@ -5,15 +5,21 @@ navigame.MapSelectionDialog = (function () {
         let _$areaSelectElement = null;
     }
 
-    MapSelectionDialog.prototype.show = function(closeable) {
-        if (!closeable && closeable !== false)
-            closeable = true;
+    MapSelectionDialog.prototype.show = function(closeable, showPathPoints, start, goal) {
+        let data = {};
 
-        let dialogElement = compiledTemplates['map_selection_dialog']({
-            data: {
-                closeable: closeable
-            }
-        });
+        if (!closeable && closeable !== false)
+            data.closeable = true;
+        else
+            data.closeable = false;
+
+        if (showPathPoints) {
+            data.showPathPoints = true;
+            data.start = start;
+            data.goal = goal;
+        }
+
+        let dialogElement = compiledTemplates['map_selection_dialog']({data: data});
         $("body").append(dialogElement);
 
         this._$dialogElement = $("#map_selection_modal");

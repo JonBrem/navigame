@@ -4,18 +4,20 @@ navigame.PathManager = (function () {
         this.markerControls = null;
         this.edgeControls = null;
         this.path = null;
+        this.canvasManager = null;
 
         this.mapListVisuals = null;
 
         this.currentMapIndex = -1;
     }
 
-    PathManager.prototype.init = function(markerControls, edgeControls, mapListVisuals) {
+    PathManager.prototype.init = function(markerControls, edgeControls, mapListVisuals, canvasManager) {
         Log.log("verbose", "Initializing Path Manager", this);
 
         this.markerControls = markerControls;
         this.edgeControls = edgeControls;
         this.mapListVisuals = mapListVisuals;
+        this.canvasManager = canvasManager;
 
         let that = this;
 
@@ -56,6 +58,11 @@ navigame.PathManager = (function () {
 
     PathManager.prototype.setPathId = function (pathId) {
         this.path.pathId = pathId;
+    };
+
+    PathManager.prototype.setStartGoal = function (start, goal) {
+        this.path.startPoint = start;
+        this.path.endPoint = goal;
     };
 
     PathManager.prototype.loadPathFromJson = function (pathJson) {
@@ -134,13 +141,19 @@ navigame.PathManager = (function () {
 
     PathManager.prototype.addNode = function (x, y, data, onEdge) {
         if (onEdge == null) { // = create new marker and append at the end
-            this.path.mapPaths[this.currentMapIndex].addNode(x, y, data);
+            this.path.mapPaths[this.currentMapIndex].addNode(
+                this.canvasManager.toImageFraction(x, true), 
+                this.canvasManager.toImageFraction(y, false), 
+                data);
             this.markerControls.addMarkerData(data.timeCreated, {
                 "markerIndex": this.path.mapPaths[this.currentMapIndex].pathNodes.length - 1
             });
         } else { // = create new marker and insert between two others
             let newMarkerIndex = onEdge.additionalData.edgeIndex + 1;
-            this.path.mapPaths[this.currentMapIndex].addNodeAtIndex(x, y, data, newMarkerIndex);
+            this.path.mapPaths[this.currentMapIndex].addNodeAtIndex(
+                this.canvasManager.toImageFraction(x, true), 
+                this.canvasManager.toImageFraction(y, false), 
+                data, newMarkerIndex);
 
             let that = this;
             setTimeout(function() {
@@ -198,8 +211,8 @@ navigame.PathManager = (function () {
 
     PathManager.prototype.onMarkerMoved = function (marker, markerIndex) {
         let markerModel = this.path.mapPaths[this.currentMapIndex].pathNodes[markerIndex];
-        markerModel.xPos = marker.left;
-        markerModel.yPos = marker.top;
+        markerModel.xPos = this.canvasManager.toImageFraction(marker.left, true);
+        markerModel.yPos = this.canvasManager.toImageFraction(marker.top, false);
 
         let markerTime = marker.additionalData.timeCreated;
 

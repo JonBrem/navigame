@@ -62,7 +62,7 @@ navigame.GameApp = (function () {
 
         this.pathManager = new navigame.PathManager();
         this.pathManager.newPath();
-        this.pathManager.init(this.markerControls, this.edgeControls, this.mapListVisuals);
+        this.pathManager.init(this.markerControls, this.edgeControls, this.mapListVisuals, this.canvasManager);
         $(this.pathManager).on('onScoreCalculated', function(e, data) { that._onScoreCalculated(data); });
 
         this.mapSelectionHandler = new navigame.MapSelectionHandler();
@@ -128,10 +128,13 @@ navigame.GameApp = (function () {
     GameApp.prototype._onSessionCreated = function (session) {
         this.newGameDialog.closeDialog();
         this.titleBar.setSession(session.session_id);
+        this.titleBar.setStartGoal(session.to_room, session.from_room);
+
         this.pathManager.setPathId(session.session_id);
+        this.pathManager.setStartGoal(session.to_room, session.from_room);
         
         // user _has_ to choose the first map:
-        this.mapListVisuals.showAddMapDialog(false);
+        this.mapListVisuals.showAddMapDialog(false, session.to_room, session.from_room);
     };
 
     GameApp.prototype._onSessionLoaded = function (pathData) {
@@ -140,6 +143,8 @@ navigame.GameApp = (function () {
         } else {
             this.newGameDialog.closeDialog();
             this.titleBar.setSession(pathData.pathId);
+            this.titleBar.setStartGoal(pathData.startPoint, pathData.endPoint);
+
             this.pathManager.setPathId(pathData.pathId);
 
             this.pathManager.loadPathFromJson(pathData);
