@@ -42,8 +42,7 @@ navigame.GameApp = (function () {
         $(this.titleBar).on('requestNewGameDialog', function(e) { that.showNewGameDialog(e); });
         $(this.titleBar).on('requestSaveGame', function(e) { that.saveGame(e); });
 
-        this.canvasManager = new navigame.CanvasManager();
-        this.canvasManager.init(this.$mainHTMLObject);
+        this.canvasManager = new navigame.CanvasManager(this.$mainHTMLObject);
 
         this.mapVisuals = new navigame.MapVisuals();
         this.mapVisuals.init(this.canvasManager);
