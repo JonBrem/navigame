@@ -54,7 +54,13 @@ navigame.MapControls = (function () {
         $body.on("mousemove touchmove", function(e) {that._onMouseMove(e);});
         $body.on("mouseup touchend touchcancel", function(e) {that._onMouseUp(e);});
 
-        
+        let hammertime = new Hammer(this._$controlsDiv[0]);
+        hammertime.get('pinch').set({enable: true, threshold: 10});
+        hammertime.get('rotate').set({ enable: true , threshold: 10 });
+        hammertime.on('pinch', function(e) { that._onMobilePinch(e); });
+        hammertime.on('rotate', function(e) { that._onMobileRotate(e); });
+        hammertime.on('rotatestart', function(e) { that._onMobileRotateStart(e); });
+
         this._$compassButton = $("#map_controls_compass");
         this._$compassButton.on('click', function(e) {that._resetMapRotation();});
 
@@ -103,6 +109,8 @@ navigame.MapControls = (function () {
             } else if (e.type == 'touchstart') {
                 hitPosX = e.originalEvent.touches[0].pageX;
                 hitPosY = e.originalEvent.touches[0].pageY;
+
+                if (e.originalEvent.touches.length > 1) return;
             } 
 
             this._canvasManager.moveCursor({
@@ -180,8 +188,10 @@ navigame.MapControls = (function () {
             hitPosX = e.pageX;
             hitPosY = e.pageY;
         } else if (e.type == 'touchmove') {
-            hitPosX = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageX;
-            hitPosY = e.originalEvent.touches[e.originalEvent.touches.length - 1].pageY;
+            if (e.originalEvent.touches.length > 1) return;
+
+            hitPosX = e.originalEvent.touches[0].pageX;
+            hitPosY = e.originalEvent.touches[0].pageY;
         } 
 
         if (this._translating) {
@@ -229,6 +239,39 @@ navigame.MapControls = (function () {
          });
 
         e.preventDefault();
+    };
+
+    MapControls.prototype._onMobilePinch = function (e) {
+        let controlsOffset = this._$controlsDiv.offset();
+        let scale = this._canvasManager.getViewportScale();
+
+        let centerOnCanvas = {
+            x: (e.center.x - controlsOffset.left) * scale,
+            y: (e.center.y - controlsOffset.top) * scale
+        };
+
+        this._canvasManager.zoomBy(-e.velocity, centerOnCanvas);
+
+        // console.log("pinch", e.velocity, e.velocityX, e.velocityY, e.center);
+    };
+
+    MapControls.prototype._onMobileRotateStart = function (e) {
+        this.lastRotation = e.rotation;
+    };
+
+    MapControls.prototype._onMobileRotate = function (e) {
+        let controlsOffset = this._$controlsDiv.offset();
+        let scale = this._canvasManager.getViewportScale();
+
+        let centerOnCanvas = {
+            x: (e.center.x - controlsOffset.left) * scale,
+            y: (e.center.y - controlsOffset.top) * scale
+        };
+
+        this._canvasManager.rotateBy(e.rotation - this.lastRotation);//, centerOnCanvas);
+        this.lastRotation = e.rotation;
+
+        // console.log("pinch", e.velocity, e.velocityX, e.velocityY, e.center);
     };
 
     MapControls.prototype._canvasCenter = function () {

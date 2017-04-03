@@ -334,6 +334,15 @@ navigame.CanvasManager = (function () {
         if (!updateRender)
             updateRender = true;
 
+        if (!center) {
+            center = {
+                x: this._fabricCanvas.width / 2,
+                y: this._fabricCanvas.height / 2
+            }
+        }
+
+        console.log(center);
+
         /*
             what this does is very simple:
             1) remove rotation the object already has (but store it for later!)
