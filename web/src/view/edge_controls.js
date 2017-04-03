@@ -1,28 +1,15 @@
+/**
+ * [EdgeControls handle the modification of the data of edges.
+ *  They use navigame.MarkerControl's html element.]
+ */
 navigame.EdgeControls = (function () {
 
-    let that = null;
-
-    function EdgeControls () {
-        this._canvasManager = null;
-        this._htmlElement = null;
-
-        this._$controlsWrapper = null;
-        this._$newEdgeDroppable = null;
-
-        this._$edgeManipulationArea = null;
-
-        this._$edgeEditButton = null;
-
-        this._edgeClicked = false;
-        this._clickedEdge = null;
-
-        this._edgesOnDisplay = [];
-        this._highlightedEdge = null;
-
-        that = this;
-    }
-
-    EdgeControls.prototype.init = function ($contentArea, canvasManager) {
+    /**
+     * [EdgeControls constructor. Registers to the canvas manager's 'clearCanvas' event,
+     *  and references the "edit" button.]
+     * @param {[type]} canvasManager [description]
+     */
+    function EdgeControls (canvasManager) {
         Log.log("verbose", "Initializing Edge controls", this);
 
         let that = this;
@@ -31,52 +18,33 @@ navigame.EdgeControls = (function () {
             that._edgesOnDisplay = [];
         });
 
-        this._$controlsWrapper = $("#controls-section");
+        let $edgeManipulationArea = $("#marker_fill_rest");
+        this._$edgeEditButton = $edgeManipulationArea.find(".marker-edit-button");
 
-        this._$edgeManipulationArea = $("#marker_fill_rest");
-        this._$edgeEditButton = this._$edgeManipulationArea.find(".marker-edit-button");
+        // these will be set dynamically!
+        this._edgeClicked = false;
+        this._clickedEdge = null;
 
-        this._setupMapEdgeControls();
+        this._edgesOnDisplay = [];
+        this._highlightedEdge = null;
+
+        this._edgeWidth = 4;
+        this._highlightedEdgeWidth = 7;
 
         Log.log("verbose", "Finished Initializing Edge Controls", this);
-    };
+    }
 
-    EdgeControls.prototype._setupMapEdgeControls = function () {
-        let that = this;
-
-        //this._$mapControlsDiv.on("mousedown", function(e) {that._onMapMouseDown(e);});
-        //$("body").on("mousemove", function(e) {that._onMapMouseMove(e);});
-        //$("body").on("mouseup", function(e) {that._onMapMouseUp(e);});
-    };
-
-    EdgeControls.prototype.createEdgeAtMapPosition = function (markerTime1, markerTime2, data) {
+    /**
+     * [createEdgeBetweenMarkers creates an edge at the map positions of the markers
+     *  with the specified timestamps.]
+     * @param  {[number]} markerTime1 [timestamp of the 'from' marker]
+     * @param  {[number]} markerTime2 [timestamp of the 'to' marker]
+     * @param  {[object]} data        [additional data for the edge.]
+     */
+    EdgeControls.prototype.createEdgeBetweenMarkers = function (markerTime1, markerTime2, data) {
         Log.log("verbose", "Creating Edge at markers ", JSON.stringify(markerTime1), JSON.stringify(markerTime2), this);
 
-        let markerStart = this._canvasManager.getMarkerByCreationTime(markerTime1);
-        let markerEnd = this._canvasManager.getMarkerByCreationTime(markerTime2);
-
-        // @todo check if adjustedPosition is within boundaries!!
-
-        let posOnMapStart = {
-            x: markerStart.left + 0,
-            y: markerStart.top + 0
-        };
-        let posOnMapEnd = {
-            x: markerEnd.left + 0,
-            y: markerEnd.top + 0
-        };
-
-        let points = [posOnMapStart.x, posOnMapStart.y, posOnMapEnd.x, posOnMapEnd.y];
-
-        let newEdge = new fabric.Line(points, {
-            strokeWidth: 4,
-            fill: 'red',
-            stroke: 'red',
-            originX: "center",
-            originY: "center"
-        });
-
-        newEdge.tag = "route";
+        let newEdge = this._setupNewEdge(markerTime1, markerTime2);
 
         newEdge.additionalData = data;
         this._canvasManager.addToVisualLayer(newEdge);
@@ -85,33 +53,17 @@ navigame.EdgeControls = (function () {
         that._edgesOnDisplay.push(newEdge);
     };
 
+    /**
+     * [updateEdgePositions creates a new edge with the additionalData of the existing edge
+     *  at edgeIndex and replaces that old edge with the new one.]
+     * @param  {[type]} edgeIndex   [description]
+     * @param  {[number]} markerTime1 [timestamp of the 'from' marker]
+     * @param  {[number]} markerTime2 [timestamp of the 'to' marker]
+     */
     EdgeControls.prototype.updateEdgePositions = function (edgeIndex, markerTime1, markerTime2) {
         let edge = this._edgesOnDisplay[edgeIndex];
+        let newEdge = this._setupNewEdge(markerTime1, markerTime2);
 
-        let markerStart = this._canvasManager.getMarkerByCreationTime(markerTime1);
-        let markerEnd = this._canvasManager.getMarkerByCreationTime(markerTime2);
-
-        // @todo check if adjustedPosition is within boundaries!!
-
-        let posOnMapStart = {
-            x: markerStart.left + 0,
-            y: markerStart.top + 0
-        };
-        let posOnMapEnd = {
-            x: markerEnd.left + 0,
-            y: markerEnd.top + 0
-        };
-
-        let points = [posOnMapStart.x, posOnMapStart.y, posOnMapEnd.x, posOnMapEnd.y];
-
-        let newEdge = new fabric.Line(points, {
-            strokeWidth: 4,
-            fill: 'red',
-            stroke: 'red',
-            originX: "center",
-            originY: "center"
-        });
-        newEdge.tag = "route";
         newEdge.additionalData = edge.additionalData;
 
         this._canvasManager.removeFromVisualLayer(edge);
@@ -121,7 +73,11 @@ navigame.EdgeControls = (function () {
         this._edgesOnDisplay[edgeIndex] = newEdge;
     };
 
-    // only to be called after a marker was deleted! 
+    /**
+     * [deleteEdge removes an edge from the visual layer. Only to be called after markers were deleted,
+     *  edges can't "just" be deleted!]
+     * @param  {[number]} edgeIndex [index of the edge on the current map.]
+     */
     EdgeControls.prototype.deleteEdge = function (edgeIndex) {
         let deleted = this._edgesOnDisplay.splice(edgeIndex, 1);
         this._canvasManager.removeFromVisualLayer(deleted[0]);
@@ -132,7 +88,8 @@ navigame.EdgeControls = (function () {
     };
 
     /**
-     * [clearEdges obviously, use with caution! Deletes all edges on the canvas.]
+     * [clearEdges deletes all edges on the canvas.
+     * obviously, use with caution!]
      */
     EdgeControls.prototype.clearEdges = function () {
         for (let edgeIndex = this._edgesOnDisplay.length - 1; edgeIndex >= 0; edgeIndex--) {
@@ -145,31 +102,41 @@ navigame.EdgeControls = (function () {
         this._highlightedEdge = null;
     };
 
-    EdgeControls.prototype._onEdgeSelected = function (edge) {
-        let that = this;
-
-        this._$edgeEditButton.unbind('click');
-        this._$edgeEditButton.on('click', function(e) {that._startEditingEdge(edge)});
-        this._$edgeEditButton.removeClass('disabled');
-    };
-
+    /**
+     * [_startEditingEdge shows the "edit edge"-dialog and registers callbacks to it.]
+     * @param  {[fabric.Object]} marker [which edge is affected by the dialog.]
+     */
     EdgeControls.prototype._startEditingEdge = function (edge) {
         let dataDialog = new navigame.AdditionalDataDialog();
         dataDialog.show("Edge", edge);
         let that = this;
-        $(dataDialog).on('okSelected', function(e, edgeTime, edgeData) {
-            that._setEdgeData(edge, edgeTime, edgeData);
+        $(dataDialog).on('okSelected', function(e, edgeTime, edgeIndex, edgeData) {
+            that._setEdgeData(edge, edgeTime, edgeIndex, edgeData);
             dataDialog.closeDialog();
         });
     };
 
-    EdgeControls.prototype._setEdgeData = function (edge, edgeTime, edgeData) {
+    /**
+     * [_setEdgeData sets the edge's additionalData to edgeData,
+     *  with edgeTime and edgeIndex being set separately, so these are ensured to be there.
+     *  Will trigger 'edgeDataChanged'.]
+     * @param {[fabric.Object]} edge      [visual representation of the edge whose data changed.]
+     * @param {[number]} edgeTime  [timestamp of the edge]
+     * @param {[number]} edgeIndex [edge index, so the logical representations knows which one was edited.]
+     * @param {[object]} edgeData  [the "additional data", other than timeCreated and edgeIndex]
+     */
+    EdgeControls.prototype._setEdgeData = function (edge, edgeTime, edgeIndex, edgeData) {
         edge.additionalData = edgeData;
         edge.additionalData["timeCreated"] = edgeTime;
+        edge.additionalData["edgeIndex"] = edgeIndex;
 
         $(this).trigger('edgeDataChanged', [this._edgesOnDisplay.indexOf(edge), edge.additionalData]);
     };  
 
+    /**
+     * [onEdgeMouseOver highlights the edge (by making it somewhat bigger).]
+     * @param  {[fabric.Object]} edge [which edge to highlight]
+     */
     EdgeControls.prototype.onEdgeMouseOver = function (edge) {
         if (this._highlightedEdge != null && this._highlightedEdge != edge) {
             this.onOtherMouseOver();
@@ -178,12 +145,19 @@ navigame.EdgeControls = (function () {
         this._highlightedEdge = edge;
 
         this._highlightedEdge.set({
-            strokeWidth: 7
+            strokeWidth: this._highlightedEdgeWidth
         });
 
         this._canvasManager.updateEdge(this._highlightedEdge);
     };
 
+    /**
+     * [onEdgeClicked sets the click callbacks for the "edge manipulation buttons" so
+     *  they will affect this edge.]
+     * @param  {[fabric.Object]} edge   [which edge was clicked]
+     * @param  {[object]} position [position of the click. necessary bugfix to enable dragging on
+     *                              mobile / touch-based systems.]
+     */
     EdgeControls.prototype.onEdgeClicked = function (edge) {
         let that = this;
 
@@ -196,6 +170,10 @@ navigame.EdgeControls = (function () {
         this._clickedEdge = edge;
     };
 
+    /**
+     * [onOtherMouseOver must be called when the mouse cursor hits nothing or hits
+     *  a marker. Removes the highlight of the highlighted edge, if there was any.]
+     */
     EdgeControls.prototype.onOtherMouseOver = function () {
         if (this._highlightedEdge != null) {
             this._highlightedEdge.set({
@@ -208,6 +186,11 @@ navigame.EdgeControls = (function () {
         }
     };
 
+    /**
+     * [onOtherClicked should be called if there was a click event that did not hit an edge.
+     *  removes the click listeners on the manipulation buttons if "what" is null.]
+     * @param  {[fabric.Object]} what [null, if nothing was clicked; the clicked object, otherwise.]
+     */
     EdgeControls.prototype.onOtherClicked = function (what) {
         let that = this;
         this._edgeClicked = false;
@@ -218,10 +201,20 @@ navigame.EdgeControls = (function () {
         }
     };
 
+    /**
+     * [onMouseUp should be called when the user stops pressing a mouse key.]
+     */
     EdgeControls.prototype.onMouseUp = function () {
         this._edgeClicked = false;
     };
 
+    /**
+     * [addEdgeData adds data to the edge, overriding data that has the same keys.]
+     * @param {[number]} creationTime [creation time of the edge, so the view representation can be identified.]
+     * @param {[object]} toAdd        [keys in this object will be created and their values will be
+     *                                 stored under the same keys in the edge's additional data;
+     *                                 if the keys already exist, the old values will be overridden.]
+     */
     EdgeControls.prototype.addEdgeData = function (creationTime, toAdd) {
         let edge = this._canvasManager.getEdgeByCreationTime(creationTime);
 
@@ -230,6 +223,41 @@ navigame.EdgeControls = (function () {
                 edge.additionalData[key] = toAdd[key];
             }
         }
+    };
+
+    /**
+     * [_setupNewEdge instantiates an edge at the map positions of the markers
+     *  with the specified timestamps. That will not be visible, though, until it is added
+     *  to a fabric canvas or the visual layer of the navigame.CanvasManager.]
+     * @param  {[number]} markerTime1 [timestamp of the 'from' marker]
+     * @param  {[number]} markerTime2 [timestamp of the 'to' marker]
+     * @return {[fabric.Line]} the line representing the edge, which is tagged 'route'.
+     */
+    EdgeControls.prototype._setupNewEdge = function (markerTime1, markerTime2) {
+        let markerStart = this._canvasManager.getMarkerByCreationTime(markerTime1);
+        let markerEnd = this._canvasManager.getMarkerByCreationTime(markerTime2);
+
+        let posOnMapStart = {
+            x: markerStart.left,
+            y: markerStart.top
+        };
+        let posOnMapEnd = {
+            x: markerEnd.left,
+            y: markerEnd.top
+        };
+
+        let points = [posOnMapStart.x, posOnMapStart.y, posOnMapEnd.x, posOnMapEnd.y];
+
+        let newEdge = new fabric.Line(points, {
+            strokeWidth: this._edgeWidth,
+            fill: 'red',
+            stroke: 'red',
+            originX: "center",
+            originY: "center"
+        });
+        newEdge.tag = "route";
+
+        return newEdge;
     };
 
     return EdgeControls;

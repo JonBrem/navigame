@@ -309,13 +309,3 @@ navigame.MapControls = (function () {
 
     return MapControls;
 }());
-
-
-       /* let hammertime = new Hammer($("body")[0], {});
-        hammertime.get('pinch').set({enable: true});
-        hammertime.get('rotate').set({ enable: true });
-*/
-        //hammertime.on('pinch', function(e) {console.log("pinch", e.velocity, e.velocityX, e.velocityY, e.center);});
-        // e.center an e.center lassen, e.velocity gibt an, wie viel man skalieren soll // @todo: initial event??
-        //hammertime.on('rotate', function(e) {console.log("rotate", e.angle, e.rotation, e.center);});
-        // e.center um e.rotation rotieren! // @todo: initial event??

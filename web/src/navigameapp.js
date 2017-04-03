@@ -47,11 +47,9 @@ navigame.GameApp = (function () {
         this.mapVisuals = new navigame.MapVisuals();
         this.mapVisuals.init(this.canvasManager);
 
-        this.markerControls = new navigame.MarkerControls();
-        this.markerControls.init(this.$mainHTMLObject, this.canvasManager);
-
-        this.edgeControls = new navigame.EdgeControls();
-        this.edgeControls.init(this.$mainHTMLObject, this.canvasManager);
+        this.markerControls = new navigame.MarkerControls(this.$mainHTMLObject, this.canvasManager);
+        
+        this.edgeControls = new navigame.EdgeControls(this.$mainHTMLObject, this.canvasManager);
 
         this.mapControls = new navigame.MapControls();
         this.mapControls.init(this.canvasManager, this.markerControls, this.edgeControls);

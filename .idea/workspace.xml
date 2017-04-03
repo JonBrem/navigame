@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7e893c5-d0f6-4414-b9ff-c7f82d86a1c4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_path.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_path.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_save_load.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_save_load.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/navigameapp.js" afterPath="$PROJECT_DIR$/web/src/navigameapp.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/additional_data_dialog.js" afterPath="$PROJECT_DIR$/web/src/view/additional_data_dialog.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/edge_controls.js" afterPath="$PROJECT_DIR$/web/src/view/edge_controls.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_controls.js" afterPath="$PROJECT_DIR$/web/src/view/map_controls.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/marker_controls.js" afterPath="$PROJECT_DIR$/web/src/view/marker_controls.js" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

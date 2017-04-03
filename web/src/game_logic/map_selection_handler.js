@@ -1,6 +1,3 @@
-/**
- * [description]
- */
 navigame.MapSelectionHandler = (function () {
 
     /**

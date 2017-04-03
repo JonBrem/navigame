@@ -129,7 +129,7 @@ navigame.PathManager = (function () {
         // load edges
         let edges = this.path.mapPaths[this.currentMapIndex].pathEdges;
         for (let i = 0; i < edges.length; i++) {
-            this.edgeControls.createEdgeAtMapPosition(
+            this.edgeControls.createEdgeBetweenMarkers(
                 markers[i].nodeData.timeCreated,
                 markers[i + 1].nodeData.timeCreated,
                 edges[i].edgeData
@@ -173,7 +173,7 @@ navigame.PathManager = (function () {
         setTimeout(
             function() {
                 // create edge spanning from "fromNode" to "toNode"
-                that.edgeControls.createEdgeAtMapPosition(
+                that.edgeControls.createEdgeBetweenMarkers(
                     whichMapPath.pathNodes[fromNode].nodeData.timeCreated,
                     whichMapPath.pathNodes[toNode].nodeData.timeCreated,
                     data);
@@ -203,7 +203,7 @@ navigame.PathManager = (function () {
         setTimeout(
             function() {
                 for (let i = 0; i < newEdges.length; i++) {
-                    that.edgeControls.createEdgeAtMapPosition(
+                    that.edgeControls.createEdgeBetweenMarkers(
                         whichMapPath.pathNodes[i].nodeData.timeCreated,
                         whichMapPath.pathNodes[i + 1].nodeData.timeCreated,
                         newEdges[i].edgeData 

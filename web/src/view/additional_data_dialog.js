@@ -3,6 +3,7 @@ navigame.AdditionalDataDialog = (function () {
     function AdditionalDataDialog () {
         let _$dialogElement = null;
         let currentDataTimeCreated = null;
+        let currentIndex = null;
     }
 
     AdditionalDataDialog.prototype.show = function(whichType, item) {
@@ -17,6 +18,7 @@ navigame.AdditionalDataDialog = (function () {
         }
 
         currentDataTimeCreated = item.additionalData.timeCreated;
+        currentIndex = 'markerIndex' in item.additionalData? item.additionalData.markerIndex : item.additionalData.edgeIndex;
 
         let dialogElement = compiledTemplates['additional_data_dialog']({
             data: {
@@ -50,7 +52,7 @@ navigame.AdditionalDataDialog = (function () {
             }
         }   
 
-        $(this).trigger('okSelected', [currentDataTimeCreated, inputData]);
+        $(this).trigger('okSelected', [currentDataTimeCreated, currentIndex, inputData]);
     }
 
     AdditionalDataDialog.prototype._onAddEntryButtonClicked = function (e) {
