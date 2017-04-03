@@ -1,5 +1,11 @@
+/**
+ * [description]
+ */
 navigame.MapSelectionHandler = (function () {
 
+    /**
+     * [MapSelectionHandler constructor. Contains a list of public members, does nothing else.]
+     */
     function MapSelectionHandler() {
         this.mapSelectionDialog = null;
         this.currentArea = null;
@@ -9,6 +15,16 @@ navigame.MapSelectionHandler = (function () {
         this.mapListVisuals = null;
     }
 
+    /**
+     * [init description]
+     * @param  {[navigame.MapVisuals]} mapVisuals     [MapVisuals instance; the selection handler
+     *                                                has to be notified when a new map selection dialog
+     *                                                is created.]
+     * @param  {[navigame.MapList]} mapListVisuals [MapList instance: The selection handler
+     *                                             is notified when a map is selected or the maps are sorted.]
+     * @param  {[navigame.PathManager]} pathManager    [PathManager instance]
+     * @return nothing
+     */
     MapSelectionHandler.prototype.init = function (mapVisuals, mapListVisuals, pathManager) {
         this.mapVisuals = mapVisuals;
         this.pathManager = pathManager;

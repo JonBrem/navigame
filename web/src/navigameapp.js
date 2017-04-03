@@ -60,9 +60,8 @@ navigame.GameApp = (function () {
         this.mapListVisuals = new navigame.MapList();
         this.mapListVisuals.init(this.$mainHTMLObject);
 
-        this.pathManager = new navigame.PathManager();
+        this.pathManager = new navigame.PathManager(this.markerControls, this.edgeControls, this.mapListVisuals, this.canvasManager);
         this.pathManager.newPath();
-        this.pathManager.init(this.markerControls, this.edgeControls, this.mapListVisuals, this.canvasManager);
         $(this.pathManager).on('onScoreCalculated', function(e, data) { that._onScoreCalculated(data); });
 
         this.mapSelectionHandler = new navigame.MapSelectionHandler();

@@ -1,7 +1,3 @@
-/**
- * [description]
- * @return {[type]}   [description]
- */
 navigame.PathSaveLoad = (function() {
     
     let that = {},

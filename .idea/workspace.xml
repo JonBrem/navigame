@@ -5,10 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c7e893c5-d0f6-4414-b9ff-c7f82d86a1c4" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/index.html" afterPath="$PROJECT_DIR$/web/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/canvas_manager.js" afterPath="$PROJECT_DIR$/web/src/view/canvas_manager.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/view/map_controls.js" afterPath="$PROJECT_DIR$/web/src/view/map_controls.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_path.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_path.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" afterPath="$PROJECT_DIR$/web/src/game_logic/map_selection_handler.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_manager.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/game_logic/path_save_load.js" afterPath="$PROJECT_DIR$/web/src/game_logic/path_save_load.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/src/navigameapp.js" afterPath="$PROJECT_DIR$/web/src/navigameapp.js" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -24,7 +25,7 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="web.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="web.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/WEB-INF/web.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="210">
@@ -58,7 +59,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SessionCreation.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="SessionCreation.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="458">
@@ -926,12 +927,12 @@
       <workItem from="1491071642515" duration="9243000" />
       <workItem from="1491136538484" duration="599000" />
       <workItem from="1491157576642" duration="8993000" />
-      <workItem from="1491213866246" duration="2313000" />
+      <workItem from="1491213866246" duration="3670000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="164817000" />
+    <option name="totallyTimeSpent" value="166174000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="7" />
@@ -1383,18 +1384,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="458">
-          <caret line="137" column="0" lean-forward="true" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/web/WEB-INF/web.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
           <caret line="10" column="4" lean-forward="true" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/de/ur/iw/navigame/sessions/SessionCreation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="137" column="0" lean-forward="true" selection-start-line="137" selection-start-column="0" selection-end-line="137" selection-end-column="0" />
           <folding />
         </state>
       </provider>
