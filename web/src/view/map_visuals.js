@@ -1,26 +1,27 @@
 navigame.MapVisuals = (function () {
 
-    let that = null;
-
-    function MapVisuals () {
-        this._canvasManager = null;
-
-        that = this;
-    }
-
-    MapVisuals.prototype.init = function (canvasManager) {
+    /**
+     * MapVisuals constructor. only references the canvas manager, does nothing else.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc Simple data container for paths. Consists of mapPaths, which in turn
+     *  contain nodes and edges of a route.
+     * @param {navigame.CanvasManager} canvasManager - the game's canvas maanger
+     */
+    function MapVisuals (canvasManager) {
         Log.log("verbose", "Initializing Map visuals", this);
-
         this._canvasManager = canvasManager;
-
-        let that = this;
-        /*let src = "mathematik-erdgeschoss.jpg.svg";
-        ImageLoader.loadImage(src, {success: that._imageLoaded,
-                                 error: function() {Log.log("error", "image could not be loaded: " + src);} });*/
-
         Log.log("verbose", "Finished Initializing Map visuals", this);
     };
 
+    /**
+     * loadNewMap downloads the image; if it was successfully downloaded, the
+     *  callback will be invoked after it was set as the new map image.
+     * @param  {string}   imgSrc - name, but without the WEBROOT-prefix.
+     * @param  {Function} callback - Success callback (no params, not an event callback). Optional.
+     * @memberof MapVisuals
+     */
     MapVisuals.prototype.loadNewMap = function(imgSrc, callback) {
         let that = this;
         ImageLoader.loadImage(WEBROOT + '/' + imgSrc, 
@@ -36,6 +37,13 @@ navigame.MapVisuals = (function () {
         );
     };
 
+    /**
+     * _imageLoaded is called if the image was successfully downloaded,
+     *  and will create a fabric.Image that is set as the new background map on the fabric
+     *  canvas.
+     * @param  {Image} image - HTML Image element
+     * @memberof MapVisuals
+     */
     MapVisuals.prototype._imageLoaded = function (image) {
         let naturalWidth = image.naturalWidth;
         let naturalHeight = image.naturalHeight;
@@ -59,8 +67,6 @@ navigame.MapVisuals = (function () {
         imgInstance.hasBorders = false;
         imgInstance.hasControls = false;
         imgInstance.hasRotatingPoint = false;
-
-        that._canvasManager.setA
 
         that._canvasManager.setMapImage(imgInstance);
     };

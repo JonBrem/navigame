@@ -1,12 +1,13 @@
-/**
- * [MarkerControls handle adding, moving, deleting, and modifying the data of markers.
- *  They have their own area in the GUI (that edge controls also use).]
- */
 navigame.MarkerControls = (function () {
 
     /**
-     * [MarkerControls constructor. Creates the controls area &
-     *  references buttons etc.]
+     * MarkerControls constructor. Creates the controls area &
+     *  references buttons etc.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc MarkerControls handle adding, moving, deleting, and modifying the data of markers.
+     *  They have their own area in the GUI (that edge controls also use).
      */
     function MarkerControls ($contentArea, canvasManager) {
         Log.log("verbose", "Initializing Marker controls", this);
@@ -41,10 +42,11 @@ navigame.MarkerControls = (function () {
     }
 
     /**
-     * [_createMarkerAtCanvasPosition creates a new marker at the position, which is given
-     *  in canvas coordinates.]
-     * @param  {[object]} position [object with x, y keys. will be transformed to map coordinates
-     *                              (but the object will not be mutated.)]
+     * _createMarkerAtCanvasPosition creates a new marker at the position, which is given
+     *  in canvas coordinates.
+     * @param  {object} position - object with x, y keys. will be transformed to map coordinates
+     *                              (but the object will not be mutated.)
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._createMarkerAtCanvasPosition = function (position) {
         Log.log("verbose", "Creating marker at canvas position ", JSON.stringify(position), this);
@@ -69,8 +71,9 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [loadMarker loads a marker from a logical representation of a marker/node.]
-     * @param  {[object]} savedMarker [navigame.PathNode or JSON with same fields.]
+     * loadMarker loads a marker from a logical representation of a marker/node.
+     * @param  {object} savedMarker - navigame.PathNode or JSON with same fields.
+     * @memberof MarkerControls
      */
     MarkerControls.prototype.loadMarker = function (savedMarker) {
         Log.log("verbose", "loading marker ", JSON.stringify(savedMarker), this);
@@ -87,11 +90,12 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [addMarkerData adds data to the marker, overriding data that has the same keys.]
-     * @param {[number]} creationTime [creation time of the marker, so the view representation can be identified.]
-     * @param {[object]} toAdd        [keys in this object will be created and their values will be
+     * addMarkerData adds data to the marker, overriding data that has the same keys.
+     * @param {number} creationTime - creation time of the marker, so the view representation can be identified.
+     * @param {object} toAdd        - keys in this object will be created and their values will be
      *                                 stored under the same keys in the marker's additional data;
-     *                                 if the keys already exist, the old values will be overridden.]
+     *                                 if the keys already exist, the old values will be overridden.
+     *                                 @memberof MarkerControls
      */
     MarkerControls.prototype.addMarkerData = function (creationTime, toAdd) {
         let marker = this._canvasManager.getMarkerByCreationTime(creationTime);
@@ -104,8 +108,9 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onMarkerMouseOver highlights the marker (by making it somewhat bigger).]
-     * @param  {[fabric.Object]} marker [which marker to highlight]
+     * onMarkerMouseOver highlights the marker (by making it somewhat bigger).
+     * @param  {fabric.Object} marker - which marker to highlight
+     * @memberof MarkerControls
      */
     MarkerControls.prototype.onMarkerMouseOver = function (marker) {
         if (this._highlightedMarker != null && this._highlightedMarker != marker) {
@@ -125,11 +130,12 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onMarkerClicked sets the click callbacks for the "marker manipulation buttons" so
-     *  they will affect this marker.]
-     * @param  {[fabric.Object]} marker   [which marker was clicked]
-     * @param  {[object]} position [position of the click. necessary bugfix to enable dragging on
-     *                              mobile / touch-based systems.]
+     * onMarkerClicked sets the click callbacks for the "marker manipulation buttons" so
+     *  they will affect this marker.
+     * @param  {fabric.Object} marker   - which marker was clicked
+     * @param  {object} position - position of the click. necessary bugfix to enable dragging on
+     *                              mobile / touch-based systems.
+     *                              @memberof MarkerControls
      */
     MarkerControls.prototype.onMarkerClicked = function (marker, position) {
         let that = this;
@@ -151,9 +157,10 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onOtherMouseOver must be called when the mouse cursor hits nothing or hits
-     *  an edge. if a marker was highlighted, that is re-set.]
-     * @param  {[fabric.Object]} what [null, if the other is not on an edge; that edge, if it is.]
+     * onOtherMouseOver must be called when the mouse cursor hits nothing or hits
+     *  an edge. if a marker was highlighted, that is re-set.
+     * @param  {fabric.Object} what - null, if the other is not on an edge; that edge, if it is.
+     * @memberof MarkerControls
      */
     MarkerControls.prototype.onOtherMouseOver = function (what) {
         if (this._highlightedMarker != null) {
@@ -175,9 +182,10 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onOtherClicked should be called if there was a click event that did not hit a marker.
-     *  removes the click listeners on the manipulation buttons if "what" is null.]
-     * @param  {[fabric.Object]} what [null, if nothing was clicked; the clicked object, otherwise.]
+     * onOtherClicked should be called if there was a click event that did not hit a marker.
+     *  removes the click listeners on the manipulation buttons if "what" is null.
+     * @param  {fabric.Object} what - null, if nothing was clicked; the clicked object, otherwise.
+     * @memberof MarkerControls
      */
     MarkerControls.prototype.onOtherClicked = function (what) {
         let that = this;
@@ -194,8 +202,9 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onMouseUp should be called when the user stops pressing a mouse key, so dragging
-     *  markers around stops (if it was active).]
+     * onMouseUp should be called when the user stops pressing a mouse key, so dragging
+     *  markers around stops (if it was active).
+     *  @memberof MarkerControls
      */
     MarkerControls.prototype.onMouseUp = function () {
         this._markerClicked = false;
@@ -203,11 +212,12 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [onCanvasMouseMove moves a marker, if one is currently being dragged.
+     * onCanvasMouseMove moves a marker, if one is currently being dragged.
      *  the position does not have to be absolute, but the changes have to be relative to the
      *  previous position. Will trigger the 'markerMoved' event, if it did actually change
-     *  a marker's position, which in turn _should_ move the attached edges.]
-     * @param  {[object]} position [object with keys 'x' and 'y']
+     *  a marker's position, which in turn _should_ move the attached edges.
+     * @param  {object} position - object with keys 'x' and 'y'
+     * @memberof MarkerControls
      */
     MarkerControls.prototype.onCanvasMouseMove = function (position) {
         if (this._markerClicked && !(this._manipulationStart.x == position.x &&
@@ -230,8 +240,9 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_startEditingMarker shows the "edit marker"-dialog and registers callbacks to it.]
-     * @param  {[fabric.Object]} marker [which marker is affected by the dialog.]
+     * _startEditingMarker shows the "edit marker"-dialog and registers callbacks to it.
+     * @param  {fabric.Object} marker - which marker is affected by the dialog.
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._startEditingMarker = function (marker) {
         let dataDialog = new navigame.AdditionalDataDialog();
@@ -244,13 +255,14 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_setMarkerData sets the marker's additionalData to markerData,
+     * _setMarkerData sets the marker's additionalData to markerData,
      *  with markerTime and markerIndex being set separately, so these are ensured to be there.
-     *  Will trigger 'markerDataChanged'.]
-     * @param {[fabric.Object]} marker      [visual representation of the marker whose data changed.]
-     * @param {[number]} markerTime  [timestamp of the marker]
-     * @param {[number]} markerIndex [marker index, so the logical representations knows which one was edited.]
-     * @param {[object]} markerData  [the "additional data", other than timeCreated and markerIndex]
+     *  Will trigger 'markerDataChanged'.
+     * @param {fabric.Object} marker      - visual representation of the marker whose data changed.
+     * @param {number} markerTime  - timestamp of the marker
+     * @param {number} markerIndex - marker index, so the logical representations knows which one was edited.
+     * @param {object} markerData  - the "additional data", other than timeCreated and markerIndex
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._setMarkerData = function (marker, markerTime, markerIndex, markerData) {
         marker.additionalData = markerData;
@@ -261,9 +273,10 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_deleteMarker removes the marker from the view, and triggers the 'markerDeleted' event to inform
-     *  other components that should know about that.]
-     * @param  {[fabric.Object]} marker [which marker should be removed.]
+     * _deleteMarker removes the marker from the view, and triggers the 'markerDeleted' event to inform
+     *  other components that should know about that.
+     * @param  {fabric.Object} marker - which marker should be removed.
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._deleteMarker = function (marker) {
         this._$markerEditButton.unbind('click');
@@ -277,8 +290,9 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_setupDragDropControls adds the drag & drop functionality to the "create marker"-GUI element,
-     *  using jQuery UI]
+     * _setupDragDropControls adds the drag & drop functionality to the "create marker"-GUI element,
+     *  using jQuery UI
+     *  @memberof MarkerControls
      */
     MarkerControls.prototype._setupDragDropControls = function () {
         this._$newMarkerDroppable = this._$controlsWrapper.find('.new_marker_droppable');
@@ -296,10 +310,11 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_onNewMarkerDragStop called when the "new marker"-draggable is dropped.
-     *  if the marker was dropped on the canvas, this will lead to the creation of a new marker.]
-     * @param  {[event]} event [event containing the location, etc., of this event.]
-     * @param  {[jQuery UI handle]} ui    [jQuery UI handle]
+     * _onNewMarkerDragStop called when the "new marker"-draggable is dropped.
+     *  if the marker was dropped on the canvas, this will lead to the creation of a new marker.
+     * @param  {event} event - event containing the location, etc., of this event.
+     * @param  {jQuery} ui    - jQuery UI handle
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._onNewMarkerDragStop = function (event, ui) {
         Log.log("verbose", "on new marker drag stop", this);
@@ -317,10 +332,11 @@ navigame.MarkerControls = (function () {
     };
 
     /**
-     * [_setupNewMarker instantiates a new fabric.Image, which will represent the marker
-     *  if added to the visual layer of a navigame.CanvasManager]
-     * @param  {[object]} posOnMap [object with x and y keys]
-     * @return {[fabric.Image]}          [the new marker object (not visible until it is added to a fabric canvas!)]
+     * _setupNewMarker instantiates a new fabric.Image, which will represent the marker
+     *  if added to the visual layer of a navigame.CanvasManager
+     * @param  {object} posOnMap - object with x and y keys
+     * @return {fabric.Image}          the new marker object (not visible until it is added to a fabric canvas!)
+     * @memberof MarkerControls
      */
     MarkerControls.prototype._setupNewMarker = function (posOnMap) {
         let newMarker = new fabric.Image(document.getElementById('marker_droppable_img'), {

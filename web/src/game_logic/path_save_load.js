@@ -1,7 +1,19 @@
+/**
+ * PathSaveLoad can ask the server to initiate a game,
+ *  save a session and load a session.
+ *  This is a singleton.
+ *  @name navigame.PathSaveLoad
+ */
 navigame.PathSaveLoad = (function() {
     
     let that = {},
 
+    /**
+     * requestId asks the server to create a new session.
+     * @name PathSaveLoad#requestId
+     * @param  {Function} onSuccess - jQuery ajax success callback
+     * @param  {Function} onError   - jQuery ajax error callback
+     */
     requestId = function (onSuccess, onError) {
         Log.log("verbose", "requesting id", that);
 
@@ -17,6 +29,12 @@ navigame.PathSaveLoad = (function() {
         });
     },
 
+    /**
+     * savePath stores the path for the current session.
+     * @memberof PathSaveLoad
+     * @param  {Function} onSuccess - jQuery ajax success callback
+     * @param  {Function} onError   - jQuery ajax error callback
+     */
     savePath = function (pathJson, onSuccess, onError) {
         Log.log("verbose", "saving path", that);
 
@@ -33,6 +51,12 @@ navigame.PathSaveLoad = (function() {
         });
     },
 
+    /**
+     * loadPath loads a path (including its session id, start and goal).
+     * @memberof PathSaveLoad
+     * @param  {Function} onSuccess - jQuery ajax success callback
+     * @param  {Function} onError   - jQuery ajax error callback
+     */
     loadPath = function (whichId, onSuccess, onError) {
         Log.log("verbose", "loading path", that);
 

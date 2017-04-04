@@ -1,15 +1,16 @@
-/**
- * [The PathManager is the central "logic" component of the game. It updates the model
- *  when the view reports changes and vice versa.]
- */
 navigame.PathManager = (function () {
 
     /**
-     * [PathManager constructor. References the parameters and initializes event listeners.]
-     * @param {[navigame.MarkerControls]} markerControls
-     * @param {[navigame.EdgeControls]} edgeControls
-     * @param {[navigame.MapList]} mapListVisuals
-     * @param {[navigame.CanvasManager]} canvasManager
+     * PathManager constructor. References the parameters and initializes event listeners.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc The PathManager is the central "logic" component of the game. It updates the model
+     *  when the view reports changes and vice versa.
+     * @param {navigame.MarkerControls} markerControls
+     * @param {navigame.EdgeControls} edgeControls
+     * @param {navigame.MapList} mapListVisuals
+     * @param {navigame.CanvasManager} canvasManager
      */
     function PathManager(markerControls, edgeControls, mapListVisuals, canvasManager) {
         Log.log("verbose", "Initializing Path Manager", this);
@@ -29,24 +30,27 @@ navigame.PathManager = (function () {
     }
 
     /**
-     * [newPath creates a new path, which deletes all the existing data in the path!
-     *  the View components are not informed about this and need to be re-set separately.]
+     * newPath creates a new path, which deletes all the existing data in the path!
+     *  the View components are not informed about this and need to be re-set separately.
+     * @memberof PathManager
      */
     PathManager.prototype.newPath = function () {
         this.path = new navigame.Path();
     };
 
     /**
-     * [setPathId sets the path id (which is synonymous to the session id)]
+     * setPathId sets the path id (which is synonymous to the session id)
+     * @memberof PathManager
      */
     PathManager.prototype.setPathId = function (pathId) {
         this.path.pathId = pathId;
     };
 
     /**
-     * [setStartGoal sets the start and goal of the path.]
-     * @param {[object]} start [object containing a roomid, area, and level]
-     * @param {[object]} goal  [object containing a roomid, area, and level]
+     * setStartGoal sets the start and goal of the path.
+     * @param {object} start - object containing a roomid, area, and level
+     * @param {object} goal  - object containing a roomid, area, and level
+     * @memberof PathManager
      */
     PathManager.prototype.setStartGoal = function (start, goal) {
         this.path.startPoint = start;
@@ -54,10 +58,11 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [loadPathFromJson loads the path from the json that is provided.
-     *  Updates the view components accordingly.]
-     * @param  {[object]} pathJson [json that was created via a navigame.Path's toJson method
-     *                              (or that has the same structure.)]
+     * loadPathFromJson loads the path from the json that is provided.
+     *  Updates the view components accordingly.
+     * @param  {object} pathJson - json that was created via a navigame.Path's toJson method
+     *                              (or that has the same structure.)
+     * @memberof PathManager
      */
     PathManager.prototype.loadPathFromJson = function (pathJson) {
         Log.log('verbose', "loading path from JSON", this);
@@ -76,11 +81,12 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [addMap adds a new map to the logical representation of the path.
+     * addMap adds a new map to the logical representation of the path.
      *  sets the current map index to that of this new map (which is the last index, new maps are always
-     *  appended to the end of the list).]
-     * @param {[string]} areaName [name of the area, such as "PT"]
-     * @param {[any]} storeyId [id of the storey / level (of the area/building that this map belongs to)]
+     *  appended to the end of the list).
+     * @param {string} areaName - name of the area, such as "PT"
+     * @param {any} storeyId - id of the storey / level (of the area/building that this map belongs to)
+     * @memberof PathManager
      */
     PathManager.prototype.addMap = function (areaName, storeyId) {
         Log.log('verbose', "adding map", areaName, storeyId, this);
@@ -92,9 +98,10 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [deleteMap deletes the map at the specified index in the list of maps on the path.
-     *     will inform the view that this map should be deleted there, too.]
-     * @param  {[number]} mapIndex [index of the map on the current path]
+     * deleteMap deletes the map at the specified index in the list of maps on the path.
+     *     will inform the view that this map should be deleted there, too.
+     * @param  {number} mapIndex - index of the map on the current path
+     * @memberof PathManager
      */
     PathManager.prototype.deleteMap = function (mapIndex) {
         mapIndex = mapIndex? mapIndex : this.currentMapIndex; // <- default value: whichever map is shown on the view
@@ -108,16 +115,18 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [setCurrentMapIndex sets the index of the currently selected map
-     *  (that new nodes & edges will be added to).]
-     * @param {[number]} index [index of the map in the list of maps on the current path]
+     * setCurrentMapIndex sets the index of the currently selected map
+     *  (that new nodes & edges will be added to).
+     * @param {number} index - index of the map in the list of maps on the current path
+     * @memberof PathManager
      */
     PathManager.prototype.setCurrentMapIndex = function (index) {
         this.currentMapIndex = index;
     };
 
     /**
-     * [loadDataIntoView loads the markers and edges of the current path into the view.]
+     * loadDataIntoView loads the markers and edges of the current path into the view.
+     * @memberof PathManager
      */
     PathManager.prototype.loadDataIntoView = function () {
         // load markers
@@ -138,15 +147,16 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [addNode adds a node to the list of nodes on the current map path. Will lead to an edge
+     * addNode adds a node to the list of nodes on the current map path. Will lead to an edge
      *  being added, unless this is the very first node. Nodes are appended by default, but can be
-     *  inserted if the edge on which to insert the node is specified.]
-     * @param {[type]} x      [x position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} y      [y position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} data   [additionalData of the node, such as its timestamp]
-     * @param {[type]} onEdge [if left empty: Node is appended to the list (at the end);
+     *  inserted if the edge on which to insert the node is specified.
+     * @param {type} x      - x position (in canvas coordinates: distance from centre of map image)
+     * @param {type} y      - y position (in canvas coordinates: distance from centre of map image)
+     * @param {type} data   - additionalData of the node, such as its timestamp
+     * @param {type} onEdge - if left empty: Node is appended to the list (at the end);
      *                         if an edge is provided: node is inserted in the node list
-     *                         between that edge's "to" and "from" nodes, and an edge is inserted instead of appended.]
+     *                         between that edge's "to" and "from" nodes, and an edge is inserted instead of appended.
+     * @memberof PathManager
      */
     PathManager.prototype.addNode = function (x, y, data, onEdge) {
         if (onEdge == null) { 
@@ -157,11 +167,12 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [onEdgeCreated is called when the MapPath created an edge and informs the view about this change.]
-     * @param  {[navigame.MapPath]} whichMapPath [mapPath that triggered this / created the edge]
-     * @param  {[number]} fromNode     [index of the "from" node of the new edge]
-     * @param  {[number]} toNode       [index of the "to" node of the new edge]
-     * @param  {[object]} data         [additionalData of the new edge (its timestamp)]
+     * onEdgeCreated is called when the MapPath created an edge and informs the view about this change.
+     * @param  {navigame.MapPath} whichMapPath - mapPath that triggered this / created the edge
+     * @param  {number} fromNode     - index of the "from" node of the new edge
+     * @param  {number} toNode       - index of the "to" node of the new edge
+     * @param  {object} data         - additionalData of the new edge (its timestamp)
+     * @memberof PathManager
      */
     PathManager.prototype.onEdgeCreated = function (whichMapPath, fromNode, toNode, data) {
         Log.log('verbose', 'on edge created, from node', fromNode, 'to node', toNode, this);
@@ -186,11 +197,12 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [onEdgesUpdated clears the edges currently on display on the map and creates representations for the new ones that
-     *  are given to this function].
-     * @param  {[navigame.MapPath]} whichMapPath [the map path that triggered this / whose edges were updated]
-     * @param  {[array]} newEdges     [array of navigame.PathEdge, visuals representations for the members
-     *                                 of which will be created]
+     * onEdgesUpdated clears the edges currently on display on the map and creates representations for the new ones that
+     *  are given to this function.
+     * @param  {navigame.MapPath} whichMapPath - the map path that triggered this / whose edges were updated
+     * @param  {array} newEdges     - array of navigame.PathEdge, visuals representations for the members
+     *                                 of which will be created
+     * @memberof PathManager
      */
     PathManager.prototype.onEdgesUpdated = function (whichMapPath, newEdges) {
         Log.log('verbose', 'edges updated; passing that event to view', this);
@@ -218,10 +230,11 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [onMarkerMoved updates the position values that are stored for this marker,
-     *     and triggers the edges that are attached to this marker to be updated as well.]
-     * @param  {[fabric.Object]} marker      [description]
-     * @param  {[number]} markerIndex [index of the marker in the list of markers of ]
+     * onMarkerMoved updates the position values that are stored for this marker,
+     *     and triggers the edges that are attached to this marker to be updated as well.
+     * @param  {fabric.Object} marker      - description
+     * @param  {number} markerIndex - index of the marker in the list of markers of 
+     * @memberof PathManager
      */
     PathManager.prototype.onMarkerMoved = function (marker, markerIndex) {
         let markerModel = this.path.mapPaths[this.currentMapIndex].pathNodes[markerIndex];
@@ -232,28 +245,31 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [onMarkerDataChanged updates the logical representation's data for the specified marker on the current map]
-     * @param  {[number]} markerIndex [index of the marker on the current map]
-     * @param  {[object]} markerData  [new additionalData of the marker]
+     * onMarkerDataChanged updates the logical representation's data for the specified marker on the current map
+     * @param  {number} markerIndex - index of the marker on the current map
+     * @param  {object} markerData  - new additionalData of the marker
+     * @memberof PathManager
      */
     PathManager.prototype.onMarkerDataChanged = function (markerIndex, markerData) {
        this.path.mapPaths[this.currentMapIndex].pathNodes[markerIndex].nodeData = markerData;
     };
 
     /**
-     * [onEdgeDataChanged updates the logical representation's data for the specified edge on the current map]
-     * @param  {[number]} edgeIndex [index of the edge on the current map]
-     * @param  {[object]} edgeData  [new additionalData of the edge]
+     * onEdgeDataChanged updates the logical representation's data for the specified edge on the current map
+     * @param  {number} edgeIndex - index of the edge on the current map
+     * @param  {object} edgeData  - new additionalData of the edge
+     * @memberof PathManager
      */
     PathManager.prototype.onEdgeDataChanged = function (edgeIndex, edgeData) {
         this.path.mapPaths[this.currentMapIndex].pathEdges[edgeIndex].edgeData = edgeData;
     };
 
     /**
-     * [onMarkerDeleted deletes the marker from the logical representation of the path,
+     * onMarkerDeleted deletes the marker from the logical representation of the path,
      *      updates the (view) markers' indices,
-     *      and deletes / updates edges affected by this.]
-     * @param  {[number]} markerIndex [index of the marker that was deleted]
+     *      and deletes / updates edges affected by this.
+     * @param  {number} markerIndex - index of the marker that was deleted
+     * @memberof PathManager
      */
     PathManager.prototype.onMarkerDeleted = function (markerIndex) {
         let edgeUpdates = this.path.mapPaths[this.currentMapIndex].deleteNodeAt(markerIndex);
@@ -270,12 +286,13 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [resortMaps changes the order of the maps in the logical representation.]
-     * @param  {[array]} newIndices [array of numbers that contain the previous indices.
-     *                              e.g.: the previous order is always [0, 1, 2, 3, ...]
-     *                                    the array is [1, 0, 2, 3, ...]
+     * resortMaps changes the order of the maps in the logical representation.
+     * @param  {array} newIndices - array of numbers that contain the previous indices.
+     *                              e.g.: the previous order is always 0, 1, 2, 3, ...
+     *                                    the array is 1, 0, 2, 3, ...
      *                                    that means the map that was at index 1 is now the first map
-     *                                        and the map that was at index 0 is now the second map.]
+     *                                        and the map that was at index 0 is now the second map.
+     * @memberof PathManager
      */
     PathManager.prototype.resortMaps = function (newIndices) {
         let maps = this.path.mapPaths;
@@ -293,8 +310,9 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [submitPath Tells the server to calculate the score for the current path.
-     *     will trigger 'onScoreCalculated', if successful.]
+     * submitPath Tells the server to calculate the score for the current path.
+     *     will trigger 'onScoreCalculated', if successful.
+     * @memberof PathManager
      */
     PathManager.prototype.submitPath = function () {
         let that = this;
@@ -316,7 +334,8 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [_registerListeners registers listeners on events by marker controls, edge controls, and map list visuals.]
+     * _registerListeners registers listeners on events by marker controls, edge controls, and map list visuals.
+     * @memberof PathManager
      */
     PathManager.prototype._registerListeners = function () {
         let that = this;
@@ -351,10 +370,11 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [_loadMapFromJson loads an individual map, registers listeners on the logical representation,
-     *     and returns an object containing the background image of the map.]
-     * @param  {[navigame.MapPath]} map [MapPath that was loaded from a JSON path]
-     * @return {[object]}     [object with only an 'imgSrc' key.]
+     * _loadMapFromJson loads an individual map, registers listeners on the logical representation,
+     *     and returns an object containing the background image of the map.
+     * @param  {navigame.MapPath} map - MapPath that was loaded from a JSON path
+     * @return {object}     object with only an 'imgSrc' key.
+     * @memberof PathManager
      */
     PathManager.prototype._loadMapFromJson = function (map) {
         maps.push({
@@ -369,8 +389,9 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [_registerListenersForMap registers listeners (for edgeCreated, edgesUpdated) for the MapPath.]
-     * @param  {[navigame.MapPath]} map [MapPath that is part of the current path.]
+     * _registerListenersForMap registers listeners (for edgeCreated, edgesUpdated) for the MapPath.
+     * @param  {navigame.MapPath} map - MapPath that is part of the current path.
+     * @memberof PathManager
      */
     PathManager.prototype._registerListenersForMap = function (map) {
         let that = this;
@@ -385,14 +406,15 @@ navigame.PathManager = (function () {
     };
 
     /**
-     * [_appendNode appends a node to the list of nodes on the current map path. Will lead to an edge
-     *  being added, unless this is the very first node.]
-     * @param {[type]} x      [x position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} y      [y position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} data   [additionalData of the node, such as its timestamp]
-     * @param {[type]} onEdge [if left empty: Node is appended to the list (at the end);
+     * _appendNode appends a node to the list of nodes on the current map path. Will lead to an edge
+     *  being added, unless this is the very first node.
+     * @param {type} x      - x position (in canvas coordinates: distance from centre of map image)
+     * @param {type} y      - y position (in canvas coordinates: distance from centre of map image)
+     * @param {type} data   - additionalData of the node, such as its timestamp
+     * @param {type} onEdge - if left empty: Node is appended to the list (at the end);
      *                         if an edge is provided: node is inserted in the node list
-     *                         between that edge's "to" and "from" nodes, and an edge is inserted instead of appended.]
+     *                         between that edge's "to" and "from" nodes, and an edge is inserted instead of appended.
+     * @memberof PathManager
      */
     PathManager.prototype._appendNode = function (x, y, data) {
         this.path.mapPaths[this.currentMapIndex].addNode(
@@ -405,13 +427,14 @@ navigame.PathManager = (function () {
     }
 
     /**
-     * [_insertNodeOnEdge inserts a node into the list of nodes on the current map path. Will lead to an edge
-     *  being added.]
-     * @param {[type]} x      [x position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} y      [y position (in canvas coordinates: distance from centre of map image)]
-     * @param {[type]} data   [additionalData of the node, such as its timestamp]
-     * @param {[type]} onEdge [node is inserted in the node list between that edge's "to" and "from" nodes,
-     *                         and an edge is inserted instead of appended.]
+     * _insertNodeOnEdge inserts a node into the list of nodes on the current map path. Will lead to an edge
+     *  being added.
+     * @param {type} x      - x position (in canvas coordinates: distance from centre of map image)
+     * @param {type} y      - y position (in canvas coordinates: distance from centre of map image)
+     * @param {type} data   - additionalData of the node, such as its timestamp
+     * @param {type} onEdge - node is inserted in the node list between that edge's "to" and "from" nodes,
+     *                         and an edge is inserted instead of appended.
+     * @memberof PathManager
      */
     PathManager.prototype._insertNodeOnEdge = function (x, y, data, onEdge) {
         let newMarkerIndex = onEdge.additionalData.edgeIndex + 1;
@@ -433,10 +456,11 @@ navigame.PathManager = (function () {
     }
 
     /**
-     * [_updateEdgeVisuals updates an edges position on the map after either its "to" or "from"
-     *     node were moved.]
-     * @param  {[number]} markerTime  [timestamp of the marker that was moved.]
-     * @param  {[number]} markerIndex [index of marker on current map path that was moved.]
+     * _updateEdgeVisuals updates an edges position on the map after either its "to" or "from"
+     *     node were moved.
+     * @param  {number} markerTime  - timestamp of the marker that was moved.
+     * @param  {number} markerIndex - index of marker on current map path that was moved.
+     * @memberof PathManager
      */
     PathManager.prototype._updateEdgeVisuals = function (markerTime, markerIndex) {
         let nodes = this.path.mapPaths[this.currentMapIndex].pathNodes;

@@ -1,5 +1,13 @@
 navigame.Path = (function () {
 
+    /**
+     * Path constructor.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc Simple data container for paths. Consists of mapPaths, which in turn
+     *  contain nodes and edges of a route.
+     */
     function Path() {
         this.mapPaths = [];
 
@@ -8,6 +16,13 @@ navigame.Path = (function () {
         this.endPoint = null;
     }
 
+    /**
+     * addMap creates a new navigame.MapPath and adds it to the list of maps
+     *  on this path.
+     * @param {string} areaName - name of the area (e.g. "PT")
+     * @param {string} storeyId - id of the storey within the area
+     * @memberof Path
+     */
     Path.prototype.addMap = function(areaName, storeyId) {
         let newMap = new navigame.MapPath();
         newMap.areaName = areaName;
@@ -16,6 +31,12 @@ navigame.Path = (function () {
         this.mapPaths.push(newMap);
     };
 
+    /**
+     * toJson creates a JSON representation of this path,
+     *  which includes JSON representations of all map paths.
+     * @return {object} a JSON representation of this path.
+     * @memberof Path
+     */
     Path.prototype.toJson = function () {
         let asJson = {
             startPoint: this.startPoint,
@@ -31,6 +52,11 @@ navigame.Path = (function () {
         return asJson;
     };
 
+    /**
+     * fromJson loads the values of this path from the object.
+     * @param  {object} obj - JSON representation of a path.
+     * @memberof Path
+     */
     Path.prototype.fromJson = function (obj) {
         this.startPoint = obj.startPoint;
         this.endPoint = obj.endPoint;

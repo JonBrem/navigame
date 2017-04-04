@@ -1,18 +1,19 @@
-/**
- * [The Canvas manager is a central "view" class in this game.
- *  It greatly limits the accessability to the underlying
- *  fabric.js-canvas, but (in doing so) ensures that certain position values,
- *  scaling and rotating the canvas work smoothly.
- *  
- *  It handles clicks by using a circle that gets moved to the mouse's position.
- *  The circle's position can be updated via methods of this class, and there are callbacks
- *  for if it hits anything.]
- */
 navigame.CanvasManager = (function () {
 
     /**
-     * [CanvasManager constructor. Creates a fabric canvas around the specified jQuery handle.]
-     * @param {[jQuery]} $contentArea [a fabric canvas will be created and appended to the specified element.]
+     * CanvasManager constructor. Creates a fabric canvas around the specified jQuery handle.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc The Canvas manager is a central "view" class in this game.
+     *  It greatly limits the accessability to the underlying
+     *  fabric.js-canvas, but (in doing so) ensures that certain position values,
+     *  scaling and rotating the canvas work smoothly.
+     *  
+     *  It handles clicks by using a circle that gets moved to the mouse's position.
+     *  The circle's position can be updated via methods of this class, and there are callbacks
+     *  for if it hits anything.
+     * @param {jQuery} $contentArea - a fabric canvas will be created and appended to the specified element.
      */
     function CanvasManager ($contentArea) {
         Log.log("verbose", "Initializing Canvas Manager", this);
@@ -33,9 +34,10 @@ navigame.CanvasManager = (function () {
     }
 
     /**
-     * [setMapImage sets the background image to the specified object;
-     *  also, performs a complete reset of the objects on display.]
-     * @param {[fabric.Image]} fabricObj [Image that contains the map]
+     * setMapImage sets the background image to the specified object;
+     *  also, performs a complete reset of the objects on display.
+     * @param {fabric.Image} fabricObj - Image that contains the map
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.setMapImage = function (fabricObj) {
         $(this).trigger('clearCanvas');
@@ -56,18 +58,20 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [getViewportScale is NOT the scale of the image, but the ratio of
-     *  the canvas' "internal" width and the DOM element's width.]
-     * @return {[number]} [the fraction of the canvas' width ]
+     * getViewportScale is NOT the scale of the image, but the ratio of
+     *  the canvas' "internal" width and the DOM element's width.
+     * @return {number} the fraction of the canvas' width 
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.getViewportScale = function () {
         return this._fabricCanvas.width / $(this._fabricCanvas.upperCanvasEl).width();
     };
 
     /**
-     * [addToVisualLayer adds an object to the visual layer (not straight to the canvas).
-     *  this object will receive the scale, rotation and position updates of the underlying map.]
-     * @param {[fabric.Object]} fabricObj [any fabric object]
+     * addToVisualLayer adds an object to the visual layer (not straight to the canvas).
+     *  this object will receive the scale, rotation and position updates of the underlying map.
+     * @param {fabric.Object} fabricObj - any fabric object
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
         fabricObj.angle = -this._visualsGroup.angle;
@@ -78,9 +82,10 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [removeFromVisualLayer removes an object from the visual layer of the canvas,
-     *  which will hide it entirely (but not "destroy" the object.)]
-     * @param  {[fabric.Object]} fabricObj [some object that is on the canvas.]
+     * removeFromVisualLayer removes an object from the visual layer of the canvas,
+     *  which will hide it entirely (but not "destroy" the object.)
+     * @param  {fabric.Object} fabricObj - some object that is on the canvas.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.removeFromVisualLayer = function (fabricObj) {
         this._visualsGroup.remove(fabricObj);
@@ -89,6 +94,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * @return {Number} the canvas's (coordinate system) width.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.canvasWidth = function () {
         return this._fabricCanvas.width;
@@ -96,6 +102,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * @return {Number} the canvas's (coordinate system) height.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.canvasHeight = function () {
         return this._fabricCanvas.height;
@@ -103,6 +110,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * @return {Number} the canvas's (DOM element) width.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.elementWidth = function () {
         return $(this._fabricCanvas.upperCanvasEl).width();
@@ -110,6 +118,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * @return {Number} the canvas's (DOM element) height.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.elementHeight = function () {
         return $(this._fabricCanvas.upperCanvasEl).height();
@@ -117,6 +126,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * @return {HTMLElement} the canvas's html element.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.canvasElement = function () {
         return this._fabricCanvas.upperCanvasEl;
@@ -124,8 +134,9 @@ navigame.CanvasManager = (function () {
 
     /**
      * Given a position on the canvas, returns the position on the map.
-     * @param  {object with keys x, y} canvasPos 
-     * @return {[fabric.Point]} point in transformed coordinates.
+     * @param  {object} canvasPos - object with keys x, y
+     * @return {fabric.Point} point in transformed coordinates.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.calculatePositionOnMap = function (canvasPos) {
         let originalPositionFractionX = canvasPos.x / $(this._fabricCanvas.upperCanvasEl).width();
@@ -140,7 +151,8 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * @return {[number]} [(horizontal) zoom level of the map.]
+     * @return {number} (horizontal) zoom level of the map.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.getCurrentZoom = function () {
         // @todo if the canvas is not square, this methods may need a parameter to determine
@@ -149,13 +161,14 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [moveCursor moves the selection circle around, and calls the callback methods to report
-     *     if it hits a marker, an edge or nothing]
-     * @param  {[object]} elementCoordinates [position on the canvas element; must contain "x" and "y" keys.]
-     * @param  {[object]} collisionCallback  [object containing three methods: "markerHit", "routeHit" and "nothingHit".
+     * moveCursor moves the selection circle around, and calls the callback methods to report
+     *     if it hits a marker, an edge or nothing
+     * @param  {object} elementCoordinates - position on the canvas element; must contain "x" and "y" keys.
+     * @param  {object} collisionCallback  - object containing three methods: "markerHit", "routeHit" and "nothingHit".
      *                                        depending on whether or not the selection circle collides with a marker,
      *                                        is near an edge or hits nothing, one of these methods will be called.
-     *                                        marker hits have precedence over edge hits.]
+     *                                        marker hits have precedence over edge hits.
+     *                                        @memberof CanvasManager
      */
     CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
         this._setCursorPosition(elementCoordinates);
@@ -164,22 +177,9 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [cursorDown moves the selection circle around, and calls the callback methods to report
-     *     if it hits a marker, an edge or nothing]
-     * @param  {[object]} elementCoordinates [position on the canvas element; must contain "x" and "y" keys.]
-     * @param  {[object]} collisionCallback  [object containing three methods: "markerHit", "routeHit" and "nothingHit".
-     *                                        depending on whether or not the selection circle collides with a marker,
-     *                                        is near an edge or hits nothing, one of these methods will be called.
-     *                                        marker hits have precedence over edge hits.]
-     */
-    CanvasManager.prototype.cursorDown = function (elementCoordinates, collisionCallback) {
-        this._setCursorPosition(elementCoordinates);
-        this._checkCursorCollisions(collisionCallback);
-    };
-
-    /**
-     * [_setCursorPosition moves the selection circle around]
-     * @param  {[object]} elementCoordinates [position on the canvas element; must contain "x" and "y" keys.]
+     * _setCursorPosition moves the selection circle around
+     * @param  {object} elementCoordinates - position on the canvas element; must contain "x" and "y" keys.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype._setCursorPosition = function (elementCoordinates) {
         let mapPos = this.calculatePositionOnMap(elementCoordinates);
@@ -192,12 +192,13 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [_checkCursorCollisions calls the callback methods to report
-     *     if the cursor / selection circle hits a marker, an edge or nothing]
-     * @param  {[object]} callback  [object containing three methods: "markerHit", "routeHit" and "nothingHit".
+     * _checkCursorCollisions calls the callback methods to report
+     *     if the cursor / selection circle hits a marker, an edge or nothing
+     * @param  {object} callback  - object containing three methods: "markerHit", "routeHit" and "nothingHit".
      *                                        depending on whether or not the selection circle collides with a marker,
      *                                        is near an edge or hits nothing, one of these methods will be called.
-     *                                        marker hits have precedence over edge hits.]     */
+     *                                        marker hits have precedence over edge hits
+     *                                        @memberof CanvasManager.     */
     CanvasManager.prototype._checkCursorCollisions = function (callback) {
         // check marker collisions
         for (let i = 0; i < this._visualsGroup._objects.length; i++) {
@@ -243,6 +244,7 @@ navigame.CanvasManager = (function () {
 
     /**
      * Positions the map at the center of the canvas.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.centerImage = function () {
         this._visualsGroup.center();
@@ -258,8 +260,9 @@ navigame.CanvasManager = (function () {
 
     /**
      * Moves the map (or object on the map, if specified) to the specified position (position of top left corner)
-     * @param  {[object with keys x, y]} pos Coordinates to move to
-     * @param  {[fabric.Object]} moveWhat if specified, moves this instead of the whole map.
+     * @param  {object} pos - Coordinates to move to (object with keys x, y)
+     * @param  {fabric.Object} moveWhat - if specified, moves this instead of the whole map.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.moveTo = function (pos, moveWhat) {
         if (moveWhat == null)
@@ -277,8 +280,9 @@ navigame.CanvasManager = (function () {
 
     /**
      * Moves the map (or object on the map, if specified) by the specified values (position of top left corner)
-     * @param  {[object with keys x, y]} moveBy values to move by; will be mutated.
-     * @param  {[fabric.Object]} moveWhat if specified, moves this instead of the whole map.
+     * @param  {object} moveBy - values to move by; will be mutated (object with keys x, y).
+     * @param  {fabric.Object} moveWhat - if specified, moves this instead of the whole map.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.moveBy = function (moveBy, moveWhat) {
         if (moveWhat == null)
@@ -302,8 +306,9 @@ navigame.CanvasManager = (function () {
 
     /**
      * Sets the zoom level and the center position.
-     * @param  {[Number]} zoomLevel new zoom level
-     * @param  {[object with keys x, y]} center center of the zoom.
+     * @param  {Number} zoomLevel - new zoom level
+     * @param  {object} center - center of the zoom (object with keys x, y).
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.zoomTo = function (zoomLevel, center) {
         let newZoom = Math.min(zoomLevel, 6);
@@ -321,8 +326,9 @@ navigame.CanvasManager = (function () {
 
     /**
      * Zooms by zoomDelta with "center" as the zoom center.
-     * @param  {[Number]} zoomDelta change in zoom level.
-     * @param  {[object with keys x, y]} center center of the zoom.
+     * @param  {Number} zoomDelta - change in zoom level.
+     * @param  {object} center - center of the zoom (object with keys x, y).
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.zoomBy = function (zoomDelta, center) {
         //this._visualsGroup.setLeft(-center.x);
@@ -353,8 +359,9 @@ navigame.CanvasManager = (function () {
     /**
      * Set absolute rotation of the map.
      * 
-     * @param {[Number]}  rotation    new rotation
-     * @param {[object with keys x, y]}   center  center of the rotation
+     * @param {Number}  rotation -   new rotation
+     * @param {object}   center  -  center of the rotation (object with keys x, y)
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.setRotation = function (rotation, center) {
         let prevRotation = this._visualsGroup.getAngle();
@@ -373,9 +380,10 @@ navigame.CanvasManager = (function () {
 
     /**
      * Set relative rotation of the map.
-     * @param {[Number]}  rotation    change in rotation
-     * @param {[object with keys x, y]}   center  center of the rotation
-     * @param {[updateRender]} updateRender  whether or not to re-render after this function (default is true)
+     * @param {Number} rotation -   change in rotation
+     * @param {object}   center - center of the rotation (object with keys x, y)
+     * @param {updateRender} updateRender - whether or not to re-render after this function (default is true)
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.rotateBy = function (rotation, center, updateRender) {
         if (!updateRender)
@@ -432,30 +440,33 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [getMarkerByCreationTime searches through all the markers that are on the canvas for the one
-     *  that has the specified timestamp, and returns it if it exists.]
-     * @param  {[number]} timeCreated [timestamp of the marker (in .additionalData.timeCreated)]
-     * @return {[fabric.Object]}      [Marker, if there is one with the specified time; null, otherwise]
+     * getMarkerByCreationTime searches through all the markers that are on the canvas for the one
+     *  that has the specified timestamp, and returns it if it exists.
+     * @param  {number} timeCreated - timestamp of the marker (in .additionalData.timeCreated)
+     * @return {fabric.Object}     Marker, if there is one with the specified time; null, otherwise
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.getMarkerByCreationTime = function (timeCreated) {
         return this._getObjectByCreationTime('marker', timeCreated);
     };
 
     /**
-     * [getEdgeByCreationTime searches through all the routes/edges that are on the canvas for the one
-     *  that has the specified timestamp, and returns it if it exists.]
-     * @param  {[number]} timeCreated [timestamp of the edge (in .additionalData.timeCreated)]
-     * @return {[fabric.Object]}      [Edge, if there is one with the specified time; null, otherwise]
+     * getEdgeByCreationTime searches through all the routes/edges that are on the canvas for the one
+     *  that has the specified timestamp, and returns it if it exists.
+     * @param  {number} timeCreated - timestamp of the edge (in .additionalData.timeCreated)
+     * @return {fabric.Object}     Edge, if there is one with the specified time; null, otherwise
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.getEdgeByCreationTime = function (timeCreated) {
         return this._getObjectByCreationTime('route', timeCreated);
     };
 
     /**
-     * [_getObjectByCreationTime searches through all the objects that are on the canvas and have the specified tag
-     *  for the one that has the specified timestamp, and returns it if it exists.]
-     * @param  {[number]} timeCreated [timestamp of the object (in .additionalData.timeCreated)]
-     * @return {[fabric.Object]}      [the Object if there is one with the specified time; null, otherwise]
+     * _getObjectByCreationTime searches through all the objects that are on the canvas and have the specified tag
+     *  for the one that has the specified timestamp, and returns it if it exists.
+     * @param  {number} timeCreated - timestamp of the object (in .additionalData.timeCreated)
+     * @return {fabric.Object}     the Object if there is one with the specified time; null, otherwise
+     * @memberof CanvasManager
      */
     CanvasManager.prototype._getObjectByCreationTime = function (tag, timeCreated) {
         let objects = this._visualsGroup.getObjects();
@@ -471,9 +482,10 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [fixEdgeRotation ensures the edges on the canvas are rotated correctly and point straight
-     *  from their start to their end nodes.]
-     * @param  {[fabric.Object]} edge [which edge/route]
+     * fixEdgeRotation ensures the edges on the canvas are rotated correctly and point straight
+     *  from their start to their end nodes.
+     * @param  {fabric.Object} edge - which edge/route
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.fixEdgeRotation = function (edge) {
         edge.setAngle(0);
@@ -482,8 +494,9 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [updateMarker re-renders the marker.]
-     * @param  {[fabric.Object]} marker [which marker to update]
+     * updateMarker re-renders the marker.
+     * @param  {fabric.Object} marker - which marker to update
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.updateMarker = function (marker) {
         this._updatePartOfGroup(marker);
@@ -491,8 +504,9 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [updateEdge re-renders the edge.]
-     * @param  {[fabric.Object]} edge [which edge to update]
+     * updateEdge re-renders the edge.
+     * @param  {fabric.Object} edge - which edge to update
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.updateEdge = function (edge) {
         this._updatePartOfGroup(edge);
@@ -500,9 +514,10 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [deleteAllEdges removes all edges from the visual layer. Their logical representation
+     * deleteAllEdges removes all edges from the visual layer. Their logical representation
      *  is not affected by this.
-     *  Obviously, use with caution.]
+     *  Obviously, use with caution.
+     *  @memberof CanvasManager
      */
     CanvasManager.prototype.deleteAllEdges = function () {        
         let objects = this._visualsGroup.getObjects();
@@ -516,12 +531,13 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [toImageFraction transforms "absolute" canvas map coordinates 
+     * toImageFraction transforms "absolute" canvas map coordinates 
      *  (which is NOT the coordinate system the "native" image uses!! the height and width
-     *   is always the same on the canvas!) to fractions of the total width & height.]
-     * @param  {[number]}  coordVal [e.g. 0 for the centre of the image.]
-     * @param  {Boolean} isX      [true if this is the x coordinate.]
-     * @return {[number]}           [transformed coordinate.]
+     *   is always the same on the canvas!) to fractions of the total width & height.
+     * @param  {number}  coordVal - e.g. 0 for the centre of the image.
+     * @param  {Boolean} isX      - true if this is the x coordinate.
+     * @return {number}           transformed coordinate.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.toImageFraction = function (coordVal, isX) {
         if (isX) {
@@ -532,26 +548,28 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [toImageCoord transforms fractions of the canvas map's coordinates 
+     * toImageCoord transforms fractions of the canvas map's coordinates 
      *  (which is NOT the coordinate system the "native" image uses!! the height and width
-     *   is always the same on the canvas!) to "absolute" canvas map coordinates.]
-     * @param  {[number]}  coordVal [e.g. 0 for the centre of the image.]
-     * @param  {Boolean} isX      [true if this is the x coordinate.]
-     * @return {[number]}           [transformed coordinate.]
+     *   is always the same on the canvas!) to "absolute" canvas map coordinates.
+     * @param  {number}  coordVal - e.g. 0 for the centre of the image.
+     * @param  {Boolean} isX      - true if this is the x coordinate.
+     * @return {number}           transformed coordinate.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype.toImageCoord = function (fractionVal, isX) {
         if (isX) {
-            return fractionVal * this._visualsGroup.getObjects()[1].width;
+            return fractionVal * this._visualsGroup.getObjects(1).width;
         } else {
-            return fractionVal * this._visualsGroup.getObjects()[1].height;
+            return fractionVal * this._visualsGroup.getObjects(1).height;
         }
     };
 
 
     /**
-     * [_unScaleMarkersAndEdges makes markers always appear in the same size,
-     *  regardless of how far in/out the user zooms.]
-     * @param  {[number]} zoomLevel [the zoom level of the map.]
+     * _unScaleMarkersAndEdges makes markers always appear in the same size,
+     *  regardless of how far in/out the user zooms.
+     * @param  {number} zoomLevel - the zoom level of the map.
+     * @memberof CanvasManager
      */
     CanvasManager.prototype._unScaleMarkersAndEdges = function (zoomLevel) {
         let objects = this._visualsGroup.getObjects();
@@ -567,10 +585,11 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [_updatePartOfGroup in order to see the change in an object that is part of a
+     * _updatePartOfGroup in order to see the change in an object that is part of a
      *  fabric.Group, it needs to be removed from the group and added again.
-     *  This method is a shorthand for those steps.]
-     * @param  {[fabric.Object]} fabricObj [object that is part of _visualsGroup]
+     *  This method is a shorthand for those steps.
+     * @param  {fabric.Object} fabricObj - object that is part of _visualsGroup
+     * @memberof CanvasManager
      */
     CanvasManager.prototype._updatePartOfGroup = function (fabricObj) {
         this._visualsGroup.remove(fabricObj);
@@ -578,13 +597,14 @@ navigame.CanvasManager = (function () {
     };
 
     /**
-     * [_initVisualLayer adds a fabric.Group to the canvas that all other objects will be added to.
+     * _initVisualLayer adds a fabric.Group to the canvas that all other objects will be added to.
      *  this is helpful because all objects on it get rotated, scaled, and translated when these operations
      *  are applied to the group itself. Coordinates are always respective to the map and independent
      *  of where it currently is on the screen.
      *  
      *  Using this was a design choice that made some things easier and other things harder, and it is
-     *  a part that could only be removed with massive changes to the rest.]
+     *  a part that could only be removed with massive changes to the rest.
+     *  @memberof CanvasManager
      */
     CanvasManager.prototype._initVisualLayer = function () {
         // this is a long method, but that is only because fabric objects require some setup.

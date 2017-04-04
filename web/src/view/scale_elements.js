@@ -1,24 +1,33 @@
 navigame.ElementScaler = (function() {
 
+    /**
+     * ElementScaler constructor. References elements, and 
+     *  sets a timer that rescales the elements after the window's size changed.
+     *  That scaling also happens once initially.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc the ElementScaler is meant to ensure that the application
+     *  always fits within the browser window vertically. 
+     *  Most of the scaling happens in media queries in the style sheet!!!
+     */
     function ElementScaler () {
         let that = this;
-        $(window).resize(_.debounce(function(){
+        $(window).resize(_.debounce(function(){ // <- rescale after the last time the window was resized is .1 seconds ago
+                                                // (so it isn't called continously, which could be slow)
             that.rescale();
         }, 100));
 
         this._$title = null;
         this._$titleElements = {};
-        this._$gameControlsElements = {};
 
         this._$lowerCanvas = null;
         this._$upperCanvas = null;
         this._$canvasContainer = null;
 
         this._$controlsDiv = null;
-        this._$controlsElements = {};
         
         this._$mapControlsDiv = null;
-        this._$mapControlsElements = {};
 
         setTimeout(function() {
             that.referenceElements();
@@ -26,17 +35,16 @@ navigame.ElementScaler = (function() {
         }, 50);
     }
 
+    /** 
+     * referenceElements references HTML elements.
+     *
+     * @memberof ElementScaler
+     */
     ElementScaler.prototype.referenceElements = function () {
         this._$title = $("#title_bar_area");
         this._$titleElements = {
             titleHeader: this._$title.find('h1'),
             titleBar: this._$title.find('.title-bar')
-        };
-
-        this._$gameControlsElements = {
-            saveButton: this._$title.find('#save_button'),
-            sessionDisplay: this._$title.find('#session_id_container'),
-            newGameButton: this._$title.find('#new_game_button')
         };
         
         this._$canvasContainer = $(".canvas-container");
@@ -47,6 +55,10 @@ navigame.ElementScaler = (function() {
         this._$mapControlsDiv = $("#map_list_area");
     };
 
+    /**
+     * rescale sets (predomininantly) the height of the main elements on display.
+     * @memberof ElementScaler
+     */
     ElementScaler.prototype.rescale = function () {
         let windowWidth = Math.max($(window.top).width(), 300);
         let windowHeight = Math.max($(window.top).height(), 500);
@@ -63,6 +75,10 @@ navigame.ElementScaler = (function() {
         // 3 / 16 of height
         this._rescaleMapConrols(windowWidth, windowHeight);
     };
+
+    // these methods set the height of the different parts, to ensure that even if one object
+    // is too big, there is no scrolling (which may be an odd design choice)
+    // _rescaleCanvas is an exception; since the canvas is a square, this also sets its width.
 
     ElementScaler.prototype._rescaleTitle = function(windowWidth, windowHeight) {
         // bottom most element minus start element
