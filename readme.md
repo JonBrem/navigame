@@ -20,6 +20,42 @@ Für die Anpassung und Erweiterung sind vor allem Verständnis von jQuery und Fa
 
 Serverseitig macht die Anwendung nicht viel, außer dem Client Daten zur Verfügung zu stellen, und hat nur den Tomcat-Server und JSON als Dependencies (die sind auch im Projekt direkt enthalten). Eine Auswertung des clientseitig erzeugten Pfades o.ä. findet noch nicht statt.
 
+## Deployment
+
+```
+Startseite:
+
+ https://www.example.com:8080/test/pfad/index.html (index.html: optional)
+ \___/   \_____________/ \__/\___________________/ 
+   |            |         |             |            
+Schema⁺        Host      Port          Pfad      
+       
+API:
+
+ https://www.example.com:8080/test/pfad/api_name?method=request_id
+ \___/   \_____________/ \__/\________/\_______/\________________/
+   |            |         |       |         |           |
+Schema⁺        Host      Port    Pfad      API        Query
+
+```
+*Angepasst von [https://de.wikipedia.org/wiki/Uniform_Resource_Locator](https://de.wikipedia.org/wiki/Uniform_Resource_Locator)*
+
+Wenn man das Spiel auf einem Server auf einem bestimmten Pfad (Beispiel: /test/pfad/) hochladen will, dann muss man:
+
+* In IntelliJ:
+    * auf "Run" -> Edit Configurations gehen
+    * im Dialog, der sich dann öffnet, den Reiter "Deployment" auswählen
+    * Navigationsspiel:war exploded auswählen
+    * rechts bei "Application context" /test/pfad/ angeben
+* In der JS-Anwendung: In der Datei "index.html" in Z. 40 angeben: var WEBROOT = "/test/pfad";
+
+Den api_name kann man wie folgt ändern:
+
+* In IntelliJ:
+    * Datei web/WEB-INF/web.xml öffnen
+    * bei &lt;servlet-mapping&gt; als url-pattern /api_name/* angeben.
+* In der JS-Anwendung: In der Datei "index.html" in Z. 41 angeben: var NAVIGAME_API = "/api_name";
+
 ## Architektur
 
 ### JS
@@ -43,7 +79,7 @@ Der PathManager kümmert sich immer darum, dass die visuelle Repräsentation und
 
 Unten auf der Seite kann man über den "Add Map"-Knopf neue MapPaths anlegen, dadurch wird wieder ein MapSelectionDialog erzeugt, auf dem man eine neue Karte anlegen kann. Karten lassen sich auch per Drag & Drop verschieben.
 
-Wenn man den Pfad vom Startpunkt zum Zielpunkt fertig erzeugt hat, dann kann man auf den "Submit Path"-Knopf drücken, um eine Bewertung zu erhalten.
+Wenn man den Pfad vom Startpunkt zum Zielpunkt fertig erzeugt hat, dann kann man auf den "Submit Path"-Knopf drücken, um eine Bewertung zu erhalten. Hierfür generiert der Server einen zufälligen Wert zwischen 0 und 99. Das muss also noch implementiert werden.
 
 #### CanvasManager
 
@@ -53,41 +89,31 @@ Da Fabric standardmäßig viel (und für diese Anwendung zu viel) Manipulation d
 
 #### MapControls
 
-abc
+Die MapControls sind einerseits für die vier kleinen Knöpfe auf der Karte verantwortlich; ihr Hauptzweck ist jedoch das Empfangen von Mouse- und Touch-Events für die Karte. Dafür kreieren sie ein `<div>`, das über dem Canvas liegt, immer gleichgroß ist wie der Canvas und alle dieser Events abfängt. Diese werden dann an den CanvasManager weitergeleitet.
+In den MapControls befindet sich der Großteil der "Interaktionslogik" der Anwendung, z.B. auch die Touch-Gesten-Interaktion mit Hammer.JS. Die MapControls entscheiden, wann die Karte gedreht, verschoben oder skaliert wird. Sie kommunizieren dabei mit den MarkerControls und EdgeControls, die Informationen über die Ergebnisse von Mouse-Events erhalten (z.B. ob ein Marker gedrückt wurde oder bei einem mouseover berührt wurde).
 
 #### PathManager
 
-Der PathManager ist eine zentrale Logikkomponente.
-abc
+Der PathManager ist eine zentrale Logikkomponente. Er erfährt, wenn bestimmte Sachen in den View-Komponenten passieren, z.B. wenn Marker erzeugt werden. Alle Änderungen im View gibt er an das "Model" weiter; es gibt immer eine View-Repräsentation aller Objekte und eine Model-Repräsentation. Marker und Edges erhalten im View Metadaten zugewiesen, unter anderem den Timestamp ihres Erstellungszeitpunkts, und derselbe Zeitpunkt ist auch im Model hinterlegt. So kann man immer bestimmen, welche Objekte zusammengehören.
+Der PathManager hat die wichtige Aufgabe, zu entscheiden, wie der Pfad gespeichert wird, z.B. auf welche Karte (im Model) neue Marker kommen. Edges werden immer aus dem Model heraus angelegt, der PathManager teilt dann dem View mit, dass es eine Kante zwischen zwei Markern geben soll.
 
 ### Server
 
-Der Server hat eine eigene Java-Dokumentation.
+Die Serverkomponente ist im Verlgeich zum JS-Teil des Projekts nicht allzu umfangreich. Neben lambda-Ausdrücken, die ganz unten in diesem Dokument beispielhaft erklärt werden, gibt es nur eine nennenswerte Eigenheit:
 
+Bei Aufrufen an die API landen alle Anfragen zunächst an der gleichen Stelle, nämlich beim `de.ur.iw.navigame.server.AppServlet`, noch konkreter: dessen `handleRequest`-Methode. Alle API-Aufrufe benötigen außerdem als Parameter den `method`-Key, z.B.:
 
-## Deployment
+`<server>:<port>/<pfad>/<api>?method=request_id`
 
-IntelliJ: Run -> Edit Configurations -> Reiter "Deployment" -> Navigationsspiel:war exploded ->
-    rechts bei "Application context" "/irgend/ein/pfad" angeben
+Das `AppServlet` entscheidet basierend auf dieser `method`, welche Serverkomponente die Anfrage verarbeit. Dafür werden in der `contextInitialized`-Methode, die automatisch aufgerufen wird, wenn der Server hochfährt, `ServletRequestHandler` registriert. Für jede mögliche `method` muss ein solcher Handler registriert werden. In der `handleRequest`-Methode des `AppServlet`s werden dann Http-Anfragen an die entsprechenden Handler weitergeleitet.
 
-    dann ist das Spiel unter http://[server]/irgend/ein/pfad/index.html verfügbar.
+Vom Funktionsumfang her macht die Serverkomponente ansonsten nicht viel; sie lädt nach Anfragen vom Client Daten vom urwalking-server herunter und gibt sie (nach bestimmten Verarbeitungsschritten) an den Client weiter. Wenn die Daten bereits heruntergeladen wurden, so werden sie nicht nochmal geladen. Deswegen kann es sein, dass beim erstmaligen Auswählen eines bestimmten Areals bei der Kartenauswahl eine längere Ladezeit auftritt, weil erst die lange xml-Datei vom urwalking-Server heruntergeladen wird. Bei weiteren Anfragen ist diese bereits da und muss nicht mehr geladen werden.
 
-index.html, WEBROOT
-
-IntelliJ: (bzw. Projektordner):
-
-    Navigationsspiel -> web -> WEB-INF -> web.xml, Z. 14: /navigame_api/*
-
-index.html, NAVIGAME_API = "/navigame_api"
-
-
-## Allgemeine Hinweise und Konventionen - Wichtig für Codeverständnis die Weiterentwicklung
-
-abc
+## Allgemeine Hinweise und Konventionen - Wichtig für Codeverständnis und die Weiterentwicklung
 
 ### Klassen
 
-Die App verwendet keine neuen ES6-Ausdrücke wie "class". Für Variablen wird meistens "let" statt "var" verwendet ([Erklärung](http://stackoverflow.com/a/11444416)). Stattdessen werden Klassen mit dem [IIFE-Pattern](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) umgesetzt:
+Die App verwendet keine neuen ES6-Ausdrücke wie "class". Stattdessen werden Klassen mit dem [IIFE-Pattern](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) umgesetzt:
 
 ```javascript
 var Klasse = (function () {
@@ -169,6 +195,55 @@ var Log = (function() {
 ```
 ... und werden dann wie folgt aufgerufen: `Log.someFunc();`
 
+### Events
+
+Da sich nicht alle Komponenten gegenseitig kennen sollten, rufen manche nicht direkt die Methoden anderer Komponenten auf, sondern lösen Events aus, um Zustandsänderungen zu kommunizieren. Das sieht meistens so aus:
+
+```javascript
+    // ...
+    $(this).trigger('eventName', [param1, param2]);
+    //
+```
+
+Eine andere Komponente kann sich zuvor darauf registriert haben:
+
+```javascript
+    // das "this" aus dem vorherigen Block ist das Objekt "someObject", und "this" ist hier etwas anderes:
+    // ...
+    let that = this;
+    $(someObject).on('eventName', function(e, param1, param2) { that.someCallbackFunc(param1, param2); });
+    //...
+
+```
+
+`e` wird automatisch erzeugt, ist aber eigentlich (bei dieser Art von Ereignis) nie besonders hilfreich. Die Parameter müssen beim `trigger`-Aufruf als Array übergeben werden. Ein gutes Beispiel ist der PathManager: Er registriert sich in seiner `_registerListeners`-Methode (Z. 343) z.B. auf das 'markerCreated'-Event der MarkerControls:
+
+```javascript
+    PathManager.prototype._registerListeners = function () {
+        let that = this;
+
+        $(this.markerControls).on("markerCreated", function(event, marker, onEdge) {
+            that.addNode(marker.left, marker.top, marker.additionalData, onEdge);
+        });
+        // ...
+    }
+
+```
+
+Die MarkerControls lösen dieses Event aus, nachdem sie einen neuen Marker kreiert haben, in der `_createMarkerAtCanvasPosition`-Methode (Z. 51):
+
+
+```javascript
+    MarkerControls.prototype._createMarkerAtCanvasPosition = function (position) {
+        // ...
+        $(this).trigger("markerCreated", [newMarker, this._hightlightedRoute]);
+        // ...
+    }
+
+```
+
+Falls dieses Event-System verwirrend ist: Es spricht meistens nichts dagegen, der Einfachheit halber events auf den `$("body")`-zu registrieren und dort zu triggern. Das kann allerdings zu Problemen führen, wenn sich die gleiche Komponente mehrmals für ein Event registrieren will oder sich von einem Event "abmelden" (s. `unbind`-Methode von jQuery) will; wenn man hier gut aufpasst, dann spricht jedoch prinzipiell nichts dagegen, den body zu verwenden (weil der body immer da ist und praktisch garantiert dasselbe Objekt bleibt).
+
 ### \_-Templates
 
 [Dieses Beispiel](http://embed.plnkr.co/4Mx9AW/) ist zwar auf russisch, erklärt aber trotzdem einigermaßen, wie underscore- oder lodash-Templates funktionieren (vermutlich etwas besser als die [Dokumentation](https://lodash.com/docs/4.17.4#template)).
@@ -185,7 +260,7 @@ templates.map_canvas =
 
 ```
 
-In der `GameApp` werden all diese Templates automatisch in das `compiledTemplates`-Objekt kopiert und dabei auch so übersetzt, dass man sie nachher als Funktion aufrufen kann: `compiledTemplates["map_canvas"]()` Erzeugt den HTML-Code aus dem Template. Diesen Code muss man immer noch über jQuery erzeugen oder an ein Objekt anhängen, damit er auf der Seite erscheint.
+In der `GameApp` werden all diese Templates automatisch in das `compiledTemplates`-Objekt kopiert und dabei auch so übersetzt, dass man sie nachher als Funktion aufrufen kann: `compiledTemplates["map_canvas"]()` Erzeugt den HTML-Code aus dem Template. Aus diesem Code muss man immer noch über jQuery ein Objekt erzeugen oder ihn an ein Objekt anhängen, damit er auf der Seite erscheint - die Template-Funktion generiert letztlich nur eine Zeichenkette.
 
 Man kann in Templates über `<%` und `%>` JS-Code einbauen:
 
@@ -194,7 +269,7 @@ Man kann in Templates über `<%` und `%>` JS-Code einbauen:
 templates.test = 
     ['<div id="<%= data.element_id %>">',
      '  <% for (let i = 0; i < data.iterations; i++) { %>',
-     '      <span>i</span>',
+     '      <span><%= i %></span>',
      '  <% } %>',
      '</div>'].join('\n');
 
@@ -217,6 +292,96 @@ Bei Erweiterungen der Anwendung könnte man also dieses System verwenden oder au
 
 ### Benennungskonventionen
 
-Von der Variablenbenennung bedeutet \_ am Anfang, dass es sich um eine private Variable handelt, und $, dass es sich um ein jQuery-Objekt handelt (_$... ist ein privates jQuery-Objekt). Das ist zwar nur eine Konvention (Variablen mit _ davor sind trotzdem öffentlich zugänglich), sollte aber als verbindlich behandelt werden.
+Für Variablen wird meistens "let" statt "var" verwendet ([Erklärung](http://stackoverflow.com/a/11444416)).
+
+Bei der Variablenbenennung bedeutet \_ am Anfang, dass es sich um eine private Variable handelt, und $, dass es sich um ein jQuery-Objekt handelt (\_$abc ist ein privates jQuery-Objekt). Das ist zwar nur eine Konvention (Variablen mit _ davor sind trotzdem öffentlich zugänglich), sollte aber als verbindlich behandelt werden.
 
 Alle Klassen befinden sich im navigame-Namespace, welcher in navigameapp.js definiert wird.
+
+
+### Server: Lambdas
+
+Im Java-Teil des Projekts werden Consumer<T> verwendet. Diese erlauben es, Funktionen als Parameter zu übergeben und "anonyme" Funktionen zu erstellen.
+Angenommen, man möchte eine Funktion aufrufen, wenn ein Prozess, der im Hintergrund läuft (z.B. ein Download), abgeschlossen ist.
+Dann könnte man folgendes tun:
+
+```java
+
+public interface DowloadFinishedCallback {
+    void onDownloadFinished(String downloadedText);
+    void onDownloadError(Exception e);
+}
+
+//   ...
+
+public class Download {
+    
+    public static void startDownload(String url, DownloadFinishedCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                //...(download - code)
+                    callback.onDownloadFinished(downloadedText);
+                } catch (Exception e) {
+                    callback.onDownloadError(e);
+                }
+            }
+        }).start();
+    }
+}
+
+//    ...
+//    (in einer anderen Klasse)
+
+    public void downloadFile(String url) {        
+        Download.startDownload(url, new DownloadFinishedCallback() {
+            @Override
+            public void onDownloadFinished(String downloadedText) {
+                // do something
+            }
+
+            @Override
+            public void onDownloadError(Exception e) {
+                // do something else
+            }
+        });
+    }
+
+```
+
+Mit Lambda-Ausdrücken kann man das Interface einfach weglassen und genauso das Runnable vereinfachen:
+
+```java
+
+public class Download {
+    
+    public static void startDownload(String url, Consumer<String> onSuccess, Consumer<Exception> onError) {
+        new Thread(() -> { // <- lambda-Ausdruck 1: Runnable nicht notwendig; "leerer" Consumer!
+            try {
+            //...(download - code)
+                onSuccess.accept(downloadedText);
+            } catch (Exception e) {
+                onError.accept(e);
+            }
+        }).start();
+    }
+}
+
+//    ...
+//    (in einer anderen Klasse)
+
+    public void downloadFile(String url) {       
+        Download.start(url,
+            downloadedText -> { // <- lambdas für onSuccess...
+                // do something
+            },
+            exception -> {      // <- ... und onError
+                // do something
+            });
+    }
+
+```
+
+Andere lambda-Konzepte von Java 8 (z.B. Predicates) kommen nicht vor.
+Die "->"-Ausdrücke werden automatisch in Consumer übersetzt; mit der "accept"-Methode ruft man die Methoden auf.

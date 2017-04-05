@@ -380,10 +380,6 @@ navigame.PathManager = (function () {
      * @memberof PathManager
      */
     PathManager.prototype._loadMapFromJson = function (map) {
-        maps.push({
-            imgSrc: this.path.mapPaths[i].storeyId
-        });
-
         this._registerListenersForMap(map);
 
         return {

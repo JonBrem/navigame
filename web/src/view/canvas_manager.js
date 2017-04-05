@@ -81,9 +81,9 @@ navigame.CanvasManager = (function () {
      */
     CanvasManager.prototype.addToVisualLayer = function (fabricObj) {
         fabricObj.angle = -this._visualsGroup.angle;
-        
 
         this._visualsGroup.add(fabricObj);
+        this._markerScaleHelperFunc();
         this._fabricCanvas.renderAll();
     };
 
@@ -558,9 +558,9 @@ navigame.CanvasManager = (function () {
      */
     CanvasManager.prototype.toImageCoord = function (fractionVal, isX) {
         if (isX) {
-            return fractionVal * this._visualsGroup.getObjects(1).width;
+            return fractionVal * this._visualsGroup.getObjects()[1].width;
         } else {
-            return fractionVal * this._visualsGroup.getObjects(1).height;
+            return fractionVal * this._visualsGroup.getObjects()[1].height;
         }
     };
 
