@@ -64,10 +64,12 @@ navigame.MapControls = (function () {
         for (let i = 0; i < 1000; i += 100)
             setTimeout(function() { that._scaleControlsDiv(); }, i);
     
-        $(window).resize(_.debounce(function() {
+        let debouncedFunc = _.debounce(function() {
             that._scaleControlsDiv(); 
             setTimeout(function() { that._scaleControlsDiv(); }, 100);
-        }, 100));
+        }, 100)
+
+        $(window).resize(debouncedFunc);
         // rescale after the last time the window was resized is .1 seconds ago
         // (so it isn't called continuously during resizing, which could be slow)
     };

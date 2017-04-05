@@ -13,10 +13,13 @@ navigame.ElementScaler = (function() {
      */
     function ElementScaler () {
         let that = this;
-        $(window).resize(_.debounce(function(){ // <- rescale after the last time the window was resized is .1 seconds ago
+
+        let debouncedFunc = _.debounce(function(){ // <- rescale after the last time the window was resized is .1 seconds ago
                                                 // (so it isn't called continously, which could be slow)
             that.rescale();
-        }, 100));
+        }, 100);
+
+        $(window).resize(debouncedFunc);
 
         this._$title = null;
         this._$titleElements = {};

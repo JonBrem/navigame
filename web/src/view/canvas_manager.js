@@ -30,6 +30,12 @@ navigame.CanvasManager = (function () {
         this._initialZoom = $(".lower-canvas").attr("width") / $(".upper-canvas").attr("width");
         this._initVisualLayer();
 
+        let that = this;
+        this._markerScaleHelperFunc = _.debounce(function() {
+            that._unScaleMarkersAndEdges();
+            that._fabricCanvas.renderAll();
+        }, 50);
+
         Log.log("verbose", "Finished Initializing Canvas Manager", this);
     }
 
@@ -173,7 +179,7 @@ navigame.CanvasManager = (function () {
     CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
         this._setCursorPosition(elementCoordinates);
         this._checkCursorCollisions(collisionCallback);
-        this._fabricCanvas.renderAll(); // <- enable if the selection circle's position should be shown at all times
+        // this._fabricCanvas.renderAll(); // <- enable if the selection circle's position should be shown at all times
     };
 
     /**
@@ -316,11 +322,9 @@ navigame.CanvasManager = (function () {
 
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
         this._fabricCanvas.renderAll();
-        let that = this;
-        setTimeout(function() {
-            that._unScaleMarkersAndEdges(newZoom);
-            that._fabricCanvas.renderAll();
-        }, 2);
+
+
+        this._markerScaleHelperFunc();
     };
 
 
@@ -349,11 +353,7 @@ navigame.CanvasManager = (function () {
         this._fabricCanvas.zoomToPoint(new fabric.Point(center.x, center.y), newZoom);
         this._fabricCanvas.renderAll();
 
-        let that = this;
-        setTimeout(function() {
-            that._unScaleMarkersAndEdges(newZoom);
-            that._fabricCanvas.renderAll();
-        }, 2);
+        this._markerScaleHelperFunc();
     };
 
     /**
@@ -564,24 +564,31 @@ navigame.CanvasManager = (function () {
         }
     };
 
-
     /**
      * _unScaleMarkersAndEdges makes markers always appear in the same size,
      *  regardless of how far in/out the user zooms.
-     * @param  {number} zoomLevel - the zoom level of the map.
+     *  (edges is still in the name, but they are not affected yet)
      * @memberof CanvasManager
      */
-    CanvasManager.prototype._unScaleMarkersAndEdges = function (zoomLevel) {
+    CanvasManager.prototype._unScaleMarkersAndEdges = function () {
+        let zoomLevel = this._fabricCanvas.getZoom();
         let objects = this._visualsGroup.getObjects();
-        for(let i = 1; i < objects.length; i++) {
+
+        let toUpdate = [];
+
+        for (let i = 0; i < objects.length; i++) {
             if ("tag" in objects[i] && objects[i].tag == "marker") {
-                objects[i].set({
-                    scaleX: 1 / zoomLevel,
-                    scaleY: 1 / zoomLevel
-                });
-                this._updatePartOfGroup(objects[i]);
+                objects[i].scale(1 / zoomLevel);
+                toUpdate.push(objects[i]);
             }
         }
+
+        for (let i = 0; i < toUpdate.length; i++) {
+            this._updatePartOfGroup(toUpdate[i]);
+        }
+
+        let that = this;
+        setTimeout(function() { that._fabricCanvas.renderAll(); }, 5);
     };
 
     /**

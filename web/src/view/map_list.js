@@ -51,17 +51,20 @@ navigame.MapList = (function () {
      * @memberof MapList
      */
     MapList.prototype.addMap = function (id, imgSrc) {
-        let newMapItem = $(compiledTemplates['map_list_item']({
+        let $newMapItem = $(compiledTemplates['map_list_item']({
             data: {
                 map_index: id,
                 map_src: imgSrc
             }
         }));
 
-        this._$mapListElement.append(newMapItem);
+        this._$mapListElement.append($newMapItem);
+
+        $('.map_item').removeClass('selected_map');
+        $newMapItem.addClass('selected_map');
         
         let that = this;
-        newMapItem.on('click touchstart', function (e) {
+        $newMapItem.on('click touchstart', function (e) {
             that._onMapClicked($(this)); // <-- "this" is not "that" in this case!
         });
     };
@@ -146,6 +149,9 @@ navigame.MapList = (function () {
      * @memberof MapList
      */
     MapList.prototype._onMapClicked = function ($mapItem) {
+        $('.map_item').removeClass('selected_map');
+        $mapItem.addClass('selected_map');
+
         $(this).trigger('onMapSelected', [{
             mapIndex: $mapItem.attr('data-map-index'),
             imgSrc: $mapItem.find('img').attr('src')
