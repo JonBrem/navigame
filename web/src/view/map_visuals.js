@@ -51,8 +51,8 @@ navigame.MapVisuals = (function () {
         let widthScaleFactor = naturalWidth > naturalHeight? 1 : naturalWidth / naturalHeight;
         let heightScaleFactor = naturalHeight > naturalWidth? 1 : naturalHeight / naturalWidth;
 
-        let fabricWidth = that._canvasManager.canvasWidth() * widthScaleFactor;
-        let fabricHeight = that._canvasManager.canvasHeight() * heightScaleFactor;
+        let fabricWidth = this._canvasManager.canvasWidth() * widthScaleFactor;
+        let fabricHeight = this._canvasManager.canvasHeight() * heightScaleFactor;
 
         let imgInstance = new fabric.Image(image, {
             left: -fabricWidth / 2,
@@ -68,7 +68,7 @@ navigame.MapVisuals = (function () {
         imgInstance.hasControls = false;
         imgInstance.hasRotatingPoint = false;
 
-        that._canvasManager.setMapImage(imgInstance);
+        this._canvasManager.setMapImage(imgInstance);
     };
 
     return MapVisuals;

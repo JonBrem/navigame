@@ -1,5 +1,4 @@
 navigame.NewGameDialog = (function () {
-    
     /**
      * NewGameDialog constructor.
      * @constructor
@@ -11,7 +10,6 @@ navigame.NewGameDialog = (function () {
     function NewGameDialog () {
         let _$dialogElement = null;
     }
-
     /**
      * show shows the dialog. This will also create the dialog.
      * @param  {boolean} closeable - whether it is possible to close this dialog. Default: true.
@@ -20,21 +18,19 @@ navigame.NewGameDialog = (function () {
     NewGameDialog.prototype.show = function(closeable) {
         if (!closeable && closeable !== false)
             closeable = true;
-
         let dialogElement = compiledTemplates['new_game_dialog']({
             data: { closeable: closeable } });
         $("body").append(dialogElement);
-
         this._$dialogElement = $("#new_game_modal");
         let revealElement = new Foundation.Reveal(this._$dialogElement, {
             "closeOnClick": closeable,
             "closeOnEsc": closeable
         });
-
-        let that = this;
         this._$dialogElement.foundation('open');
+        let that = this;
+        this._$dialogElement.on("closed.zf.reveal", function (e) {that._onDialogClose(e);});
+        $("#new_game_start_button").on("click", function (e) {that._onStartClicked(e);});
     };
-
     /**
      * showSessionError shows an error message that there was a problem loading the session.
      * @memberof NewGameDialog
@@ -42,7 +38,6 @@ navigame.NewGameDialog = (function () {
     NewGameDialog.prototype.showSessionError = function () {
         $("#load_session_error").text('Session konnte nicht geladen werden!');
     };
-
     /**
      * _onStartClicked is called when the "Start"-Button is clicked and will trigger the
      *  'newGameStartClicked'-callback.
@@ -51,7 +46,6 @@ navigame.NewGameDialog = (function () {
     NewGameDialog.prototype._onStartClicked = function (e) {
         $(this).trigger('newGameStartClicked', [$("#session_input").val()]);
     }
-
     /**
      * closeDialog Closes the dialog.
      * @memberof NewGameDialog
@@ -59,7 +53,6 @@ navigame.NewGameDialog = (function () {
     NewGameDialog.prototype.closeDialog = function () {
         this._$dialogElement.foundation('close');
     };
-
     /**
      * _onDialogClose is called when the dialog is closed (by pressing Esc, clicking the 'x'
      *  or clicking outside the dialog) and will remove the HTML element.
@@ -72,6 +65,5 @@ navigame.NewGameDialog = (function () {
             this._$dialogElement = null;
         }
     };
-
     return NewGameDialog;
 })();

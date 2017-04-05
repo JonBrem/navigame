@@ -27,7 +27,7 @@ navigame.CanvasManager = (function () {
         this._visualsGroup = null;
         this._selectionCircle = null;
 
-        this._initialZoom = null;
+        this._initialZoom = $(".lower-canvas").attr("width") / $(".upper-canvas").attr("width");
         this._initVisualLayer();
 
         Log.log("verbose", "Finished Initializing Canvas Manager", this);
@@ -173,7 +173,7 @@ navigame.CanvasManager = (function () {
     CanvasManager.prototype.moveCursor = function (elementCoordinates, collisionCallback) {
         this._setCursorPosition(elementCoordinates);
         this._checkCursorCollisions(collisionCallback);
-        //this._fabricCanvas.renderAll(); // <- enable if the selection circle's position should be shown at all times
+        this._fabricCanvas.renderAll(); // <- enable if the selection circle's position should be shown at all times
     };
 
     /**
@@ -251,8 +251,8 @@ navigame.CanvasManager = (function () {
 
         // magic number 1.25: I just don't know why, but this is the initial scale and it needs to be accounted for.
         this._fabricCanvas.absolutePan(new fabric.Point(
-            -(this._fabricCanvas.width / 2 - this._visualsGroup.width / 2 * Math.pow(this._visualsGroup.zoomX / this.getViewportScale(), 1)), 
-            -(this._fabricCanvas.height / 2 - this._visualsGroup.height / 2 * Math.pow(this._visualsGroup.zoomX / this.getViewportScale(), 1))
+            -(this._fabricCanvas.width / 2 - this._visualsGroup.width / 2 * this._visualsGroup.zoomX / this._initialZoom), 
+            -(this._fabricCanvas.height / 2 - this._visualsGroup.height / 2 * this._visualsGroup.zoomY / this._initialZoom)
         ));
 
         this._fabricCanvas.renderAll();
@@ -639,7 +639,7 @@ navigame.CanvasManager = (function () {
             left: 0,
             top: 0,
             radius: 5 / this._visualsGroup.zoomX, 
-            fill: "rgba(255, 0, 0, 1)"
+            fill: "rgba(255, 0, 0, 0)"
         });
         this._visualsGroup.add(this._selectionCircle);
 

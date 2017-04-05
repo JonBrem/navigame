@@ -61,7 +61,7 @@ navigame.MapList = (function () {
         this._$mapListElement.append(newMapItem);
         
         let that = this;
-        newMapItem.on('click', function (e) {
+        newMapItem.on('click touchstart', function (e) {
             that._onMapClicked($(this)); // <-- "this" is not "that" in this case!
         });
     };
@@ -119,7 +119,10 @@ navigame.MapList = (function () {
      * @memberof MapList
      */
     MapList.prototype.setSelectedMapIndex = function (newSelectedIndex) {
+        $('.map_item').removeClass('selected_map');
+
         let $mapItem = $('.map_item').eq(newSelectedIndex);
+        $mapItem.addClass('selected_map');
 
         $(this).trigger('onMapSelected', [{
             mapIndex: $mapItem.attr('data-map-index'),
@@ -182,6 +185,9 @@ navigame.MapList = (function () {
             distance: 10,
             update: function (e, ui) {
                 that._onMapListResorted();
+            },
+            sort: function (e, ui) {
+                console.log(ui.helper);
             }
         });
         this._$mapListElement.disableSelection();

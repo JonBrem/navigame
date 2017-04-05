@@ -104,6 +104,9 @@ navigame.PathManager = (function () {
      * @memberof PathManager
      */
     PathManager.prototype.deleteMap = function (mapIndex) {
+        if (this.path.mapPaths.length <= 1) // @todo: disable button or show some message
+            return;
+
         mapIndex = mapIndex? mapIndex : this.currentMapIndex; // <- default value: whichever map is shown on the view
         Log.log("verbose", "deleting map at index: " + mapIndex, this);
 

@@ -61,8 +61,13 @@ navigame.MapControls = (function () {
         this._setupTouchGestures();
         this._setupControlsButtons();
 
-        setTimeout(function() { that._scaleControlsDiv(); }, 50);
-        $(window).resize(_.debounce(function() { that._scaleControlsDiv(); }, 100));
+        for (let i = 0; i < 1000; i += 100)
+            setTimeout(function() { that._scaleControlsDiv(); }, i);
+    
+        $(window).resize(_.debounce(function() {
+            that._scaleControlsDiv(); 
+            setTimeout(function() { that._scaleControlsDiv(); }, 100);
+        }, 100));
         // rescale after the last time the window was resized is .1 seconds ago
         // (so it isn't called continuously during resizing, which could be slow)
     };
@@ -90,7 +95,7 @@ navigame.MapControls = (function () {
         let that = this;
 
         let hammertime = new Hammer(this._$controlsDiv[0]);
-        hammertime.get('pinch').set({enable: true, threshold: 10});
+        hammertime.get('pinch').set({enable: true, threshold: .25});
         hammertime.get('rotate').set({ enable: true , threshold: 10 });
         hammertime.on('pinch', function(e) { that._onMobilePinch(e); });
         hammertime.on('rotate', function(e) { that._onMobileRotate(e); });
@@ -106,15 +111,15 @@ navigame.MapControls = (function () {
         let that = this;
 
         this._$compassButton = $("#map_controls_compass");
-        this._$compassButton.on('click', function(e) {that._resetMapRotation();});
+        this._$compassButton.on('click touchstart', function(e) {that._resetMapRotation();});
 
         this._$centerMapButton = $("#map_controls_position_reset");
-        this._$centerMapButton.on('click', function(e) {that._resetMapPosition();});
+        this._$centerMapButton.on('click touchstart', function(e) {that._resetMapPosition();});
 
         this._$zoomInButton = $("#map_controls_zoom_in");
-        this._$zoomInButton.on('click', function(e) {that._zoomInViaButton();});
+        this._$zoomInButton.on('click touchstart', function(e) {that._zoomInViaButton();});
         this._$zoomOutButton = $("#map_controls_zoom_out");
-        this._$zoomOutButton.on('click', function(e) {that._zoomOutViaButton();});
+        this._$zoomOutButton.on('click touchstart', function(e) {that._zoomOutViaButton();});
     }
 
     /**
@@ -187,7 +192,7 @@ navigame.MapControls = (function () {
         if (!hits) return;
 
         let hitPosX = hits.x, hitPosY = hits.y;
- 
+
         if (this._translating) {
             this._handleMapTranslation(hitPosX, hitPosY);
         } else if (this._rotating) {
@@ -246,7 +251,7 @@ navigame.MapControls = (function () {
                 hitPosY >= controlsOffset.top &&
                 hitPosY <= controlsOffset.top + this._$controlsDiv.height()) {
 
-            let that = this;
+            let that = this;        
 
             this._markerControls.onCanvasMouseMove({x: hitPosX - controlsOffset.left,
                 y: hitPosY - controlsOffset.top});
@@ -372,7 +377,7 @@ navigame.MapControls = (function () {
             y: (e.center.y - controlsOffset.top) * scale
         };
 
-        this._canvasManager.zoomBy(-e.velocity, centerOnCanvas);
+        this._canvasManager.zoomBy(-e.velocity / scale, centerOnCanvas);
     };
 
     /**
@@ -490,7 +495,7 @@ navigame.MapControls = (function () {
             hitPosY = e.originalEvent.touches[0].pageY;
 
             if (e.originalEvent.touches.length > 1) return false;
-        } 
+        }
 
         return {x: hitPosX, y: hitPosY};
     };
