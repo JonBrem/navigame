@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: MapSelectionHandler</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: MapSelectionHandler</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>MapSelectionHandler</h2>
+        
+            <div class="class-description">The Map Selection Handler comes into play when new maps are being added to the game and when the currently selected map changes. It is responsible for notifying the correct components about these changes.</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="MapSelectionHandler"><span class="type-signature"></span>new MapSelectionHandler<span class="signature">(mapVisuals, mapListVisuals, pathManager)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    MapSelectionHandler constructor. Registers listeners to events fired by the params.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mapVisuals</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">navigame.MapVisuals</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">MapVisuals instance; the selection handler                                               has to make it load map images.]</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mapListVisuals</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">navigame.MapList</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">MapList instance: The selection handler                                            is notified when a map is selected or the maps are sorted.]</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>pathManager</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">navigame.PathManager</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">PathManager instance</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line17">line 17</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="_onAreasLoaded"><span class="type-signature"></span>_onAreasLoaded<span class="signature">(serverResponse)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    _onAreasLoaded is called when the list of areas has been successfully downloaded  and passes that list on to the map selection dialog, so the user can choose one.]
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverResponse</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-response (most likely an array) containing a list                                   of possible areas.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line154">line 154</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="_onLevelsLoaded"><span class="type-signature"></span>_onLevelsLoaded<span class="signature">(serverResponse, selectedArea)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    _onAreasLoaded is called when the list of levels for a given area has been successfully downloaded  and passes that list on to the map selection dialog, so the user can choose one.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serverResponse</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">JSON-response (most likely an array) containing a list                                   of possible levels.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>selectedArea</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">identifier string of the selected area</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line166">line 166</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="loadAreas"><span class="type-signature"></span>loadAreas<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    loadAreas loads a list of areas (such as "PT" or "Campus") from the server.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="loadLevels"><span class="type-signature"></span>loadLevels<span class="signature">(selectedArea)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    loadLevels loads a list of levels/storeys for a specified area from the server.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>selectedArea</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">a possible map area.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line75">line 75</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="loadMaps"><span class="type-signature"></span>loadMaps<span class="signature">(maps)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    [loadMaps loads a list of maps on the map list, the last of which is set as the map on display on the canvas.]
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>maps</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">array of objects containing 'imgSrc' as a key.                              has to be in the very same order as the map paths in the logical                              representation.]</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line121">line 121</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onMapChosen"><span class="type-signature"></span>onMapChosen<span class="signature">(area, storey, imgSrc)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    onMapChosen is called when a specific map is selected and added to the path. It loads that map on the canvas, adds it to the map list and informs the  pathManager that there is a new map.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>area</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">description</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>storey</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">level id of the map</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imgSrc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">description</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setDialog"><span class="type-signature"></span>setDialog<span class="signature">(dialog)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    setDialog sets the mapSelectionDialog of this object to the specified dialog, and registers to its onAreaSelected and storeySelected events.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>dialog</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">navigame.MapSelectionDialog</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">dialog whose events will be listened to.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="setSelectedMap"><span class="type-signature"></span>setSelectedMap<span class="signature">(mapIndex, imgSrc)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    setSelectedMap informs the path manager and the map visuals that another map should be set as the currently selected map
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mapIndex</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">index of the map among the maps that make up the current path</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>imgSrc</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">url of the map's image file</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="game_logic_map_selection_handler.js.html">game_logic/map_selection_handler.js</a>, <a href="game_logic_map_selection_handler.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdditionalDataDialog.html">AdditionalDataDialog</a></li><li><a href="CanvasManager.html">CanvasManager</a></li><li><a href="EdgeControls.html">EdgeControls</a></li><li><a href="ElementScaler.html">ElementScaler</a></li><li><a href="GameApp.html">GameApp</a></li><li><a href="GameTitleBar.html">GameTitleBar</a></li><li><a href="MapControls.html">MapControls</a></li><li><a href="MapList.html">MapList</a></li><li><a href="MapPath.html">MapPath</a></li><li><a href="MapSelectionDialog.html">MapSelectionDialog</a></li><li><a href="MapSelectionHandler.html">MapSelectionHandler</a></li><li><a href="MapVisuals.html">MapVisuals</a></li><li><a href="MarkerControls.html">MarkerControls</a></li><li><a href="NewGameDialog.html">NewGameDialog</a></li><li><a href="Path.html">Path</a></li><li><a href="PathEdge.html">PathEdge</a></li><li><a href="PathManager.html">PathManager</a></li><li><a href="PathNode.html">PathNode</a></li><li><a href="ScoreDialog.html">ScoreDialog</a></li></ul><h3>Namespaces</h3><ul><li><a href="navigame.html">navigame</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#Log">Log</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 05 2017 23:55:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

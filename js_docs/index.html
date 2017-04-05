@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Navigationsspiel: Projekt- und Codedokumentation</h1><h2>Zusammenfassung</h2><p>Dieses Dokument erklärt, wie das Navigationsspiel grundsätzlich aufgebaut ist und wo Erweiterungen angefügt werden können.</p>
+<h2>Dependencies</h2><p>Auf der JS-Seite sind alle Bibliotheken mit abgegeben. Eine Installation ist nicht notwendig, es wird kein node.js etc. verwendet. Alles ist &quot;oldschool&quot; integriert, also in der .html-Datei referenziert, nicht via z.B. require.js eingebunden.
+Folgende Bibliotheken werden verwendet:</p>
+<ul>
+<li><a href="http://jquery.com/">jQuery 2.2.4</a> für diverse Zwecke (Selektoren, Events, ...)</li>
+<li><a href="http://foundation.zurb.com/sites/docs/">Foundation 6</a> als Design-Grid</li>
+<li><a href="https://jqueryui.com/">jQuery UI 1.7</a> für einfaches Styling und Drag&amp;Drop-Funktionalität</li>
+<li><a href="https://lodash.com/">lodash</a> als Templating-Bibliothek</li>
+<li><a href="http://fabricjs.com/docs/">Fabric JS</a> als HTML-Canvas-API</li>
+<li><a href="http://hammerjs.github.io/getting-started/">Hammer.JS</a> für Touch-Gesten-Unterstützung</li>
+</ul>
+<p>Für die Anpassung und Erweiterung sind vor allem Verständnis von jQuery und Fabric JS notwendig. Man sollte außerdem wissen, was <a href="https://www.w3schools.com/xml/ajax_intro.asp">ajax</a> (bzw. zur Verwendung in jQuery <a href="http://api.jquery.com/jquery.ajax/">hier</a>) ist.</p>
+<p>Serverseitig macht die Anwendung nicht viel, außer dem Client Daten zur Verfügung zu stellen, und hat nur den Tomcat-Server und JSON als Dependencies (die sind auch im Projekt direkt enthalten). Eine Auswertung des clientseitig erzeugten Pfades o.ä. findet noch nicht statt.</p>
+<h2>Deployment</h2><pre class="prettyprint source"><code>Startseite:
+
+ https://www.example.com:8080/test/pfad/index.html (index.html: optional)
+ \___/   \_____________/ \__/\___________________/ 
+   |            |         |             |            
+Schema⁺        Host      Port          Pfad      
+
+API:
+
+ https://www.example.com:8080/test/pfad/api_name?method=request_id
+ \___/   \_____________/ \__/\________/\_______/\________________/
+   |            |         |       |         |           |
+Schema⁺        Host      Port    Pfad      API        Query</code></pre><p><em>Angepasst von <a href="https://de.wikipedia.org/wiki/Uniform_Resource_Locator">https://de.wikipedia.org/wiki/Uniform_Resource_Locator</a></em></p>
+<p>Wenn man das Spiel auf einem Server auf einem bestimmten Pfad (Beispiel: /test/pfad/) hochladen will, dann muss man:</p>
+<ul>
+<li>In IntelliJ:<ul>
+<li>auf &quot;Run&quot; -&gt; Edit Configurations gehen</li>
+<li>im Dialog, der sich dann öffnet, den Reiter &quot;Deployment&quot; auswählen</li>
+<li>Navigationsspiel:war exploded auswählen</li>
+<li>rechts bei &quot;Application context&quot; /test/pfad/ angeben</li>
+</ul>
+</li>
+<li>In der JS-Anwendung: In der Datei &quot;index.html&quot; in Z. 40 angeben: var WEBROOT = &quot;/test/pfad&quot;;</li>
+</ul>
+<p>Den api_name kann man wie folgt ändern:</p>
+<ul>
+<li>In IntelliJ:<ul>
+<li>Datei web/WEB-INF/web.xml öffnen</li>
+<li>bei &lt;servlet-mapping&gt; als url-pattern /api_name/* angeben.</li>
+</ul>
+</li>
+<li>In der JS-Anwendung: In der Datei &quot;index.html&quot; in Z. 41 angeben: var NAVIGAME_API = &quot;/api_name&quot;;</li>
+</ul>
+<h2>Architektur</h2><h3>JS</h3><p>In diesem Punkt werden die Funktionen des Spiels beschrieben, sowie die Klassen, die für sie zuständig sind. Das soll einen Überblick vermitteln, wo man bei der Weiterentwicklung ansetzen kann, wenn man einen bestimmten Punkt überarbeiten will.</p>
+<h4>Übersicht</h4><p>Die App hat keine strikte Trennung von Darstellung und Logik, wobei schon angestrebt wurde, die Bestandteile einigermaßen austauschbar zu halten.
+Die Darstellung wird zum Großteil entweder durch Templates erzeugt oder von Fabric / dem Canvas übernommen, das grundlegende HTML-Gerüst der index.html ist also wenig aussagekräftig. Der Einstiegspunkt des Programms ist die startGame-Methode der GameApp (navigameapp.js).</p>
+<p>Darin wird (nach allen anderen Elementen) ein NewGameDialog erzeugt und angezeigt. Darin kann man eine Session-ID aus einem vorherigen Spiel laden oder ein neues Spiel starten, wofür dem Server eine Anfrage geschickt wird, dass er eine neue Session-ID und einen Start- und Zielpunkt anlegen soll.</p>
+<p>Dann wird unmittelbar ein MapSelectionDialog erzeugt, auf dem man zunächst das grobe Areal und dann eine Karte/Etage in diesem Areal auswählt. Wenn man sich für eine Karte entschieden hat, so kann man diesen Dialog beenden. Die Karte wird zur Liste von Karten (unten auf dem Bildschirm) hinzugefügt und über die MapVisuals auf den Canvas geladen, der nur dem CanvasManager zugänglich ist. Dieser hat seinen eigenen Unterpunkt, da er etwas komplexer ist. Über die MapControls (die ebenfalls in einem eigenen Unterpunkt genauer erklärt werden) kann man die Karte verschieben, rotieren und skalieren.</p>
+<p>Wenn man den Punkt bei der &quot;Marker hinzufügen&quot;-Fläche auf die Karte zieht, so wird an der entsprechenden Stelle ein neuer  <strong>Marker</strong> erzeugt. Auf der Logikebene erfährt dies der PathManager, der einen <strong>Node</strong> anlegt. Diese Begriffe sind mehr oder weniger Synonym zu verstehen (Marker heißen die Teile, die in Google Maps Zielpunkte anzeigen; Nodes ist der Begriff aus der Graphentheorie). Wenn man den zweiten (3., 4., ...) Marker anlegt, so sieht man, dass die Marker automatisch mit <strong>Routen</strong> (oder <strong>Edges</strong>) verbunden werden.</p>
+<p>Marker kann man per Drag &amp; Drop verschieben, die Routen / Edges wandern automatisch mit. Wenn man Marker löscht, indem man sie anklickt und dann auf den Roten Knopf drückt), dann wird eine ihrer anliegenden Edges gelöscht und die andere verbindet ihren Vorgänger mit ihrem Nachfolger. Man kann &quot;Zwischenpunkte&quot; einfügen, indem man einen Marker direkt auf eine Route zieht. Über den Bearbeiten-Knopf kann man Markern und Edges Daten hinzufügen.</p>
+<p>Der PathManager kümmert sich immer darum, dass die visuelle Repräsentation und die Logikrepräsentation des Graphen, den man so erzeugt, identisch sind. Marker werden hier als PathNodes bezeichnet, Routen als PathEdges. Diese befinden sich auf MapPaths, also den Teilstücken des Pfades, die auf einer Karte dargestellt sind. Die MapPaths bilden zusammen den Path.</p>
+<p>Unten auf der Seite kann man über den &quot;Add Map&quot;-Knopf neue MapPaths anlegen, dadurch wird wieder ein MapSelectionDialog erzeugt, auf dem man eine neue Karte anlegen kann. Karten lassen sich auch per Drag &amp; Drop verschieben.</p>
+<p>Wenn man den Pfad vom Startpunkt zum Zielpunkt fertig erzeugt hat, dann kann man auf den &quot;Submit Path&quot;-Knopf drücken, um eine Bewertung zu erhalten. Hierfür generiert der Server einen zufälligen Wert zwischen 0 und 99. Das muss also noch implementiert werden.</p>
+<h4>CanvasManager</h4><p>Der CanvasManager ist als Zwischenstufe zwischen den verwendeten Canvas-Framework (Fabric) und der Anwendung zu verstehen, der aber durchaus anwendungsspezifische &quot;View-Logik&quot; beinhaltet (und deswegen z.B. davon ausgeht, dass sich immer ein Bild im Hintergrund befindet).
+Damit alle Koordinaten immer relativ zur Karte sind, was bei der Auswertung vermutlich hilfreich sein wird, befinden sich alle Objekte in einer fabric.Group. Darin ist ein weißer Hintergrund, auf den die Karte kommt, und wiederum darauf kommen alle Marker und Edges, die angelegt werden. Das erfordert die Transformation von Canvas-Koordinaten in Karten-(bzw. Gruppen-)Koordinaten bei der Eingabe, sorgt aber wie gesagt dafür, dass die Positionen relativ zum Zentrum der Karte alle immer gleich bleiben.
+Da Fabric standardmäßig viel (und für diese Anwendung zu viel) Manipulation der Objekte erlauben, ist sie vollständig deaktiviert. Man kann Objekte also nicht direkt über die vom Framework bereitgestellten Punkte manipulieren. Stattdessen wird ein unsichtbarer Kreis auf die Karte gezeichnet; wenn dieser in die Nähe eines Markers oder der Route kommt, dann wird eine Kollision damit erkannt.</p>
+<h4>MapControls</h4><p>Die MapControls sind einerseits für die vier kleinen Knöpfe auf der Karte verantwortlich; ihr Hauptzweck ist jedoch das Empfangen von Mouse- und Touch-Events für die Karte. Dafür kreieren sie ein <code>&lt;div&gt;</code>, das über dem Canvas liegt, immer gleichgroß ist wie der Canvas und alle dieser Events abfängt. Diese werden dann an den CanvasManager weitergeleitet.
+In den MapControls befindet sich der Großteil der &quot;Interaktionslogik&quot; der Anwendung, z.B. auch die Touch-Gesten-Interaktion mit Hammer.JS. Die MapControls entscheiden, wann die Karte gedreht, verschoben oder skaliert wird. Sie kommunizieren dabei mit den MarkerControls und EdgeControls, die Informationen über die Ergebnisse von Mouse-Events erhalten (z.B. ob ein Marker gedrückt wurde oder bei einem mouseover berührt wurde).</p>
+<h4>PathManager</h4><p>Der PathManager ist eine zentrale Logikkomponente. Er erfährt, wenn bestimmte Sachen in den View-Komponenten passieren, z.B. wenn Marker erzeugt werden. Alle Änderungen im View gibt er an das &quot;Model&quot; weiter; es gibt immer eine View-Repräsentation aller Objekte und eine Model-Repräsentation. Marker und Edges erhalten im View Metadaten zugewiesen, unter anderem den Timestamp ihres Erstellungszeitpunkts, und derselbe Zeitpunkt ist auch im Model hinterlegt. So kann man immer bestimmen, welche Objekte zusammengehören.
+Der PathManager hat die wichtige Aufgabe, zu entscheiden, wie der Pfad gespeichert wird, z.B. auf welche Karte (im Model) neue Marker kommen. Edges werden immer aus dem Model heraus angelegt, der PathManager teilt dann dem View mit, dass es eine Kante zwischen zwei Markern geben soll.</p>
+<h3>Server</h3><p>Die Serverkomponente ist im Verlgeich zum JS-Teil des Projekts nicht allzu umfangreich. Neben lambda-Ausdrücken, die ganz unten in diesem Dokument beispielhaft erklärt werden, gibt es nur eine nennenswerte Eigenheit:</p>
+<p>Bei Aufrufen an die API landen alle Anfragen zunächst an der gleichen Stelle, nämlich beim <code>de.ur.iw.navigame.server.AppServlet</code>, noch konkreter: dessen <code>handleRequest</code>-Methode. Alle API-Aufrufe benötigen außerdem als Parameter den <code>method</code>-Key, z.B.:</p>
+<p><code>&lt;server&gt;:&lt;port&gt;/&lt;pfad&gt;/&lt;api&gt;?method=request_id</code></p>
+<p>Das <code>AppServlet</code> entscheidet basierend auf dieser <code>method</code>, welche Serverkomponente die Anfrage verarbeit. Dafür werden in der <code>contextInitialized</code>-Methode, die automatisch aufgerufen wird, wenn der Server hochfährt, <code>ServletRequestHandler</code> registriert. Für jede mögliche <code>method</code> muss ein solcher Handler registriert werden. In der <code>handleRequest</code>-Methode des <code>AppServlet</code>s werden dann Http-Anfragen an die entsprechenden Handler weitergeleitet.</p>
+<p>Vom Funktionsumfang her macht die Serverkomponente ansonsten nicht viel; sie lädt nach Anfragen vom Client Daten vom urwalking-server herunter und gibt sie (nach bestimmten Verarbeitungsschritten) an den Client weiter. Wenn die Daten bereits heruntergeladen wurden, so werden sie nicht nochmal geladen. Deswegen kann es sein, dass beim erstmaligen Auswählen eines bestimmten Areals bei der Kartenauswahl eine längere Ladezeit auftritt, weil erst die lange xml-Datei vom urwalking-Server heruntergeladen wird. Bei weiteren Anfragen ist diese bereits da und muss nicht mehr geladen werden.</p>
+<h2>Allgemeine Hinweise und Konventionen - Wichtig für Codeverständnis und die Weiterentwicklung</h2><h3>Klassen</h3><p>Die App verwendet keine neuen ES6-Ausdrücke wie &quot;class&quot;. Stattdessen werden Klassen mit dem <a href="https://en.wikipedia.org/wiki/Immediately-invoked_function_expression">IIFE-Pattern</a> umgesetzt:</p>
+<pre class="prettyprint source lang-javascript"><code>var Klasse = (function () {
+
+    function Klasse(params) {
+        this.publicMember = null;
+        // nicht wirklich privat - ist nur eine Konvention!
+        this._privateMember = null;
+    }
+
+    Klasse.prototype.publicMethod = function () {
+        console.log(this._privateMember);
+    }; 
+
+    /**
+     * _privateMethod ist nicht wirklich privat - das ist auch nur eine Konvention!
+     */
+    Klasse.prototype._privateMethod = function () {
+    };
+
+    return Klasse;
+}());</code></pre><p>Dadurch kann man nun die Schreibweise <code>let a = new Klasse();</code> verwenden. Man muss ggf. aufpassen, dass Methoden, die als Callbacks übergeben werden, ein anderes <code>this</code> haben:</p>
+<p>Das funktioniert nicht:</p>
+<pre class="prettyprint source lang-javascript"><code>   Klasse.prototype._doSomething = function () {
+        this._$someMember.on(&quot;mousedown&quot;, _onMouseDown);
+    };
+
+    Klasse.prototype._onMouseDown = function(e) {
+        console.log(this._someValue);
+        // &quot;this&quot; ist hier _nicht_ die Instanz der Klasse!
+        // _onMouseDown wird allerdings schon aufgerufen.
+    };</code></pre><p>Das funktioniert:</p>
+<pre class="prettyprint source lang-javascript"><code>   Klasse.prototype._doSomething = function () {
+        let that = this;
+        this._$someMember.on(&quot;mousedown&quot;, function(e) {that._onMouseDown(e);});
+    };
+
+    Klasse.prototype._onMouseDown = function(e) {
+        console.log(this._someValue);
+        // &quot;this&quot; ist hier die Instanz der Klasse!
+    };</code></pre><h3>Singletons</h3><p>Singletons benutzen folgende Syntax:</p>
+<pre class="prettyprint source lang-javascript"><code>
+var Log = (function() {
+
+    let that = {},
+
+    somePublicFunc = function() {
+
+    },
+
+    _somePrivateFunc = function() {
+
+    };
+
+    that.someFunc = somePublicFunc;
+    return that;
+}());</code></pre><p>... und werden dann wie folgt aufgerufen: <code>Log.someFunc();</code></p>
+<h3>Events</h3><p>Da sich nicht alle Komponenten gegenseitig kennen sollten, rufen manche nicht direkt die Methoden anderer Komponenten auf, sondern lösen Events aus, um Zustandsänderungen zu kommunizieren. Das sieht meistens so aus:</p>
+<pre class="prettyprint source lang-javascript"><code>    // ...
+    $(this).trigger('eventName', [param1, param2]);
+    //</code></pre><p>Eine andere Komponente kann sich zuvor darauf registriert haben:</p>
+<pre class="prettyprint source lang-javascript"><code>    // das &quot;this&quot; aus dem vorherigen Block ist das Objekt &quot;someObject&quot;, und &quot;this&quot; ist hier etwas anderes:
+    // ...
+    let that = this;
+    $(someObject).on('eventName', function(e, param1, param2) { that.someCallbackFunc(param1, param2); });
+    //...</code></pre><p><code>e</code> wird automatisch erzeugt, ist aber eigentlich (bei dieser Art von Ereignis) nie besonders hilfreich. Die Parameter müssen beim <code>trigger</code>-Aufruf als Array übergeben werden. Ein gutes Beispiel ist der PathManager: Er registriert sich in seiner <code>_registerListeners</code>-Methode (Z. 343) z.B. auf das 'markerCreated'-Event der MarkerControls:</p>
+<pre class="prettyprint source lang-javascript"><code>    PathManager.prototype._registerListeners = function () {
+        let that = this;
+
+        $(this.markerControls).on(&quot;markerCreated&quot;, function(event, marker, onEdge) {
+            that.addNode(marker.left, marker.top, marker.additionalData, onEdge);
+        });
+        // ...
+    }</code></pre><p>Die MarkerControls lösen dieses Event aus, nachdem sie einen neuen Marker kreiert haben, in der <code>_createMarkerAtCanvasPosition</code>-Methode (Z. 51):</p>
+<pre class="prettyprint source lang-javascript"><code>    MarkerControls.prototype._createMarkerAtCanvasPosition = function (position) {
+        // ...
+        $(this).trigger(&quot;markerCreated&quot;, [newMarker, this._hightlightedRoute]);
+        // ...
+    }</code></pre><p>Falls dieses Event-System verwirrend ist: Es spricht meistens nichts dagegen, der Einfachheit halber events auf den <code>$(&quot;body&quot;)</code>-zu registrieren und dort zu triggern. Das kann allerdings zu Problemen führen, wenn sich die gleiche Komponente mehrmals für ein Event registrieren will oder sich von einem Event &quot;abmelden&quot; (s. <code>unbind</code>-Methode von jQuery) will; wenn man hier gut aufpasst, dann spricht jedoch prinzipiell nichts dagegen, den body zu verwenden (weil der body immer da ist und praktisch garantiert dasselbe Objekt bleibt).</p>
+<h3>_-Templates</h3><p><a href="http://embed.plnkr.co/4Mx9AW/">Dieses Beispiel</a> ist zwar auf russisch, erklärt aber trotzdem einigermaßen, wie underscore- oder lodash-Templates funktionieren (vermutlich etwas besser als die <a href="https://lodash.com/docs/4.17.4#template">Dokumentation</a>).
+Templates sind HTML-Codes in String-Form, die man dynamisch erzeugen und mit Daten befüllen kann.</p>
+<p>Ein kurzer eigener Erklärungsversuch ist folgender:</p>
+<pre class="prettyprint source lang-javascript"><code>
+templates.map_canvas = 
+       ['&lt;div class=&quot;small-12 columns&quot;>',
+        '   &lt;canvas width=&quot;500&quot; height=&quot;500&quot; id=&quot;my_canvas&quot;>&lt;/canvas>',
+        '&lt;/div>'].join('\n');</code></pre><p>In der <code>GameApp</code> werden all diese Templates automatisch in das <code>compiledTemplates</code>-Objekt kopiert und dabei auch so übersetzt, dass man sie nachher als Funktion aufrufen kann: <code>compiledTemplates[&quot;map_canvas&quot;]()</code> Erzeugt den HTML-Code aus dem Template. Aus diesem Code muss man immer noch über jQuery ein Objekt erzeugen oder ihn an ein Objekt anhängen, damit er auf der Seite erscheint - die Template-Funktion generiert letztlich nur eine Zeichenkette.</p>
+<p>Man kann in Templates über <code>&lt;%</code> und <code>%&gt;</code> JS-Code einbauen:</p>
+<pre class="prettyprint source lang-javascript"><code>
+templates.test = 
+    ['&lt;div id=&quot;&lt;%= data.element_id %>&quot;>',
+     '  &lt;% for (let i = 0; i &lt; data.iterations; i++) { %>',
+     '      &lt;span>&lt;%= i %>&lt;/span>',
+     '  &lt;% } %>',
+     '&lt;/div>'].join('\n');</code></pre><p>würde durch den Aufruf <code>compiledTemplates[&quot;test&quot;]({data: {element_id: &quot;hey&quot;, iterations: 3}})</code> folgenden Code erzeugen:</p>
+<pre class="prettyprint source lang-html"><code>
+&lt;div id=&quot;hey&quot;>
+      &lt;span>0&lt;/span>  
+      &lt;span>1&lt;/span>
+      &lt;span>2&lt;/span>
+&lt;/div></code></pre><p>Alle templates befinden sich im Ordner view_templates. Es gibt eigentlich keinen Grund, sie für Objekte zu verwenden, die einmalig erzeugt werden, außer dass die &quot;Haupt&quot;-HTML-Datei nicht so überfrachtet wird.
+Bei Erweiterungen der Anwendung könnte man also dieses System verwenden oder auch nicht. Allerdings muss man ggf. darauf achten, dass die bestehenden Klassen ihre Template-Inhalte nicht zwingend an die bestehenden Container-Divs anhängen, sondern ihren Inhalt auch überschreiben könnten.</p>
+<h3>Benennungskonventionen</h3><p>Für Variablen wird meistens &quot;let&quot; statt &quot;var&quot; verwendet (<a href="http://stackoverflow.com/a/11444416">Erklärung</a>).</p>
+<p>Bei der Variablenbenennung bedeutet _ am Anfang, dass es sich um eine private Variable handelt, und $, dass es sich um ein jQuery-Objekt handelt (_$abc ist ein privates jQuery-Objekt). Das ist zwar nur eine Konvention (Variablen mit _ davor sind trotzdem öffentlich zugänglich), sollte aber als verbindlich behandelt werden.</p>
+<p>Alle Klassen befinden sich im navigame-Namespace, welcher in navigameapp.js definiert wird.</p>
+<h3>Server: Lambdas</h3><p>Im Java-Teil des Projekts werden Consumer<T> verwendet. Diese erlauben es, Funktionen als Parameter zu übergeben und &quot;anonyme&quot; Funktionen zu erstellen.
+Angenommen, man möchte eine Funktion aufrufen, wenn ein Prozess, der im Hintergrund läuft (z.B. ein Download), abgeschlossen ist.
+Dann könnte man folgendes tun:</p>
+<pre class="prettyprint source lang-java"><code>
+public interface DowloadFinishedCallback {
+    void onDownloadFinished(String downloadedText);
+    void onDownloadError(Exception e);
+}
+
+//   ...
+
+public class Download {
+
+    public static void startDownload(String url, DownloadFinishedCallback callback) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                //...(download - code)
+                    callback.onDownloadFinished(downloadedText);
+                } catch (Exception e) {
+                    callback.onDownloadError(e);
+                }
+            }
+        }).start();
+    }
+}
+
+//    ...
+//    (in einer anderen Klasse)
+
+    public void downloadFile(String url) {        
+        Download.startDownload(url, new DownloadFinishedCallback() {
+            @Override
+            public void onDownloadFinished(String downloadedText) {
+                // do something
+            }
+
+            @Override
+            public void onDownloadError(Exception e) {
+                // do something else
+            }
+        });
+    }</code></pre><p>Mit Lambda-Ausdrücken kann man das Interface einfach weglassen und genauso das Runnable vereinfachen:</p>
+<pre class="prettyprint source lang-java"><code>
+public class Download {
+
+    public static void startDownload(String url, Consumer&lt;String> onSuccess, Consumer&lt;Exception> onError) {
+        new Thread(() -> { // &lt;- lambda-Ausdruck 1: Runnable nicht notwendig; &quot;leerer&quot; Consumer!
+            try {
+            //...(download - code)
+                onSuccess.accept(downloadedText);
+            } catch (Exception e) {
+                onError.accept(e);
+            }
+        }).start();
+    }
+}
+
+//    ...
+//    (in einer anderen Klasse)
+
+    public void downloadFile(String url) {       
+        Download.start(url,
+            downloadedText -> { // &lt;- lambdas für onSuccess...
+                // do something
+            },
+            exception -> {      // &lt;- ... und onError
+                // do something
+            });
+    }</code></pre><p>Andere lambda-Konzepte von Java 8 (z.B. Predicates) kommen nicht vor.
+Die &quot;-&gt;&quot;-Ausdrücke werden automatisch in Consumer übersetzt; mit der &quot;accept&quot;-Methode ruft man die Methoden auf.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdditionalDataDialog.html">AdditionalDataDialog</a></li><li><a href="CanvasManager.html">CanvasManager</a></li><li><a href="EdgeControls.html">EdgeControls</a></li><li><a href="ElementScaler.html">ElementScaler</a></li><li><a href="GameApp.html">GameApp</a></li><li><a href="GameTitleBar.html">GameTitleBar</a></li><li><a href="MapControls.html">MapControls</a></li><li><a href="MapList.html">MapList</a></li><li><a href="MapPath.html">MapPath</a></li><li><a href="MapSelectionDialog.html">MapSelectionDialog</a></li><li><a href="MapSelectionHandler.html">MapSelectionHandler</a></li><li><a href="MapVisuals.html">MapVisuals</a></li><li><a href="MarkerControls.html">MarkerControls</a></li><li><a href="NewGameDialog.html">NewGameDialog</a></li><li><a href="Path.html">Path</a></li><li><a href="PathEdge.html">PathEdge</a></li><li><a href="PathManager.html">PathManager</a></li><li><a href="PathNode.html">PathNode</a></li><li><a href="ScoreDialog.html">ScoreDialog</a></li></ul><h3>Namespaces</h3><ul><li><a href="navigame.html">navigame</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#Log">Log</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 05 2017 23:55:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

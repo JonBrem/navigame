@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: view/map_visuals.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: view/map_visuals.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>navigame.MapVisuals = (function () {
+
+    /**
+     * MapVisuals constructor. only references the canvas manager, does nothing else.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc Simple data container for paths. Consists of mapPaths, which in turn
+     *  contain nodes and edges of a route.
+     * @param {navigame.CanvasManager} canvasManager - the game's canvas maanger
+     */
+    function MapVisuals (canvasManager) {
+        Log.log("verbose", "Initializing Map visuals", this);
+        this._canvasManager = canvasManager;
+        Log.log("verbose", "Finished Initializing Map visuals", this);
+    };
+
+    /**
+     * loadNewMap downloads the image; if it was successfully downloaded, the
+     *  callback will be invoked after it was set as the new map image.
+     * @param  {string}   imgSrc - name, but without the WEBROOT-prefix.
+     * @param  {Function} callback - Success callback (no params, not an event callback). Optional.
+     * @memberof MapVisuals
+     */
+    MapVisuals.prototype.loadNewMap = function(imgSrc, callback) {
+        let that = this;
+        ImageLoader.loadImage(WEBROOT + '/' + imgSrc, 
+            {
+                success: function (image) {
+                    that._imageLoaded(image);
+                    if (callback) {
+                        callback();
+                    }
+                },
+                error: function() {Log.log("error", "image could not be loaded: " + imgSrc);} 
+            }
+        );
+    };
+
+    /**
+     * _imageLoaded is called if the image was successfully downloaded,
+     *  and will create a fabric.Image that is set as the new background map on the fabric
+     *  canvas.
+     * @param  {Image} image - HTML Image element
+     * @memberof MapVisuals
+     */
+    MapVisuals.prototype._imageLoaded = function (image) {
+        let naturalWidth = image.naturalWidth;
+        let naturalHeight = image.naturalHeight;
+
+        let widthScaleFactor = naturalWidth > naturalHeight? 1 : naturalWidth / naturalHeight;
+        let heightScaleFactor = naturalHeight > naturalWidth? 1 : naturalHeight / naturalWidth;
+
+        let fabricWidth = this._canvasManager.canvasWidth() * widthScaleFactor;
+        let fabricHeight = this._canvasManager.canvasHeight() * heightScaleFactor;
+
+        let imgInstance = new fabric.Image(image, {
+            left: -fabricWidth / 2,
+            top: -fabricHeight / 2,
+            angle: 0,
+            width: fabricWidth,
+            height: fabricHeight,
+            originX: 'left',
+            originY: 'top'
+        });
+
+        imgInstance.hasBorders = false;
+        imgInstance.hasControls = false;
+        imgInstance.hasRotatingPoint = false;
+
+        this._canvasManager.setMapImage(imgInstance);
+    };
+
+    return MapVisuals;
+}());
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdditionalDataDialog.html">AdditionalDataDialog</a></li><li><a href="CanvasManager.html">CanvasManager</a></li><li><a href="EdgeControls.html">EdgeControls</a></li><li><a href="ElementScaler.html">ElementScaler</a></li><li><a href="GameApp.html">GameApp</a></li><li><a href="GameTitleBar.html">GameTitleBar</a></li><li><a href="MapControls.html">MapControls</a></li><li><a href="MapList.html">MapList</a></li><li><a href="MapPath.html">MapPath</a></li><li><a href="MapSelectionDialog.html">MapSelectionDialog</a></li><li><a href="MapSelectionHandler.html">MapSelectionHandler</a></li><li><a href="MapVisuals.html">MapVisuals</a></li><li><a href="MarkerControls.html">MarkerControls</a></li><li><a href="NewGameDialog.html">NewGameDialog</a></li><li><a href="Path.html">Path</a></li><li><a href="PathEdge.html">PathEdge</a></li><li><a href="PathManager.html">PathManager</a></li><li><a href="PathNode.html">PathNode</a></li><li><a href="ScoreDialog.html">ScoreDialog</a></li></ul><h3>Namespaces</h3><ul><li><a href="navigame.html">navigame</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#Log">Log</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 05 2017 23:55:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

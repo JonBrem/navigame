@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: view/map_list.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: view/map_list.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>navigame.MapList = (function () {
+
+    /**
+     * MapList constructor.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc Simple data container for paths. Consists of mapPaths, which in turn
+     *  contain nodes and edges of a route.
+     */
+    function MapList ($contentArea) {
+        this._$contentArea = $contentArea;
+        this._$contentArea.append(compiledTemplates['map_list']());
+
+        this._$mapListElement = $("#map_list");
+        this._$addMapButton = $("#add_map_button");
+        this._$removeMapButton = $("#remove_map_button");
+        this._$submitPathButton = $("#submit_path_button");
+
+        this._setupSortableList();
+        this._setupButtons();
+    };
+
+    /**
+     * showAddMapDialog will create and show an AddMapDialog, then trigger the
+     *  'dialogCreated'-event.
+     * @param  {boolean} closeable - whether it is possible to close the dialog.
+     * @param  {object} start - object in a {roomid: x, area: y}-type format
+     * @param  {object} goal  - object in a {roomid: x, area: y}-type format
+     * @memberof MapList
+     */
+    MapList.prototype.showAddMapDialog = function (closeable, start, goal) {
+        if (!closeable &amp;&amp; closeable !== false)
+            closeable = true; // &lt;- default is true, unless "false" is explicitly set.
+
+        let addMapDialog = new navigame.MapSelectionDialog();
+
+        if (start || goal) {
+            addMapDialog.show(closeable, true, start, goal);
+        } else {
+            addMapDialog.show(closeable, false);
+        }
+
+        $(this).trigger('dialogCreated', [addMapDialog]);
+    };
+
+    /**
+     * addMap adds a map to the list.
+     * @param {string} id - index of the map
+     * @param {string} imgSrc - src of the map image
+     * @memberof MapList
+     */
+    MapList.prototype.addMap = function (id, imgSrc) {
+        let $newMapItem = $(compiledTemplates['map_list_item']({
+            data: {
+                map_index: id,
+                map_src: imgSrc
+            }
+        }));
+
+        this._$mapListElement.append($newMapItem);
+
+        $('.map_item').removeClass('selected_map');
+        $newMapItem.addClass('selected_map');
+        
+        let that = this;
+        $newMapItem.on('click touchstart', function (e) {
+            that._onMapClicked($(this)); // &lt;-- "this" is not "that" in this case!
+        });
+    };
+
+    /**
+     * deleteMapButtonClicked will request that the map be deleted.
+     *  This does not directly delete the map, because the view shouldn't make that
+     *  decision. Triggers the 'requestDeleteMap'-event.
+     *  @memberof MapList
+     */
+    MapList.prototype.deleteMapButtonClicked = function () {
+        $(this).trigger('requestDeleteMap'); // &lt;- because the view can't just delete things!
+    };
+
+    /**
+     * submitPathClicked triggers the 'requestSubmitPath'-event.
+     * @memberof MapList
+     */
+    MapList.prototype.submitPathClicked = function () {
+        $(this).trigger("requestSubmitPath");
+    };
+
+    /**
+     * deleteMap deletes a map from the view. This has no effect on the model,
+     *  and should be called from / via a model, to ensure that the view does not just
+     *  decide that "on its own".
+     * 
+     * @param  {number} index            - index of the map that should be deleted
+     * @param  {number} newSelectedIndex - index of the map that is selected after the other one was deleted
+     * @memberof MapList
+     */
+    MapList.prototype.deleteMap = function (index, newSelectedIndex) {
+        Log.log("verbose", "deleting map at index: " + index, this);
+
+        let $mapItem = $('.map_item').eq(index);
+        $mapItem.remove();
+
+        let that = this;
+
+        setTimeout(function() { // &lt;- insure this happens after DOM is updated
+            let $remainingItems = $(".map_item");
+
+            for (let i = 0; i &lt; $remainingItems.length; i++) {
+                $remainingItems.eq(i).attr("data-map-index", i);
+            }
+
+            that.setSelectedMapIndex(newSelectedIndex);
+        }, 1);
+    };
+
+    /**
+     * setSelectedMapIndex triggers 'onMapSelected', to inform other components
+     *  that a map was clicked and should be loaded into the view.
+     * @param {number} newSelectedIndex - the map that will be selected
+     * @memberof MapList
+     */
+    MapList.prototype.setSelectedMapIndex = function (newSelectedIndex) {
+        $('.map_item').removeClass('selected_map');
+
+        let $mapItem = $('.map_item').eq(newSelectedIndex);
+        $mapItem.addClass('selected_map');
+
+        $(this).trigger('onMapSelected', [{
+            mapIndex: $mapItem.attr('data-map-index'),
+            imgSrc: $mapItem.find('img').attr('src')
+        }]);
+    };
+
+    /**
+     * clear removes all maps from the view.
+     * @memberof MapList
+     */
+    MapList.prototype.clear = function () {
+        let $mapItems = $('.map_item');
+        $mapItems.remove();
+    };
+
+    /**
+     * _onMapClicked triggers 'onMapSelected', to inform other components
+     *  that a map was clicked and should be loaded into the view.
+     * @param  {jQuery} $mapItem - jQuery handle of the map that was clicked.
+     * @memberof MapList
+     */
+    MapList.prototype._onMapClicked = function ($mapItem) {
+        $('.map_item').removeClass('selected_map');
+        $mapItem.addClass('selected_map');
+
+        $(this).trigger('onMapSelected', [{
+            mapIndex: $mapItem.attr('data-map-index'),
+            imgSrc: $mapItem.find('img').attr('src')
+        }]);
+    };
+
+    /**
+     * _onMapListResorted is called when the jQuery UI-sortable-callback was used to
+     *  change the order of the maps on the path.
+     *  Changes the "data-map-index"-attributes of the map elements, and
+     *  triggers the 'onMapsResorted'-event, passing along the new positions of the old indices.
+     *  @memberof MapList
+     */
+    MapList.prototype._onMapListResorted = function () {
+        let indices = [];
+        let $sortedItems = $(".map_item");
+
+        for (let i = 0; i &lt; $sortedItems.length; i++) {
+            indices.push(Number($sortedItems.eq(i).attr("data-map-index")));
+            $sortedItems.eq(i).attr("data-map-index", i);
+        }
+
+        $(this).trigger('onMapsResorted', [indices]);
+    };
+
+    /**
+     * _setupSortableList makes the map list drag/drop-sortable, using the jQuery UI-sortable
+     *  method.
+     *  @memberof MapList
+     */
+    MapList.prototype._setupSortableList = function () {
+        let that = this;
+
+        this._$mapListElement.sortable({
+            axis: "x",
+            delay: 50,
+            distance: 10,
+            update: function (e, ui) {
+                that._onMapListResorted();
+            },
+            sort: function (e, ui) {
+                console.log(ui.helper);
+            }
+        });
+        this._$mapListElement.disableSelection();
+    };
+
+    /**
+     * _setupButtons references the "add map", "remove map" and "submit path"-buttons and
+     * sets up their respective click listeners.
+     * @memberof MapList
+     */
+    MapList.prototype._setupButtons = function () {
+        let that = this;
+        this._$addMapButton.on("click", function(e) {
+            that.showAddMapDialog(true);
+        });
+
+        this._$removeMapButton.on("click", function(e) {
+            that.deleteMapButtonClicked();
+        });
+
+        this._$submitPathButton.on("click", function(e) {
+            that.submitPathClicked();
+        });
+    };
+
+    return MapList;
+})();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdditionalDataDialog.html">AdditionalDataDialog</a></li><li><a href="CanvasManager.html">CanvasManager</a></li><li><a href="EdgeControls.html">EdgeControls</a></li><li><a href="ElementScaler.html">ElementScaler</a></li><li><a href="GameApp.html">GameApp</a></li><li><a href="GameTitleBar.html">GameTitleBar</a></li><li><a href="MapControls.html">MapControls</a></li><li><a href="MapList.html">MapList</a></li><li><a href="MapPath.html">MapPath</a></li><li><a href="MapSelectionDialog.html">MapSelectionDialog</a></li><li><a href="MapSelectionHandler.html">MapSelectionHandler</a></li><li><a href="MapVisuals.html">MapVisuals</a></li><li><a href="MarkerControls.html">MarkerControls</a></li><li><a href="NewGameDialog.html">NewGameDialog</a></li><li><a href="Path.html">Path</a></li><li><a href="PathEdge.html">PathEdge</a></li><li><a href="PathManager.html">PathManager</a></li><li><a href="PathNode.html">PathNode</a></li><li><a href="ScoreDialog.html">ScoreDialog</a></li></ul><h3>Namespaces</h3><ul><li><a href="navigame.html">navigame</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#Log">Log</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 05 2017 23:55:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: view/map_selection_dialog.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: view/map_selection_dialog.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>navigame.MapSelectionDialog = (function () {
+    
+    /**
+     * MapSelectionDialog constructor.
+     * @constructor
+     * @global
+     * @class
+     * @classdesc The map selection dialog shows a list of possible areas and then
+     *  levels on these areas, from which the user can choose one to create a new
+     *  sub-path (navigame.MapPath) on the overall path from the start to the destination.
+     */
+    function MapSelectionDialog () {
+        let _$dialogElement = null;
+        let _$areaSelectElement = null;
+    }
+
+    /**
+     * show shows the dialog. This will also create the dialog.
+     * @param  {boolean} closeable - whether it is possible to close this dialog. Default: true.
+     * @param  {boolean} showPathPoints - whether the start and goal points of the path should be shown
+     * @param  {object} start - object in a {roomid: x, area: y}-type format
+     * @param  {object} goal  - object in a {roomid: x, area: y}-type format
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype.show = function(closeable, showPathPoints, start, goal) {
+        let data = this._getData(closeable, showPathPoints, start, goal);
+
+        let dialogElement = compiledTemplates['map_selection_dialog']({data: data});
+        $("body").append(dialogElement);
+
+        this._$dialogElement = $("#map_selection_modal");
+        let revealElement = new Foundation.Reveal(this._$dialogElement, {
+            "closeOnClick": closeable,
+            "closeOnEsc": closeable
+        });
+
+        this._$dialogElement.foundation('open');
+
+        // listeners
+        let that = this;        
+        this._$dialogElement.on("closed.zf.reveal", function (e) {that._onDialogClose(e);});
+        $("#map_selection_confirm").on("click", function (e) {that._onMapSelected(e);});
+    };
+
+    /**
+     * setAreas shows a dropdown of a list of possible map areas in the dialog.
+     * @param {array} areas - array of {name: x, filename: y}-type objects
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype.setAreas = function (areas) {
+        // sort areas alphabetically
+        areas.sort(function(a, b) { return a.name >= b.name; });
+
+        $("#map_selection_area_selection").html(compiledTemplates['map_selection_dialog_select_area']({
+            data: { options: areas } }));
+
+        this._$areaSelectElement = $("#map_selection_area_input");
+
+        let that = this;
+        this._$areaSelectElement.on('change', function(e) { that._onAreaSelected(e); });
+    };
+
+    /**
+     * setAreaLevels shows a list of levels / storeys on the dialog, with previews of the
+     *  respective maps for these levels.
+     * @param {array} areaLevels - array of {level_id: x, image_path: y, storey: z}-type objects
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype.setAreaLevels = function (areaLevels) {
+        areaLevels.sort(function(a, b) { return a.storey >= b.storey; });
+
+        $("#map_selection_level_selection").html(compiledTemplates['map_selection_dialog_select_level']({
+            data: { options: areaLevels } }));
+
+        // bugfix for foundation; something is broken when this is initialized after page load
+        new Foundation.Tabs($("#map_selection_level_selection"), {});
+        $("#map_selection_level_selection").on("change.zf.tabs", function(e) {
+            try {
+                let $activeTab = $("#map_selection_levels_vert_tabs").find(".is-active");
+                let $contentArea = $($activeTab.find('a').attr('href'));
+                setTimeout(function() {
+                    $contentArea.attr("aria-hidden", false);
+                }, 1);
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
+        $("#map_selection_confirm").parent().css("display", "block");
+    };
+
+    /**
+     * closeDialog closes the dialog.
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype.closeDialog = function () {
+        this._$dialogElement.foundation('close');
+    };
+
+    /**
+     * _onAreaSelected is called when the selected option in the dropdown changes.
+     *  It triggers the 'onAreaSelected'-event.
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype._onAreaSelected = function (e) {
+        let option = this._$areaSelectElement.find('option:selected');
+        if (option != null) {
+            if(option.val() != "default") {
+                $(this).trigger("onAreaSelected", [option.val()]);
+            }
+        }
+    };
+
+    /**
+     * _onMapSelected is called when a specific map has been selected and should be added
+     *  to the path.
+     *  It triggers the 'storeySelected'-event.
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype._onMapSelected = function (e) {
+        try {
+            let $activeTabLink = $("#map_selection_levels_vert_tabs").find(".is-active").find('a');
+            $(this).trigger('storeySelected', [$activeTabLink.attr("data-level-id"), $activeTabLink.attr('data-img-src')]);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    /**
+     * _onDialogClose is called when the dialog is closed (by pressing Esc, clicking the 'x'
+     *  or clicking outside the dialog) and will remove the HTML element.
+     * @param  {event} e - dialog close event
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype._onDialogClose = function (e) {
+        if (this._$dialogElement != null) {
+            this._$dialogElement.remove();
+            this._$dialogElement = null;
+        }
+    };
+
+    /**
+     * _getData builds the object from which the lodash template will read the data.
+     * @param  {boolean} closeable - whether the dialog can be cloased
+     * @param  {boolean} showPathPoints - whether the start and goal points of the path should be shown
+     * @param  {object} start - object in a {roomid: x, area: y}-type format
+     * @param  {object} goal  - object in a {roomid: x, area: y}-type format
+     * @return {object} object with the params in the right format for the lodash template.
+     * @memberof MapSelectionDialog
+     */
+    MapSelectionDialog.prototype._getData = function (closeable, showPathPoints, start, goal) {
+        let data = {};
+
+        if (closeable || (!closeable &amp;&amp; closeable !== false))
+            data.closeable = true;
+        else
+            data.closeable = false;
+
+        if (showPathPoints) {
+            data.showPathPoints = true;
+            data.start = start;
+            data.goal = goal;
+        }
+
+        return data;
+    };
+
+    return MapSelectionDialog;
+})();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AdditionalDataDialog.html">AdditionalDataDialog</a></li><li><a href="CanvasManager.html">CanvasManager</a></li><li><a href="EdgeControls.html">EdgeControls</a></li><li><a href="ElementScaler.html">ElementScaler</a></li><li><a href="GameApp.html">GameApp</a></li><li><a href="GameTitleBar.html">GameTitleBar</a></li><li><a href="MapControls.html">MapControls</a></li><li><a href="MapList.html">MapList</a></li><li><a href="MapPath.html">MapPath</a></li><li><a href="MapSelectionDialog.html">MapSelectionDialog</a></li><li><a href="MapSelectionHandler.html">MapSelectionHandler</a></li><li><a href="MapVisuals.html">MapVisuals</a></li><li><a href="MarkerControls.html">MarkerControls</a></li><li><a href="NewGameDialog.html">NewGameDialog</a></li><li><a href="Path.html">Path</a></li><li><a href="PathEdge.html">PathEdge</a></li><li><a href="PathManager.html">PathManager</a></li><li><a href="PathNode.html">PathNode</a></li><li><a href="ScoreDialog.html">ScoreDialog</a></li></ul><h3>Namespaces</h3><ul><li><a href="navigame.html">navigame</a></li></ul><h3>Global</h3><ul><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#Log">Log</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Apr 05 2017 23:55:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
