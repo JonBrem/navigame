@@ -1,6 +1,6 @@
 templates.additional_data_dialog = 
    ['<div class="reveal" id="additional_data_modal">',
-    '   <h1><%= data.whichType %> bearbeiten</h1>',
+    '   <h1><% if (data.whichType == "marker") { %>Marker<% } else { %>Kante<% } %> bearbeiten</h1>',
     '   <div id="data_dialog_items_area">',
     '       <% for (let i = 0; i < data.items.length; i++) { %>',
     '           <%= compiledTemplates["additional_data_item"]({data: data.items[i]}) %>',
