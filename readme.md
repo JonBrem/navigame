@@ -47,7 +47,9 @@ Wenn man den Pfad vom Startpunkt zum Zielpunkt fertig erzeugt hat, dann kann man
 
 #### CanvasManager
 
-abc
+Der CanvasManager ist als Zwischenstufe zwischen den verwendeten Canvas-Framework (Fabric) und der Anwendung zu verstehen, der aber durchaus anwendungsspezifische "View-Logik" beinhaltet (und deswegen z.B. davon ausgeht, dass sich immer ein Bild im Hintergrund befindet).
+Damit alle Koordinaten immer relativ zur Karte sind, was bei der Auswertung vermutlich hilfreich sein wird, befinden sich alle Objekte in einer fabric.Group. Darin ist ein weißer Hintergrund, auf den die Karte kommt, und wiederum darauf kommen alle Marker und Edges, die angelegt werden. Das erfordert die Transformation von Canvas-Koordinaten in Karten-(bzw. Gruppen-)Koordinaten bei der Eingabe, sorgt aber wie gesagt dafür, dass die Positionen relativ zum Zentrum der Karte alle immer gleich bleiben.
+Da Fabric standardmäßig viel (und für diese Anwendung zu viel) Manipulation der Objekte erlauben, ist sie vollständig deaktiviert. Man kann Objekte also nicht direkt über die vom Framework bereitgestellten Punkte manipulieren. Stattdessen wird ein unsichtbarer Kreis auf die Karte gezeichnet; wenn dieser in die Nähe eines Markers oder der Route kommt, dann wird eine Kollision damit erkannt.
 
 #### MapControls
 
@@ -55,6 +57,7 @@ abc
 
 #### PathManager
 
+Der PathManager ist eine zentrale Logikkomponente.
 abc
 
 ### Server

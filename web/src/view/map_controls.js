@@ -204,7 +204,7 @@ navigame.MapControls = (function () {
      * @param  {number} hitPosY - coordinate on the controls div
      * @memberof MapControls
      */
-    MapControls.prorotype._handleMapTranslation = function (hitPosX, hitPosY) {    
+    MapControls.prototype._handleMapTranslation = function (hitPosX, hitPosY) {    
         let scale = this._canvasManager.getViewportScale();
 
         this._canvasManager.moveBy(

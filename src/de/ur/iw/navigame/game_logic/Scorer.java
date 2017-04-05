@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.Map;
 
 /*
- * This is a dummy implementation - it only checks if the end is on the correct map.
+ * This is a dummy implementation - it will always return a random score.
  */
 /**
  * The Scorer takes the path data for a session and its start and goal and calculates a score for the path.
@@ -17,40 +17,50 @@ import java.util.Map;
  */
 public class Scorer implements ServletRequestHandler {
 
+    /**
+     * Calculates a score based on how good the path is.
+     *
+     * @param params object containing the path data to evaluate.
+     * @param response response that will receive the output / feedback.
+     */
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        JSONObject obj = new JSONObject(params.get("path_data")[0]);
+        // JSONObject obj = new JSONObject(params.get("path_data")[0]); // <- this needs to be evaluated!
 
         try {
-            writeResponse(response, obj);
+            writeResponse(response);
         } catch (Exception e) {
-            writeError(response, e);
+            writeError(response);
+            e.printStackTrace();
         }
     }
 
-    private void writeError(HttpServletResponse response, Exception e) {
+    /**
+     * Sends an internal server error to the client.
+     *
+     * @param response response that will receive the output / feedback.
+     */
+    private void writeError(HttpServletResponse response) {
         try {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while calculating the score");
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        e.printStackTrace();
     }
 
-    private void writeResponse(HttpServletResponse response, JSONObject pathData) throws IOException {
+    /**
+     * Prints the score to the client.
+     *
+     * @param response response that will receive the output / feedback.
+     */
+    private void writeResponse(HttpServletResponse response) throws IOException {
         PrintWriter responeWriter = response.getWriter();
         JSONObject responseObject = new JSONObject();
 
-        if (lastNodeIsOnRightMap(pathData)) {
-            responseObject.put("score", (int) (90 + Math.random() * 10));
-        } else {
-            responseObject.put("score", (int) (Math.random() * 45));
-        }
+        responseObject.put("score", (int) (Math.random() * 100));
+
 
         responeWriter.write(responseObject.toString());
     }
 
-    private boolean lastNodeIsOnRightMap(JSONObject pathData) {
-        return false;
-    }
 }

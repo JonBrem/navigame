@@ -1,16 +1,23 @@
 package de.ur.iw.navigame.utility;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.function.Consumer;
 
+/**
+ * Enables downloading files to this server (has nothing to do with the client - Tomcat takes care of
+ * client/server communication itself)
+ */
 public class FileDownload {
 
+    /**
+     * Downloads a file to a String.
+     *
+     * @param webAddress url of the file to download
+     * @param onSuccess callback when the download is complete
+     * @param onFail callback when there is an error
+     */
     public void download(String webAddress, Consumer<String> onSuccess, Consumer<Void> onFail) {
         try {
             URLConnection connection = getUrlConnection(webAddress);
@@ -25,7 +32,14 @@ public class FileDownload {
         }
     }
 
-
+    /**
+     * Downloads an file to a byte-array. Strings don't work for this, so the {@link FileDownload#download(String, Consumer, Consumer)}-method
+     * does not work (unless for .svg-files).
+     *
+     * @param webAddress url of the file to download
+     * @param onSuccess callback when the download is complete
+     * @param onFail callback when there is an error
+     */
     public void downloadImage(String webAddress, Consumer<byte[]> onSuccess, Consumer<Void> onFail) {
         try {
             URL url = new URL(webAddress);
@@ -48,6 +62,12 @@ public class FileDownload {
         }
     }
 
+    /**
+     * Reads the lines in the BufferedReader into a StringBuilder, concatenated by '\n'.
+     *
+     * @param br Reader from which lines will be read.
+     * @return a StringBuilder containing all the lines in the BufferedReader.
+     */
     private StringBuilder readLines(BufferedReader br) throws IOException {
         StringBuilder toReturn = new StringBuilder();
         String line;
@@ -58,11 +78,22 @@ public class FileDownload {
         return toReturn;
     }
 
+    /**
+     * Creates a BufferedReader for a URLConnection.
+     * @param connection connection for which to create the reader.
+     * @return reader for output from the URLConnection.
+     */
     private BufferedReader getReader(URLConnection connection) throws IOException {
         InputStream is = connection.getInputStream();
         return new BufferedReader(new InputStreamReader((is)));
     }
 
+    /**
+     * Opens a URLConnection for a web address.
+     *
+     * @param webAddress URL String for which to open the address.
+     * @return Open &amp; Connected URL Connection (unless an exception is raised).
+     */
     private URLConnection getUrlConnection(String webAddress) throws IOException {
         URL url = new URL(webAddress);
         URLConnection connection = url.openConnection();

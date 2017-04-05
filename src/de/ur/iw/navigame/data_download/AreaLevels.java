@@ -8,14 +8,22 @@ import org.json.JSONObject;
 import org.json.XML;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Request handler that is responsible for downloading &amp; showing the levels / storeys in a given area.
+ */
 public class AreaLevels implements ServletRequestHandler {
 
+    /**
+     * Will print a list of storeys (with ids, map files...) for a given area.
+     *
+     * @param params request parameters. need to contain a "which_area" key.
+     * @param response response that will receive the output / feedback.
+     */
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
         String whichArea = params.get("which_area")[0];
@@ -25,6 +33,14 @@ public class AreaLevels implements ServletRequestHandler {
                 v -> onDownloadError(response));
     }
 
+    /**
+     * If the file exists: reads it and calls onSuccess;
+     * if it does not exist: downloads it, stores it and calls onSuccess
+     *
+     * @param whichArea which area to load the storeys for.
+     * @param onSuccess callback for when everything went okay
+     * @param onError callback for if there was an error
+     */
     public void loadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
         if (FileStorage.fileExists("area_" + whichArea + ".json")) {
             FileStorage.loadFile("area_" + whichArea + ".json", onSuccess, onError);
@@ -33,6 +49,13 @@ public class AreaLevels implements ServletRequestHandler {
         }
     }
 
+    /**
+     * Downloads the area file and calls onSuccess if it went OK.
+     *
+     * @param whichArea which area to load the storeys for.
+     * @param onSuccess callback for when everything went okay
+     * @param onError callback for if there was an error
+     */
     private void downloadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
         new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?getxml=" + whichArea,
                 s -> {
@@ -41,6 +64,14 @@ public class AreaLevels implements ServletRequestHandler {
                 }, onError);
     }
 
+    /**
+     * Loads the XML-Parts of the file into a JSON-Object and then passes them on to a method
+     * that will check that all the images are on this server, then print the storey data to the client.
+     *
+     * @param whichArea which area to load the storeys for.
+     * @param jsonContents json contents of an area file.
+     * @param response response that will receive the output / feedback.
+     */
     private void onAreaFileLoaded(String whichArea, String jsonContents, HttpServletResponse response) {
         String xmlPart = new JSONObject(jsonContents).getString("xml");
         JSONObject asObject = XML.toJSONObject(xmlPart);
@@ -54,14 +85,12 @@ public class AreaLevels implements ServletRequestHandler {
             graph.put("level", levelArray);
         }
 
-        downloadImagesUnlessLoaded(whichArea, asObject, response);
-    }
-
-    private void downloadImagesUnlessLoaded(String whichArea, JSONObject asObject, HttpServletResponse response) {
         recursiveImageDownload(whichArea, asObject, 0, response);
     }
 
     /**
+     * Ensures that all images have been downloaded. This is called recursively because Thread iterations
+     * are hard to do. When all images are present, the data can finally be output.
      *
      * @param whichArea area index (PT, Mathematik etc.)
      * @param object the big JSON file containing all the levels and rooms.
@@ -90,6 +119,15 @@ public class AreaLevels implements ServletRequestHandler {
         }
     }
 
+    /**
+     *
+     * @param data Bytes of the image file
+     * @param whichArea area index (PT, Mathematik etc.)
+     * @param object the big JSON file containing all the levels and rooms.
+     * @param currentIndex this is recursive, so this is just to keep track of which image files have been downloaded
+     *          and what is next. index is of the "level"-array.
+     * @param response response that will receive the output / feedback.
+     */
     private void storeImageFile(byte[] data, String whichArea, JSONObject object, int currentIndex,
                                 HttpServletResponse response) {
         JSONObject levelObject = object.getJSONObject("graph").getJSONArray("level").getJSONObject(currentIndex);
@@ -103,6 +141,14 @@ public class AreaLevels implements ServletRequestHandler {
         recursiveImageDownload(whichArea, object, currentIndex + 1, response);
     }
 
+    /**
+     * Currently, all the map files are called .png, even though some are .svg files.
+     * To cope with this - it causes problems!! - the files are read and, if they have an xml header,
+     * a new version of the file is created with a .svg ending.
+     *
+     * @param levelObject JSON object for one level / storey
+     * @return true, if the map file is an .svg file (even though it is probably called .png)
+     */
     private boolean checkSvg(JSONObject levelObject) {
         String s = FileStorage.loadFileNoCallback(levelObject.getString("mapfile"));
         if (s != null && s.startsWith("<?xml")) {
@@ -113,6 +159,21 @@ public class AreaLevels implements ServletRequestHandler {
         return false;
     }
 
+    /**
+     * Creates a JSON array containing objects with keys:
+     * <pre>
+     * {
+     *   levelid: int,
+     *   image_path: url,
+     *   storey: int
+     * }
+     * </pre>
+     *
+     * and prints that object to the client as a JSON string.
+     *
+     * @param areaData the big JSON file containing all the levels and rooms.
+     * @param response response that will receive the output / feedback.
+     */
     private void readAndPrintLevelInfo(JSONObject areaData, HttpServletResponse response) {
         JSONArray levelArray = areaData.getJSONObject("graph").getJSONArray("level");
         JSONArray responseContents = new JSONArray();
@@ -138,7 +199,16 @@ public class AreaLevels implements ServletRequestHandler {
         }
     }
 
+    /**
+     * Sends an internal server error as a response.
+     *
+     * @param response response that will receive the output / feedback.
+     */
     private void onDownloadError(HttpServletResponse response) {
-
+        try {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "files could not be loaded from the URWalking-Server");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

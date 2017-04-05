@@ -13,16 +13,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * Request Handler that can print a list of possible areas for maps to the client.
+ */
 public class UniversityAreas implements ServletRequestHandler{
 
     private static final String UNI_AREAS_FILE_NAME = "uni_areas.json";
 
+    /**
+     * Prints a list of areas to the client, possibly after downloading said list first.
+     *
+     * @param params request parameters. are not used in this request handler.
+     * @param response response that will receive the output / feedback.
+     */
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
         loadAreasFile(s -> readAndPrintAreasInfo(s, response),
                 v -> onDownloadError(response));
     }
 
+    /**
+     * If the xmlareas file from the urwalking server already exists on this local server,
+     * it just reads the contents of it;
+     * otherwise, the file will be downloaded first.
+     *
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     public void loadAreasFile(Consumer<String> onSuccess, Consumer<Void> onError) {
         if (FileStorage.fileExists(UNI_AREAS_FILE_NAME)) {
             FileStorage.loadFile(UNI_AREAS_FILE_NAME, onSuccess, onError);
@@ -31,6 +48,12 @@ public class UniversityAreas implements ServletRequestHandler{
         }
     }
 
+    /**
+     * Loads the xmlareas file from the urwalking server.
+     *
+     * @param onSuccessfulDownload success callback
+     * @param onError error callback
+     */
     private void downloadAreasFile(Consumer<String> onSuccessfulDownload, Consumer<Void> onError) {
         new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
                 s -> {
@@ -39,10 +62,21 @@ public class UniversityAreas implements ServletRequestHandler{
                 }, onError);
     }
 
+    /**
+     * Saves a copy of the areas file.
+     *
+     * @param jsonContents the area file contents.
+     */
     private void onAreasFileLoaded(String jsonContents) {
         FileStorage.storeFile(UNI_AREAS_FILE_NAME, jsonContents);
     }
 
+    /**
+     * Reads and prints the parts of the file that concern the university campus.
+     *
+     * @param jsonContents the area file contents.
+     * @param response response that will receive the output / feedback.
+     */
     private void readAndPrintAreasInfo(String jsonContents, HttpServletResponse response) {
         JSONObject fromFile = new JSONObject(jsonContents);
         JSONArray responseArray = readAreasFromFile(fromFile);
@@ -57,6 +91,13 @@ public class UniversityAreas implements ServletRequestHandler{
         }
     }
 
+    /**
+     * Reads data that concern the university campus and puts it in a json array, ignoring all other data
+     * in the file.
+     *
+     * @param fromFile the data of the original areas file
+     * @return JSONArray containing the areas of the university (ignoring all others)
+     */
     public JSONArray readAreasFromFile(JSONObject fromFile) {
         JSONArray responseArray = new JSONArray();
 
@@ -68,7 +109,7 @@ public class UniversityAreas implements ServletRequestHandler{
 
                 for(String key : keys) {
                     if (key.equals("Uni Regensburg")) {
-                        responseArray = buildAreasArray(array.getJSONObject(i).getJSONArray(key), i, key);
+                        responseArray = buildAreasArray(array.getJSONObject(i).getJSONArray(key));
                     }
                 }
             }
@@ -76,7 +117,13 @@ public class UniversityAreas implements ServletRequestHandler{
         return responseArray;
     }
 
-    private JSONArray buildAreasArray(JSONArray uniAreasArray, int i, String key) {
+    /**
+     * Puts the data from the original xmlareas file in a more "focused" format for output.
+     *
+     * @param uniAreasArray original array in the xmlareas file.
+     * @return a new array in a {name: x, filename: y} format.
+     */
+    private JSONArray buildAreasArray(JSONArray uniAreasArray) {
         JSONArray values = new JSONArray();
 
         for(int j = 0; j < uniAreasArray.length(); j++) {
@@ -89,8 +136,17 @@ public class UniversityAreas implements ServletRequestHandler{
         return values;
     }
 
+    /**
+     * Sends an internal server error as a response.
+     *
+     * @param response response that will receive the output / feedback.
+     */
     private void onDownloadError(HttpServletResponse response) {
-        System.out.println("On download error :(");
+        try {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "files could not be loaded from the URWalking-Server");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

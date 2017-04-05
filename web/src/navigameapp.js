@@ -32,8 +32,8 @@ navigame.GameApp = (function () {
 
         this.newGameDialog = null;
 
-        this.$mainHTMLObject = $("#" + mainAreaName);
-        this.$titleArea = $("#" + titleAreaName);
+        this.$mainHTMLObject = $("#" + mainAreaId);
+        this.$titleArea = $("#" + titleAreaId);
     }
 
     /**

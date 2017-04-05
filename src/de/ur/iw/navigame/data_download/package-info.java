@@ -1,4 +1,4 @@
 /**
- * Created by jonbr on 04.04.2017.
+ * Area selection and level/storey selection request handlers.
  */
 package de.ur.iw.navigame.data_download;

@@ -16,46 +16,88 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * The SessionCreation initiates a new session of the game by creating a unique ID
+ * and selecting two rooms, one of which will be the start and the other one of which will be
+ * the goal of the path.
+ */
 public class SessionCreation implements ServletRequestHandler {
 
+    // code-wise, this isn't great - it's more like a long chain of methods, with no data being stored in instance
+    // variables. This should be improved by creating more classes.
+
+    /**
+     * Creates a new session of the game.
+     *
+     * @param params HTTP params; are not used by this particular request handler.
+     * @param response response that will receive the output / feedback.
+     */
     @Override
     public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
         pickRandomPointsInMaps(objects -> {
             try {
-                PrintWriter writer = response.getWriter();
-
-                JSONObject obj = new JSONObject();
-                obj.put("session_id", UUID.randomUUID().toString());
-
-                obj.put("from_room", objects[0]);
-                obj.put("to_room", objects[1]);
-
-                writer.write(obj.toString());
-
-                writer.flush();
-                writer.close();
-
+                sendSessionInfoToClient(response, objects);
             } catch (IOException e) {
-                try {
-                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-                } catch (IOException e1) {
-                    e.printStackTrace();
-                }
+                sendErrorToClient(response, e);
             }
         },
-        v -> {
-            try {
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        });
+        v -> sendErrorToClient(response, new IOException("")));
     }
 
+    /**
+     * Sends an internal server error to the client.
+     *
+     * @param response response that will receive the output / feedback.
+     * @param e exception that occurred
+     */
+    private void sendErrorToClient(HttpServletResponse response, IOException e) {
+        try {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+        } catch (IOException e1) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a unique ID and sends that + data for two rooms to the client, as JSON.
+     *
+     * @param response response that will receive the output / feedback.
+     * @param objects two objects that contain the data for two rooms of the university
+     */
+    private void sendSessionInfoToClient(HttpServletResponse response, JSONObject[] objects) throws IOException {
+        PrintWriter writer = response.getWriter();
+
+        JSONObject obj = new JSONObject();
+        obj.put("session_id", UUID.randomUUID().toString());
+
+        obj.put("from_room", objects[0]);
+        obj.put("to_room", objects[1]);
+
+        writer.write(obj.toString());
+
+        writer.flush();
+        writer.close();
+    }
+
+    /**
+     * Loads the xmlareas file of the urwalking server, and then initiates the rest of the process
+     *  (which continues with onAreasFileLoaded)
+     *
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     private void pickRandomPointsInMaps(Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         new UniversityAreas().loadAreasFile((String s) -> onAreasFileLoaded(s, onSuccess, onError), onError);
     }
 
+    /**
+     * Called when the xmlareas file of the urwalking server was loaded successfully.
+     * picks to random sub-areas and continues the rest of the process (loadFirstRoom)
+     *
+     * @param jsonContents contents of the xmlareas file
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     private void onAreasFileLoaded(String jsonContents, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         JSONObject areasFile = new JSONObject(jsonContents);
         JSONArray areasData = new UniversityAreas().readAreasFromFile(areasFile);
@@ -79,12 +121,30 @@ public class SessionCreation implements ServletRequestHandler {
         loadFirstRoom(areaOne, areaTwo, onSuccess, onError);
     }
 
+    /**
+     * loads the first area file (the long files containing a graph and a list of all the rooms in an area),
+     * then calls onFirstRoomFileLoaded
+     *
+     * @param areaOne object containing info about one area ({..., filename: PT, ...}-type
+     * @param areaTwo object containing info about one area ({..., filename: PT, ...}-type
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     private void loadFirstRoom(JSONObject areaOne, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
          new AreaLevels().loadAreaFile(areaOne.getString("filename"),
                 s -> onFirstRoomFileLoaded(s, areaOne.getString("filename"), areaTwo, onSuccess, onError),
                 onError);
     }
 
+    /**
+     * selects a random room from the first area file and then continues the process (onSecondRoomFileLoaded)
+     *
+     * @param areaOneFile the long files containing a graph and a list of all the rooms in an area
+     * @param areaOneName name of the first area (e.g. "PT")
+     * @param areaTwo object containing info about one area ({..., filename: PT, ...}-type
+     * @param onSuccess success callback
+     * @param onError error callback
+     */
     private void onFirstRoomFileLoaded(String areaOneFile, String areaOneName, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
         JSONObject areaFile = new JSONObject(areaOneFile);
         JSONObject roomId = getRandomRoomId(areaOneName, areaFile);
@@ -95,6 +155,13 @@ public class SessionCreation implements ServletRequestHandler {
 
     }
 
+    /**
+     *
+     * @param roomOne data about the "start" room, which has already been selected.
+     * @param areaTwoFile the long files containing a graph and a list of all the rooms in an area
+     * @param areaTwoName name of the second area (e.g. "PT")
+     * @param onSuccess success callback
+     */
     private void onSecondRoomFileLoaded(JSONObject roomOne, String areaTwoFile, String areaTwoName, Consumer<JSONObject[]> onSuccess) {
         JSONObject areaFile = new JSONObject(areaTwoFile);
         JSONObject roomTwo = getRandomRoomId(areaTwoName, areaFile);
@@ -102,6 +169,14 @@ public class SessionCreation implements ServletRequestHandler {
         onSuccess.accept(new JSONObject[]{roomOne, roomTwo});
     }
 
+    /**
+     * Selects a random (valid) room from the file, builds a JSONObject containing its data and returns that.
+     * <em>valid</em> means that the room has to have a roomid.
+     *
+     * @param areaName name of an area (e.g. "PT")
+     * @param areaFile the long files containing a graph and a list of all the rooms in an area
+     * @return a {roomid: string, area: string, level: int}-type JSON object
+     */
     private JSONObject getRandomRoomId(String areaName, JSONObject areaFile) {
         String xml = areaFile.getString("xml");
         JSONObject graph = XML.toJSONObject(xml).getJSONObject("graph");
