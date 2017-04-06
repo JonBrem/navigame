@@ -278,7 +278,7 @@ public class Download {
 //    (in einer anderen Klasse)
 
     public void downloadFile(String url) {       
-        Download.start(url,
+        Download.startDownload(url,
             downloadedText -> { // &lt;- lambdas für onSuccess...
                 // do something
             },
