@@ -2,6 +2,7 @@ package de.ur.iw.navigame.data_download;
 
 import de.ur.iw.navigame.utility.FileDownload;
 import de.ur.iw.navigame.utility.FileStorage;
+import de.ur.iw.navigame.utility.J7Consumer;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * Request handler that is responsible for downloading &amp; showing the levels / storeys in a given area.
@@ -25,12 +25,22 @@ public class AreaLevels implements ServletRequestHandler {
      * @param response response that will receive the output / feedback.
      */
     @Override
-    public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        String whichArea = params.get("which_area")[0];
+    public void handleRequest(Map<String, String[]> params, final HttpServletResponse response) {
+        final String whichArea = params.get("which_area")[0];
 
         loadAreaFile(whichArea,
-                s -> onAreaFileLoaded(whichArea, s, response),
-                v -> onDownloadError(response));
+                new J7Consumer<String>() {
+                    @Override
+                    public void accept(String val) {
+                        onAreaFileLoaded(whichArea, val, response);
+                    }
+                },
+                new J7Consumer<Void>() {
+                    @Override
+                    public void accept(Void val) {
+                        onDownloadError(response);
+                    }
+                });
     }
 
     /**
@@ -41,7 +51,7 @@ public class AreaLevels implements ServletRequestHandler {
      * @param onSuccess callback for when everything went okay
      * @param onError callback for if there was an error
      */
-    public void loadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
+    public void loadAreaFile(String whichArea, J7Consumer<String> onSuccess, J7Consumer<Void> onError) {
         if (FileStorage.fileExists("area_" + whichArea + ".json")) {
             FileStorage.loadFile("area_" + whichArea + ".json", onSuccess, onError);
         } else {
@@ -56,11 +66,14 @@ public class AreaLevels implements ServletRequestHandler {
      * @param onSuccess callback for when everything went okay
      * @param onError callback for if there was an error
      */
-    private void downloadAreaFile(String whichArea, Consumer<String> onSuccess, Consumer<Void> onError) {
+    private void downloadAreaFile(final String whichArea, final J7Consumer<String> onSuccess, J7Consumer<Void> onError) {
         new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?getxml=" + whichArea,
-                s -> {
-                    FileStorage.storeFile("area_" + whichArea + ".json", s);
-                    onSuccess.accept(s);
+                new J7Consumer<String>() {
+                    @Override
+                    public void accept(String val) {
+                        FileStorage.storeFile("area_" + whichArea + ".json", val);
+                        onSuccess.accept(val);
+                    }
                 }, onError);
     }
 
@@ -98,8 +111,8 @@ public class AreaLevels implements ServletRequestHandler {
      *                     and what is next. index is of the "level"-array.
      * @param response response that is being passed around to avoid conflicts with multiple simultaneous requests.
      */
-    private void recursiveImageDownload(String whichArea, JSONObject object, int currentIndex,
-                                        HttpServletResponse response) {
+    private void recursiveImageDownload(final String whichArea, final JSONObject object, final int currentIndex,
+                                        final HttpServletResponse response) {
         JSONArray arr = object.getJSONObject("graph").getJSONArray("level");
 
         if (arr.length() <= currentIndex) {
@@ -112,9 +125,19 @@ public class AreaLevels implements ServletRequestHandler {
                 recursiveImageDownload(whichArea, object, currentIndex + 1, response);
             } else {
                 new FileDownload().downloadImage("http://urwalking.ur.de:8080/routing/Router?getimage&xmlfile=" +
-                        whichArea + "&levelid=" + levelObject.getInt("id"),
-                        data -> storeImageFile(data, whichArea, object, currentIndex, response),
-                        v -> onDownloadError(response));
+                                whichArea + "&levelid=" + levelObject.getInt("id"),
+                        new J7Consumer<byte[]>() { // on success
+                            @Override
+                            public void accept(byte[] data) {
+                                storeImageFile(data, whichArea, object, currentIndex, response);
+                            }
+                        },
+                        new J7Consumer<Void>() { // on error
+                            @Override
+                            public void accept(Void val) {
+                                onDownloadError(response);
+                            }
+                        });
             }
         }
     }

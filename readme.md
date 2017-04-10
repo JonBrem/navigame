@@ -301,6 +301,10 @@ Alle Klassen befinden sich im navigame-Namespace, welcher in navigameapp.js defi
 
 ### Server: Lambdas
 
+```diff
+- ACHTUNG: Da der Server Java 8 nicht unterstützt hat, wurde als schneller Workaround ein eigenes "J7Consumer<T>"-interface implementiert. Das löst dieselbe Aufgabe eines "universellen Callbacks", bietet jedoch keine der Syntaxfunktionen mit den Pfeilen. Es empfiehlt sich trotzdem, diesen Text zu lesen.
+```
+
 Im Java-Teil des Projekts werden Consumer<T> verwendet. Diese erlauben es, Funktionen als Parameter zu übergeben und "anonyme" Funktionen zu erstellen.
 Angenommen, man möchte eine Funktion aufrufen, wenn ein Prozess, der im Hintergrund läuft (z.B. ein Download), abgeschlossen ist.
 Dann könnte man folgendes tun:

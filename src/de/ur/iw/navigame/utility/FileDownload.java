@@ -3,7 +3,6 @@ package de.ur.iw.navigame.utility;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.function.Consumer;
 
 /**
  * Enables downloading files to this server (has nothing to do with the client - Tomcat takes care of
@@ -18,7 +17,7 @@ public class FileDownload {
      * @param onSuccess callback when the download is complete
      * @param onFail callback when there is an error
      */
-    public void download(String webAddress, Consumer<String> onSuccess, Consumer<Void> onFail) {
+    public void download(String webAddress, J7Consumer<String> onSuccess, J7Consumer<Void> onFail) {
         try {
             URLConnection connection = getUrlConnection(webAddress);
             BufferedReader br = getReader(connection);
@@ -33,14 +32,14 @@ public class FileDownload {
     }
 
     /**
-     * Downloads an file to a byte-array. Strings don't work for this, so the {@link FileDownload#download(String, Consumer, Consumer)}-method
+     * Downloads an file to a byte-array. Strings don't work for this, so the {@link FileDownload#download(String, J7Consumer, J7Consumer)}-method
      * does not work (unless for .svg-files).
      *
      * @param webAddress url of the file to download
      * @param onSuccess callback when the download is complete
      * @param onFail callback when there is an error
      */
-    public void downloadImage(String webAddress, Consumer<byte[]> onSuccess, Consumer<Void> onFail) {
+    public void downloadImage(String webAddress, J7Consumer<byte[]> onSuccess, J7Consumer<Void> onFail) {
         try {
             URL url = new URL(webAddress);
             InputStream in = new BufferedInputStream(url.openStream());

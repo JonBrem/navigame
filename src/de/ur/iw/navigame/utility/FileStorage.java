@@ -2,7 +2,6 @@ package de.ur.iw.navigame.utility;
 
 import javax.servlet.ServletContext;
 import java.io.*;
-import java.util.function.Consumer;
 
 /**
  * Helper class that facilitates storing and loading files.
@@ -72,7 +71,7 @@ public class FileStorage {
      * @param onSuccess success callback, will receive the contents of the file
      * @param onFail error callback
      */
-    public static void loadFile(String name, Consumer<String> onSuccess, Consumer<Void> onFail) {
+    public static void loadFile(String name, J7Consumer<String> onSuccess, J7Consumer<Void> onFail) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(getPath() + name));
             StringBuilder b = new StringBuilder();

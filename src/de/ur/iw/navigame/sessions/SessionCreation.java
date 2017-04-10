@@ -2,6 +2,7 @@ package de.ur.iw.navigame.sessions;
 
 import de.ur.iw.navigame.data_download.AreaLevels;
 import de.ur.iw.navigame.data_download.UniversityAreas;
+import de.ur.iw.navigame.utility.J7Consumer;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * The SessionCreation initiates a new session of the game by creating a unique ID
@@ -33,15 +33,25 @@ public class SessionCreation implements ServletRequestHandler {
      * @param response response that will receive the output / feedback.
      */
     @Override
-    public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        pickRandomPointsInMaps(objects -> {
-            try {
-                sendSessionInfoToClient(response, objects);
-            } catch (IOException e) {
-                sendErrorToClient(response, e);
-            }
-        },
-        v -> sendErrorToClient(response, new IOException("")));
+    public void handleRequest(Map<String, String[]> params, final HttpServletResponse response) {
+        pickRandomPointsInMaps(
+                new J7Consumer<JSONObject[]>() { // on Success
+                   @Override
+                   public void accept(JSONObject[] val) {
+                       try {
+                           sendSessionInfoToClient(response, val);
+                       } catch (IOException e) {
+                           sendErrorToClient(response, e);
+                       }
+
+                   }
+               },
+                new J7Consumer<Void>() { // on Error
+                    @Override
+                    public void accept(Void val) {
+                        sendErrorToClient(response, new IOException(""));
+                    }
+                });
     }
 
     /**
@@ -86,8 +96,14 @@ public class SessionCreation implements ServletRequestHandler {
      * @param onSuccess success callback
      * @param onError error callback
      */
-    private void pickRandomPointsInMaps(Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
-        new UniversityAreas().loadAreasFile((String s) -> onAreasFileLoaded(s, onSuccess, onError), onError);
+    private void pickRandomPointsInMaps(final J7Consumer<JSONObject[]> onSuccess, final J7Consumer<Void> onError) {
+        new UniversityAreas().loadAreasFile(
+                new J7Consumer<String>() {
+                    @Override
+                    public void accept(String val) {
+                        onAreasFileLoaded(val, onSuccess, onError);
+                    }
+                }, onError);
     }
 
     /**
@@ -98,7 +114,7 @@ public class SessionCreation implements ServletRequestHandler {
      * @param onSuccess success callback
      * @param onError error callback
      */
-    private void onAreasFileLoaded(String jsonContents, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
+    private void onAreasFileLoaded(String jsonContents, J7Consumer<JSONObject[]> onSuccess, J7Consumer<Void> onError) {
         JSONObject areasFile = new JSONObject(jsonContents);
         JSONArray areasData = new UniversityAreas().readAreasFromFile(areasFile);
 
@@ -130,10 +146,15 @@ public class SessionCreation implements ServletRequestHandler {
      * @param onSuccess success callback
      * @param onError error callback
      */
-    private void loadFirstRoom(JSONObject areaOne, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
+    private void loadFirstRoom(final JSONObject areaOne, final JSONObject areaTwo, final J7Consumer<JSONObject[]> onSuccess, final J7Consumer<Void> onError) {
          new AreaLevels().loadAreaFile(areaOne.getString("filename"),
-                s -> onFirstRoomFileLoaded(s, areaOne.getString("filename"), areaTwo, onSuccess, onError),
-                onError);
+                 new J7Consumer<String>() {
+                     @Override
+                     public void accept(String val) {
+                         onFirstRoomFileLoaded(val, areaOne.getString("filename"), areaTwo, onSuccess, onError);
+                     }
+                 },
+                 onError);
     }
 
     /**
@@ -145,12 +166,17 @@ public class SessionCreation implements ServletRequestHandler {
      * @param onSuccess success callback
      * @param onError error callback
      */
-    private void onFirstRoomFileLoaded(String areaOneFile, String areaOneName, JSONObject areaTwo, Consumer<JSONObject[]> onSuccess, Consumer<Void> onError) {
+    private void onFirstRoomFileLoaded(String areaOneFile, String areaOneName, final JSONObject areaTwo, final J7Consumer<JSONObject[]> onSuccess, J7Consumer<Void> onError) {
         JSONObject areaFile = new JSONObject(areaOneFile);
-        JSONObject roomId = getRandomRoomId(areaOneName, areaFile);
+        final JSONObject roomId = getRandomRoomId(areaOneName, areaFile);
 
         new AreaLevels().loadAreaFile(areaTwo.getString("filename"),
-                s -> onSecondRoomFileLoaded(roomId, s, areaTwo.getString("filename"), onSuccess),
+                new J7Consumer<String>() {
+                    @Override
+                    public void accept(String val) {
+                        onSecondRoomFileLoaded(roomId, val, areaTwo.getString("filename"), onSuccess);
+                    }
+                },
                 onError);
 
     }
@@ -162,7 +188,7 @@ public class SessionCreation implements ServletRequestHandler {
      * @param areaTwoName name of the second area (e.g. "PT")
      * @param onSuccess success callback
      */
-    private void onSecondRoomFileLoaded(JSONObject roomOne, String areaTwoFile, String areaTwoName, Consumer<JSONObject[]> onSuccess) {
+    private void onSecondRoomFileLoaded(JSONObject roomOne, String areaTwoFile, String areaTwoName, J7Consumer<JSONObject[]> onSuccess) {
         JSONObject areaFile = new JSONObject(areaTwoFile);
         JSONObject roomTwo = getRandomRoomId(areaTwoName, areaFile);
 

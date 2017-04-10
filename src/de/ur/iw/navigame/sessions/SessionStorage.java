@@ -1,6 +1,7 @@
 package de.ur.iw.navigame.sessions;
 
 import de.ur.iw.navigame.utility.FileStorage;
+import de.ur.iw.navigame.utility.J7Consumer;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
 import org.json.JSONObject;
 
@@ -60,17 +61,25 @@ public class SessionStorage implements ServletRequestHandler {
      * @param params must contain a "path_id" key, which is the {@link java.util.UUID} of the session.
      * @param response response that will receive the output / feedback.
      */
-    private void loadSession(Map<String, String[]> params, HttpServletResponse response) {
+    private void loadSession(Map<String, String[]> params, final HttpServletResponse response) {
         String pathId = params.get("path_id")[0];
 
         if (FileStorage.fileExists("session" + pathId + ".txt")) {
             FileStorage.loadFile("session" + pathId + ".txt",
-                    s -> printSession(s, response),
-                    v -> {
-                        try {
-                            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    new J7Consumer<String>() {
+                        @Override
+                        public void accept(String val) {
+                            printSession(val, response);
+                        }
+                    },
+                    new J7Consumer<Void>() {
+                        @Override
+                        public void accept(Void val) {
+                            try {
+                                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
         } else {

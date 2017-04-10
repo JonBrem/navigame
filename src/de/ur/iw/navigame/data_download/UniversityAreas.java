@@ -2,6 +2,7 @@ package de.ur.iw.navigame.data_download;
 
 import de.ur.iw.navigame.utility.FileDownload;
 import de.ur.iw.navigame.utility.FileStorage;
+import de.ur.iw.navigame.utility.J7Consumer;
 import de.ur.iw.navigame.utility.ServletRequestHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,7 +12,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * Request Handler that can print a list of possible areas for maps to the client.
@@ -27,9 +27,19 @@ public class UniversityAreas implements ServletRequestHandler{
      * @param response response that will receive the output / feedback.
      */
     @Override
-    public void handleRequest(Map<String, String[]> params, HttpServletResponse response) {
-        loadAreasFile(s -> readAndPrintAreasInfo(s, response),
-                v -> onDownloadError(response));
+    public void handleRequest(Map<String, String[]> params, final HttpServletResponse response) {
+        loadAreasFile(new J7Consumer<String>() {
+                          @Override
+                          public void accept(String val) {
+                              readAndPrintAreasInfo(val, response);
+                          }
+                      },
+                new J7Consumer<Void>() {
+                    @Override
+                    public void accept(Void val) {
+                        onDownloadError(response);
+                    }
+                });
     }
 
     /**
@@ -40,7 +50,7 @@ public class UniversityAreas implements ServletRequestHandler{
      * @param onSuccess success callback
      * @param onError error callback
      */
-    public void loadAreasFile(Consumer<String> onSuccess, Consumer<Void> onError) {
+    public void loadAreasFile(J7Consumer<String> onSuccess, J7Consumer<Void> onError) {
         if (FileStorage.fileExists(UNI_AREAS_FILE_NAME)) {
             FileStorage.loadFile(UNI_AREAS_FILE_NAME, onSuccess, onError);
         } else {
@@ -54,11 +64,14 @@ public class UniversityAreas implements ServletRequestHandler{
      * @param onSuccessfulDownload success callback
      * @param onError error callback
      */
-    private void downloadAreasFile(Consumer<String> onSuccessfulDownload, Consumer<Void> onError) {
+    private void downloadAreasFile(final J7Consumer<String> onSuccessfulDownload, J7Consumer<Void> onError) {
         new FileDownload().download("http://urwalking.ur.de:8080/routing/Router?xmlareas",
-                s -> {
-                    onAreasFileLoaded(s);
-                    onSuccessfulDownload.accept(s);
+                new J7Consumer<String>() {
+                    @Override
+                    public void accept(String val) {
+                        onAreasFileLoaded(val);
+                        onSuccessfulDownload.accept(val);
+                    }
                 }, onError);
     }
 
