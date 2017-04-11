@@ -355,7 +355,15 @@ navigame.MapControls = (function () {
      * @memberof MapControls
      */
     MapControls.prototype._onScroll = function (e) {
-        this._canvasManager.zoomBy(e.originalEvent.wheelDelta / Math.abs(e.originalEvent.wheelDelta) * 0.3,
+        let value = 0;
+        if ("wheelDelta" in e.originalEvent) {
+            value = e.originalEvent.wheelDelta;
+        } else if ("deltaY" in e.originalEvent) {
+            value = -e.originalEvent.deltaY;
+        }
+        value = value / ((value == 0)? 1 : Math.abs(value));
+
+        this._canvasManager.zoomBy(value * 0.3,
          {
             x: e.originalEvent.offsetX,
             y: e.originalEvent.offsetY
