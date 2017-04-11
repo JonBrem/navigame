@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="war" name="Navigationsspiel:war exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/Navigationsspiel_war_exploded</output-path>
-    <root id="archive" name="Navigationsspiel_war exploded.war">
+  <artifact type="war" name="navigame">
+    <output-path>$PROJECT_DIR$/out/artifacts/navigame</output-path>
+    <root id="archive" name="navigame.war">
       <element id="javaee-facet-resources" facet="Navigationsspiel/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
