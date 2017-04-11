@@ -11,16 +11,29 @@ import java.net.URLConnection;
 public class FileDownload {
 
     /**
-     * Downloads a file to a String.
+     * Downloads a file to a String. Uses UTF-8 encoding (see {@link FileDownload#download(String, J7Consumer, J7Consumer, String)}
+     * if you want to specify another encoding);
      *
      * @param webAddress url of the file to download
      * @param onSuccess callback when the download is complete
      * @param onFail callback when there is an error
      */
     public void download(String webAddress, J7Consumer<String> onSuccess, J7Consumer<Void> onFail) {
+        this.download(webAddress, onSuccess, onFail, "UTF-8");
+    }
+
+    /**
+     * Downloads a file to a String.
+     *
+     * @param webAddress url of the file to download
+     * @param onSuccess callback when the download is complete
+     * @param onFail callback when there is an error
+     * @param encoding Character encoding
+     */
+    public void download(String webAddress, J7Consumer<String> onSuccess, J7Consumer<Void> onFail, String encoding) {
         try {
             URLConnection connection = getUrlConnection(webAddress);
-            BufferedReader br = getReader(connection);
+            BufferedReader br = getReader(connection, encoding);
 
             StringBuilder toReturn = readLines(br);
             onSuccess.accept(toReturn.toString());
@@ -82,9 +95,9 @@ public class FileDownload {
      * @param connection connection for which to create the reader.
      * @return reader for output from the URLConnection.
      */
-    private BufferedReader getReader(URLConnection connection) throws IOException {
+    private BufferedReader getReader(URLConnection connection, String encoding) throws IOException {
         InputStream is = connection.getInputStream();
-        return new BufferedReader(new InputStreamReader((is)));
+        return new BufferedReader(new InputStreamReader(is, encoding));
     }
 
     /**
@@ -96,6 +109,7 @@ public class FileDownload {
     private URLConnection getUrlConnection(String webAddress) throws IOException {
         URL url = new URL(webAddress);
         URLConnection connection = url.openConnection();
+
         connection.setDoOutput(true);
         connection.setConnectTimeout(1500);
         connection.connect();

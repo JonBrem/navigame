@@ -67,6 +67,7 @@ body > * {
 
 .map_item img {
     max-height: 150px;
+    max-width: 200px;
 }
 
 #marker_fill_rest > .row {

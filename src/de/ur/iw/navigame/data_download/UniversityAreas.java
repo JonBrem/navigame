@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,7 +74,7 @@ public class UniversityAreas implements ServletRequestHandler{
                         onAreasFileLoaded(val);
                         onSuccessfulDownload.accept(val);
                     }
-                }, onError);
+                }, onError, "windows-1252");
     }
 
     /**
@@ -96,7 +98,7 @@ public class UniversityAreas implements ServletRequestHandler{
 
         try {
             PrintWriter responseWriter = response.getWriter();
-            responseWriter.write(responseArray.toString());
+            responseWriter.write(new String(responseArray.toString().getBytes("UTF-8")));
             responseWriter.flush();
             responseWriter.close();
         } catch (IOException e) {
